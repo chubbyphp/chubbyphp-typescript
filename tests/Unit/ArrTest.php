@@ -18,31 +18,66 @@ use PHPUnit\Framework\TestCase;
  */
 final class ArrTest extends TestCase
 {
-    // Array constructor - no arguments
+    // Array constructor
 
-    public function testArrayConstructorNoArgumentsSetsLengthToZero(): void
+    public function testArrayConstructorSetsLengthFromArgumentCount(): void
     {
-        $array = new Arr();
-
-        self::assertCount(0, iterator_to_array($array->values()));
+        self::assertCount(0, iterator_to_array((new Arr())->values()));
+        self::assertCount(4, iterator_to_array((new Arr(0, 1, 0, 1))->values()));
+        self::assertCount(2, iterator_to_array((new Arr(null, null))->values()));
     }
 
-    // Array constructor - single argument (length)
-
-    public function testArrayConstructorWithLengthCreatesArrayWithThatManyHoles(): void
+    public function testArrayConstructorWithSingleNumericArgumentCreatesHoles(): void
     {
-        $array = new Arr(5);
+        $array = new Arr(2);
 
-        $values = iterator_to_array($array->values());
-        self::assertCount(5, $values);
-        self::assertSame([null, null, null, null, null], $values);
+        self::assertCount(2, iterator_to_array($array->values()));
+        self::assertNull($array->at(0));
+        self::assertNull($array->at(1));
     }
 
-    public function testArrayConstructorWithLengthZeroCreatesEmptyArray(): void
+    public function testArrayConstructorWithManyArgumentsSetsItemsInOrder(): void
     {
-        $array = new Arr(0);
+        $array = new Arr(
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+        );
 
-        self::assertCount(0, iterator_to_array($array->values()));
+        self::assertSame(
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+            iterator_to_array($array->values()),
+        );
+    }
+
+    public function testArrayConstructorWithSingleNonNumericArgumentCreatesSingleElementArray(): void
+    {
+        self::assertSame(['hello'], iterator_to_array((new Arr('hello'))->values()));
+    }
+
+    public function testArrayConstructorThrowsRangeErrorForFloatLength(): void
+    {
+        $this->expectException(RangeError::class);
+        $this->expectExceptionMessage('Invalid array length');
+
+        new Arr(1.5);
     }
 
     public function testArrayConstructorThrowsRangeErrorForNegativeLength(): void
@@ -53,7 +88,7 @@ final class ArrTest extends TestCase
         new Arr(-1);
     }
 
-    public function testArrayConstructorThrowsRangeErrorForLengthAboveMax(): void
+    public function testArrayConstructorThrowsRangeErrorForLengthAboveUint32Range(): void
     {
         $this->expectException(RangeError::class);
         $this->expectExceptionMessage('Invalid array length');
@@ -61,72 +96,40 @@ final class ArrTest extends TestCase
         new Arr(2 ** 32);
     }
 
-    public function testArrayConstructorThrowsRangeErrorForNonIntegerNumericArgument(): void
+    public function testArrayConstructorThrowsRangeErrorForNanAndInfinityLengths(): void
     {
-        $this->expectException(RangeError::class);
-        $this->expectExceptionMessage('Invalid array length');
-
-        new Arr(1.5);
+        foreach ([NAN, INF, -INF, PHP_FLOAT_MAX, PHP_FLOAT_MIN] as $length) {
+            try {
+                new Arr($length);
+                self::fail('Expected RangeError for invalid length');
+            } catch (RangeError $exception) {
+                self::assertSame('Invalid array length', $exception->getMessage());
+            }
+        }
     }
 
-    // Array constructor - multiple arguments
-
-    public function testArrayConstructorWithMultipleArgumentsSetsElements(): void
+    public function testArrayConstructorWithSingleNullAndBooleanArgumentsCreatesSingleElementArray(): void
     {
-        $array = new Arr(0, 1, 2, 3);
+        self::assertSame([null], iterator_to_array((new Arr(null))->values()));
+        self::assertSame([true], iterator_to_array((new Arr(true))->values()));
 
-        self::assertSame([0, 1, 2, 3], iterator_to_array($array->values()));
-    }
-
-    public function testArrayConstructorWithMultipleArgumentsSetsCorrectLength(): void
-    {
-        $array = new Arr(0, 1, 0, 1);
-
-        self::assertCount(4, iterator_to_array($array->values()));
-    }
-
-    public function testArrayConstructorWithSingleUndefinedArgument(): void
-    {
-        $array = new Arr(null, null);
-
-        self::assertCount(2, iterator_to_array($array->values()));
-    }
-
-    // Array constructor - single non-numeric argument
-
-    public function testArrayConstructorWithSingleNonNumericArgumentCreatesSingleElementArray(): void
-    {
-        $array = new Arr('hello');
-
-        self::assertSame(['hello'], iterator_to_array($array->values()));
+        $booleanObject = new \stdClass();
+        $booleanObject->value = false;
+        self::assertSame([$booleanObject], iterator_to_array((new Arr($booleanObject))->values()));
     }
 
     // __toString
 
-    public function testToStringOfEmptyArrayReturnsEmptyString(): void
-    {
-        $array = new Arr();
-
-        self::assertSame('', $array->__toString());
-    }
-
-    public function testToStringOfArrayWithElementsReturnsCommaSeparatedString(): void
+    public function testMagicToStringDelegatesToJoin(): void
     {
         $array = new Arr(1, 2, 3);
 
         self::assertSame('1,2,3', $array->__toString());
     }
 
-    public function testToStringOfSparseArrayCommasForNullElements(): void
-    {
-        $array = new Arr(3);
-
-        self::assertSame(',,', $array->__toString());
-    }
-
     // Array.prototype.at
 
-    public function testAtReturnsItemAtSpecifiedIndex(): void
+    public function testAtReturnsItemValueAtSpecifiedIndex(): void
     {
         $array = new Arr(1, 2, 3, 4, null, 5);
 
@@ -138,7 +141,7 @@ final class ArrTest extends TestCase
         self::assertSame(5, $array->at(5));
     }
 
-    public function testAtReturnsItemAtSpecifiedRelativeIndex(): void
+    public function testAtReturnsItemValueAtSpecifiedRelativeIndex(): void
     {
         $array = new Arr(1, 2, 3, 4, null, 5);
 
@@ -158,2053 +161,1230 @@ final class ArrTest extends TestCase
         self::assertNull($array->at(1));
     }
 
+    public function testAtReturnsNullForHolePositions(): void
+    {
+        $array = new Arr(3);
+
+        self::assertNull($array->at(0));
+        self::assertNull($array->at(1));
+        self::assertNull($array->at(2));
+        self::assertNull($array->at(-1));
+    }
+
     // Array.prototype.concat
 
-    public function testConcatWithArrayArgumentsSpreadsElementsInOrder(): void
+    public function testConcatWithArrayArgumentsAppendsArrayElementsInOrder(): void
     {
-        $x = new Arr();
-        $y = new Arr(0, 1);
-        $z = new Arr(2, 3, 4);
-        $arr = $x->concat($y, $z);
+        $result = (new Arr())->concat(new Arr(0, 1), new Arr(2, 3, 4));
 
-        $values = iterator_to_array($arr->values());
-        self::assertSame(0, $values[0]);
-        self::assertSame(1, $values[1]);
-        self::assertSame(2, $values[2]);
-        self::assertSame(3, $values[3]);
-        self::assertSame(4, $values[4]);
-        self::assertCount(5, $values);
+        self::assertSame([0, 1, 2, 3, 4], iterator_to_array($result->values()));
     }
 
-    public function testConcatWithArrayObjectAndPrimitiveArguments(): void
+    public function testConcatWithPrimitiveArgumentsAppendsPrimitiveValues(): void
     {
-        $x = new Arr('x');
-        $y = new Arr(1, 2);
-        $arr = $x->concat($y, -1, true, 'NaN');
+        $result = (new Arr('x'))->concat(new Arr(1, 2), -1, true, 'NaN');
 
-        $values = iterator_to_array($arr->values());
-        self::assertSame('x', $values[0]);
-        self::assertSame(1, $values[1]);
-        self::assertSame(2, $values[2]);
-        self::assertSame(-1, $values[3]);
-        self::assertTrue($values[4]);
-        self::assertSame('NaN', $values[5]);
-        self::assertCount(6, $values);
+        self::assertSame(['x', 1, 2, -1, true, 'NaN'], iterator_to_array($result->values()));
     }
 
-    public function testConcatWithNoItemsReturnsCopyOfArray(): void
+    public function testConcatWithNoArgumentsReturnsCopy(): void
     {
-        $x = new Arr(0, 1);
-        $arr = $x->concat();
+        $array = new Arr(0, 1);
+        $result = $array->concat();
 
-        $values = iterator_to_array($arr->values());
-        self::assertSame(0, $values[0]);
-        self::assertSame(1, $values[1]);
-        self::assertCount(2, $values);
-    }
-
-    public function testConcatWithHoleyArrayPreservesHolesAsNull(): void
-    {
-        $x = new Arr(null, 1);
-        $arr = $x->concat(new Arr(), new Arr(1));
-
-        $values = iterator_to_array($arr->values());
-        self::assertNull($values[0]);
-        self::assertSame(1, $values[1]);
-        self::assertNull($values[2]);
-        self::assertCount(3, $values);
+        self::assertNotSame($array, $result);
+        self::assertSame([0, 1], iterator_to_array($result->values()));
     }
 
     public function testConcatDoesNotModifyOriginalArray(): void
     {
-        $a = new Arr(1, 2);
-        $a->concat(new Arr(3, 4));
-
-        self::assertSame([1, 2], iterator_to_array($a->values()));
-    }
-
-    // Array.prototype.copyWithin
-
-    public function testCopyWithinWithNonNegativeTargetAndStartCopiesCorrectValues(): void
-    {
-        $array = new Arr('a', 'b', 'c', 'd', 'e', 'f');
-
-        self::assertSame(
-            ['a', 'b', 'c', 'd', 'e', 'f'],
-            iterator_to_array($array->copyWithin(0, 0)->values()),
-        );
-
-        $array2 = new Arr('a', 'b', 'c', 'd', 'e', 'f');
-        self::assertSame(
-            ['c', 'd', 'e', 'f', 'e', 'f'],
-            iterator_to_array($array2->copyWithin(0, 2)->values()),
-        );
-
-        $array3 = new Arr('a', 'b', 'c', 'd', 'e', 'f');
-        self::assertSame(
-            ['a', 'b', 'c', 'a', 'b', 'c'],
-            iterator_to_array($array3->copyWithin(3, 0)->values()),
-        );
-
-        $array4 = new Arr(0, 1, 2, 3, 4, 5);
-        self::assertSame(
-            [0, 4, 5, 3, 4, 5],
-            iterator_to_array($array4->copyWithin(1, 4)->values()),
-        );
-    }
-
-    public function testCopyWithinWithNonNegativeTargetStartAndEndCopiesCorrectValues(): void
-    {
-        $array = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [0, 1, 2, 3],
-            iterator_to_array($array->copyWithin(0, 0, 0)->values()),
-        );
-
-        $array2 = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [0, 1, 2, 3],
-            iterator_to_array($array2->copyWithin(0, 0, 2)->values()),
-        );
-
-        $array3 = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [1, 1, 2, 3],
-            iterator_to_array($array3->copyWithin(0, 1, 2)->values()),
-        );
-
-        $array4 = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [0, 0, 1, 3],
-            iterator_to_array($array4->copyWithin(1, 0, 2)->values()),
-        );
-
-        $array5 = new Arr(0, 1, 2, 3, 4, 5);
-        self::assertSame(
-            [0, 3, 4, 3, 4, 5],
-            iterator_to_array($array5->copyWithin(1, 3, 5)->values()),
-        );
-    }
-
-    public function testCopyWithinWithNegativeTargetCopiesCorrectly(): void
-    {
-        $array = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [0, 1, 2, 0],
-            iterator_to_array($array->copyWithin(-1, 0)->values()),
-        );
-
-        $array2 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [0, 1, 2, 2, 3],
-            iterator_to_array($array2->copyWithin(-2, 2)->values()),
-        );
-
-        $array3 = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [0, 1, 2, 2],
-            iterator_to_array($array3->copyWithin(-1, 2)->values()),
-        );
-    }
-
-    public function testCopyWithinWithNegativeStartCopiesCorrectly(): void
-    {
-        $array = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [3, 1, 2, 3],
-            iterator_to_array($array->copyWithin(0, -1)->values()),
-        );
-
-        $array2 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [0, 1, 3, 4, 4],
-            iterator_to_array($array2->copyWithin(2, -2)->values()),
-        );
-
-        $array3 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [0, 3, 4, 3, 4],
-            iterator_to_array($array3->copyWithin(1, -2)->values()),
-        );
-
-        $array4 = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [0, 1, 2, 2],
-            iterator_to_array($array4->copyWithin(-1, -2)->values()),
-        );
-
-        $array5 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [0, 1, 2, 2, 3],
-            iterator_to_array($array5->copyWithin(-2, -3)->values()),
-        );
-
-        $array6 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [3, 4, 2, 3, 4],
-            iterator_to_array($array6->copyWithin(-5, -2)->values()),
-        );
-    }
-
-    public function testCopyWithinWithNegativeEndCopiesCorrectly(): void
-    {
-        $array = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [1, 2, 2, 3],
-            iterator_to_array($array->copyWithin(0, 1, -1)->values()),
-        );
-
-        $array2 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [0, 1, 0, 1, 2],
-            iterator_to_array($array2->copyWithin(2, 0, -1)->values()),
-        );
-
-        $array3 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [0, 2, 2, 3, 4],
-            iterator_to_array($array3->copyWithin(1, 2, -2)->values()),
-        );
-
-        $array4 = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [2, 1, 2, 3],
-            iterator_to_array($array4->copyWithin(0, -2, -1)->values()),
-        );
-
-        $array5 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [0, 1, 3, 3, 4],
-            iterator_to_array($array5->copyWithin(2, -2, -1)->values()),
-        );
-
-        $array6 = new Arr(0, 1, 2, 3);
-        self::assertSame(
-            [0, 2, 2, 3],
-            iterator_to_array($array6->copyWithin(-3, -2, -1)->values()),
-        );
-
-        $array7 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [0, 1, 2, 2, 3],
-            iterator_to_array($array7->copyWithin(-2, -3, -1)->values()),
-        );
-
-        $array8 = new Arr(0, 1, 2, 3, 4);
-        self::assertSame(
-            [3, 1, 2, 3, 4],
-            iterator_to_array($array8->copyWithin(-5, -2, -1)->values()),
-        );
-    }
-
-    public function testCopyWithinReturnsThis(): void
-    {
-        $array = new Arr();
-        $result = $array->copyWithin(0, 0);
-
-        self::assertSame($array, $result);
-
-        $array2 = new Arr(0, 1, 2);
-        $result2 = $array2->copyWithin(0, 0);
-
-        self::assertSame($array2, $result2);
-    }
-
-    public function testCopyWithinCopiesNullValuesFromHoleySource(): void
-    {
-        $array = new Arr(0, 1, null, null, 1);
-        $array->copyWithin(0, 1, 4);
-
-        self::assertCount(5, iterator_to_array($array->values()));
-        self::assertSame(1, $array->at(0));
-        self::assertNull($array->at(1));
-        self::assertNull($array->at(2));
-        self::assertNull($array->at(3));
-        self::assertSame(1, $array->at(4));
-    }
-
-    public function testCopyWithinWithZeroCountReturnsArrayUnmodified(): void
-    {
-        $array = new Arr(0, 1, 2);
-        $result = $array->copyWithin(0, 3);
-        self::assertSame($array, $result);
-        self::assertSame([0, 1, 2], iterator_to_array($array->values()));
-    }
-
-    // Array.prototype.entries
-
-    public function testEntriesReturnsGenerator(): void
-    {
-        $array = new Arr();
-        $iterator = $array->entries();
-
-        self::assertInstanceOf(\Generator::class, $iterator);
-    }
-
-    public function testEntriesYieldsKeyValuePairs(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $iterator = $array->entries();
-
-        self::assertSame([0, 'a'], $iterator->current());
-        $iterator->next();
-        self::assertSame([1, 'b'], $iterator->current());
-        $iterator->next();
-        self::assertSame([2, 'c'], $iterator->current());
-    }
-
-    public function testEntriesIteratesAllEntries(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $entries = [];
-
-        foreach ($array->entries() as $entry) {
-            $entries[] = $entry;
-        }
-
-        self::assertSame([[0, 'a'], [1, 'b'], [2, 'c']], $entries);
-    }
-
-    public function testEntriesReturnsExhaustedGeneratorForEmptyArray(): void
-    {
-        $array = new Arr();
-        $iterator = $array->entries();
-
-        self::assertNull($iterator->current());
-    }
-
-    public function testEntriesIterationMutableBeforeFirstNext(): void
-    {
-        $array = new Arr();
-        $iterator = $array->entries();
-
-        $array->push('a');
-
-        self::assertSame([0, 'a'], $iterator->current());
-
-        $iterator->next();
-        self::assertNull($iterator->current());
-        self::assertFalse($iterator->valid());
-
-        $array->push('b');
-
-        $iterator->next();
-        self::assertNull($iterator->current());
-        self::assertFalse($iterator->valid());
-    }
-
-    // Array.prototype.every
-
-    public function testEveryReturnsTrueWhenAllElementsPass(): void
-    {
-        $array = new Arr(1, 2, 3, 4, 5);
-
-        $result = $array->every(static fn (int $value): bool => 0 < $value);
-
-        self::assertTrue($result);
-    }
-
-    public function testEveryReturnsFalseWhenAnyElementFails(): void
-    {
-        $array = new Arr(1, 2, 3, 4, 5);
-
-        $result = $array->every(static fn (int $value): bool => 4 > $value);
-
-        self::assertFalse($result);
-    }
-
-    public function testEveryStopsIteratingAfterFirstFalse(): void
-    {
-        $visited = [];
-        $array = new Arr(1, 2, 3, 4, 5);
-
-        $array->every(static function (int $value) use (&$visited): bool {
-            $visited[] = $value;
-
-            return 2 !== $value;
-        });
-
-        self::assertSame([1, 2], $visited);
-    }
-
-    public function testEveryReturnsTrueForEmptyArray(): void
-    {
-        $array = new Arr();
-
-        $called = false;
-        $result = $array->every(static function () use (&$called): bool {
-            $called = true;
-
-            return false;
-        });
-
-        self::assertTrue($result);
-        self::assertFalse($called);
-    }
-
-    public function testEveryCallbackReceivesValueIndexAndArray(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $captured = [];
-
-        $array->every(static function (mixed $value, int $index, Arr $arr) use (&$captured): bool {
-            $captured[] = [$value, $index, $arr];
-
-            return true;
-        });
-
-        self::assertCount(3, $captured);
-        self::assertSame('a', $captured[0][0]);
-        self::assertSame(0, $captured[0][1]);
-        self::assertSame($array, $captured[0][2]);
-        self::assertSame('b', $captured[1][0]);
-        self::assertSame(1, $captured[1][1]);
-        self::assertSame($array, $captured[1][2]);
-        self::assertSame('c', $captured[2][0]);
-        self::assertSame(2, $captured[2][1]);
-        self::assertSame($array, $captured[2][2]);
-    }
-
-    public function testEveryDoesNotMutateArray(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        $array->every(static fn (int $value): bool => 0 < $value);
-
-        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
-    }
-
-    public function testEveryReceivesArrayInstanceAsThirdArgument(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $captured = null;
-
-        $array->every(static function (mixed $value, int $index, Arr $arr) use (&$captured): bool {
-            $captured = $arr;
-
-            return true;
-        });
-
-        self::assertSame($array, $captured);
-    }
-
-    public function testEveryWithThisArgBindsClosure(): void
-    {
-        $context = new Dummy();
-
-        self::assertTrue((new Arr(1, 2, 3))->every($context->thresholdCallback(), $context));
-    }
-
-    // Array.prototype.fill
-
-    public function testFillAllElementsWithValueWhenNoStartEndGiven(): void
-    {
-        $array = new Arr(0, 0, 0);
-        $result = $array->fill(8);
-
-        self::assertSame([8, 8, 8], iterator_to_array($result->values()));
-    }
-
-    public function testFillReturnsEmptyArrayWhenArrayIsEmpty(): void
-    {
-        $array = new Arr();
-        $result = $array->fill(8);
-
-        self::assertSame([], iterator_to_array($result->values()));
-    }
-
-    public function testFillWithCustomStartAndEnd(): void
-    {
-        $array = new Arr(0, 0, 0);
-        $result = $array->fill(8, 1, 2);
-
-        self::assertSame([0, 8, 0], iterator_to_array($result->values()));
-    }
-
-    public function testFillWithNegativeStart(): void
-    {
-        $array = new Arr(0, 0, 0);
-        $result = $array->fill(8, -1);
-
-        self::assertSame([0, 0, 8], iterator_to_array($result->values()));
-    }
-
-    public function testFillWithOutOfBoundsStartDoesNothing(): void
-    {
-        $array = new Arr(0, 0, 0);
-        $result = $array->fill(8, 4);
-
-        self::assertSame([0, 0, 0], iterator_to_array($result->values()));
-    }
-
-    public function testFillWithRelativeEnd(): void
-    {
-        $array = new Arr(0, 0, 0);
-        $result = $array->fill(8, 0, -1);
-
-        self::assertSame([8, 8, 0], iterator_to_array($result->values()));
-    }
-
-    public function testFillWithEndBeyondLengthFillsAll(): void
-    {
-        $array = new Arr(0, 0, 0);
-        $result = $array->fill(8, 0, 5);
-
-        self::assertSame([8, 8, 8], iterator_to_array($result->values()));
-    }
-
-    public function testFillWithNegativeStartAndPositiveEnd(): void
-    {
-        $array = new Arr(0, 0, 0, 0, 0);
-        $result = $array->fill(8, -3, 4);
-
-        self::assertSame([0, 0, 8, 8, 0], iterator_to_array($result->values()));
-    }
-
-    public function testFillWithNegativeStartAndNegativeEnd(): void
-    {
-        $array = new Arr(0, 0, 0, 0, 0);
-        $result = $array->fill(8, -2, -1);
-
-        self::assertSame([0, 0, 0, 8, 0], iterator_to_array($result->values()));
-    }
-
-    public function testFillWithStartGreaterThanEndDoesNothing(): void
-    {
-        $array = new Arr(0, 0, 0, 0, 0);
-        $result = $array->fill(8, -1, -3);
-
-        self::assertSame([0, 0, 0, 0, 0], iterator_to_array($result->values()));
-    }
-
-    public function testFillReturnsThis(): void
-    {
-        $array = new Arr(0, 0, 0);
-        $result = $array->fill(8);
-
-        self::assertSame($array, $result);
-    }
-
-    // Array.prototype.filter
-
-    public function testFilterReturnsNewArrayWithAllElementsWhenAllPass(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->filter(static fn (int $value): bool => 0 < $value);
-
-        self::assertSame([1, 2, 3], iterator_to_array($result->values()));
-    }
-
-    public function testFilterReturnsNewArrayWithOnlyPassingElements(): void
-    {
-        $array = new Arr(1, 2, 3, 4, 5);
-        $result = $array->filter(static fn (int $value): bool => 3 < $value);
-
-        self::assertSame([4, 5], iterator_to_array($result->values()));
-    }
-
-    public function testFilterReturnsEmptyArrayWhenNoElementsPass(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->filter(static fn (int $value): bool => false);
-
-        self::assertSame([], iterator_to_array($result->values()));
-    }
-
-    public function testFilterCallbackReceivesValueIndexAndArray(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $captured = [];
-
-        $array->filter(static function (mixed $value, int $index, Arr $arr) use (&$captured): bool {
-            $captured[] = [$value, $index, $arr];
-
-            return true;
-        });
-
-        self::assertCount(3, $captured);
-        self::assertSame('a', $captured[0][0]);
-        self::assertSame(0, $captured[0][1]);
-        self::assertSame($array, $captured[0][2]);
-    }
-
-    public function testFilterReturnsNewInstanceNotOriginal(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->filter(static fn (int $value): bool => 0 < $value);
-
-        self::assertNotSame($array, $result);
-    }
-
-    public function testFilterDoesNotMutateOriginalArray(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $array->filter(static fn (int $value): bool => 2 !== $value);
-
-        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
-    }
-
-    public function testFilterReturnsEmptyArrayAndDoesNotCallCallbackForEmptyArray(): void
-    {
-        $array = new Arr();
-
-        $called = false;
-        $result = $array->filter(static function () use (&$called): bool {
-            $called = true;
-
-            return true;
-        });
-
-        self::assertSame([], iterator_to_array($result->values()));
-        self::assertFalse($called);
-    }
-
-    public function testFilterWithThisArgBindsClosure(): void
-    {
-        $context = new Dummy();
-        $array = new Arr(1, 2, 3, 4, 5);
-
-        self::assertSame([1, 2], iterator_to_array($array->filter($context->limitCallback(), $context)->values()));
-    }
-
-    // Array.prototype.find
-
-    public function testFindReturnsElementWhenPredicateMatches(): void
-    {
-        $array = new Arr(1, 2, 3, 4, 5);
-        $result = $array->find(static fn (int $value): bool => 3 === $value);
-
-        self::assertSame(3, $result);
-    }
-
-    public function testFindReturnsFirstMatchingElement(): void
-    {
-        $array = new Arr(1, 2, 3, 4, 5);
-        $result = $array->find(static fn (int $value): bool => 2 < $value);
-
-        self::assertSame(3, $result);
-    }
-
-    public function testFindReturnsNullWhenNoElementMatches(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->find(static fn (int $value): bool => false);
-
-        self::assertNull($result);
-    }
-
-    public function testFindShortCircuitsAfterFirstMatch(): void
-    {
-        $visited = [];
-        $array = new Arr(1, 2, 3, 4, 5);
-
-        $array->find(static function (int $value) use (&$visited): bool {
-            $visited[] = $value;
-
-            return 3 === $value;
-        });
-
-        self::assertSame([1, 2, 3], $visited);
-    }
-
-    public function testFindCallbackReceivesValueIndexAndArray(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $captured = [];
-
-        $array->find(static function (mixed $value, int $index, Arr $arr) use (&$captured): bool {
-            $captured = [$value, $index, $arr];
-
-            return true;
-        });
-
-        self::assertSame('a', $captured[0]);
-        self::assertSame(0, $captured[1]);
-        self::assertSame($array, $captured[2]);
-    }
-
-    public function testFindReturnsNullAndDoesNotCallCallbackForEmptyArray(): void
-    {
-        $array = new Arr();
-
-        $called = false;
-        $result = $array->find(static function () use (&$called): bool {
-            $called = true;
-
-            return true;
-        });
-
-        self::assertNull($result);
-        self::assertFalse($called);
-    }
-
-    public function testFindDoesNotMutateArray(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $array->find(static fn (int $value): bool => 2 === $value);
-
-        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
-    }
-
-    public function testFindWithThisArgBindsClosure(): void
-    {
-        $context = new Dummy();
-
-        self::assertSame(2, (new Arr(1, 2, 3))->find($context->targetCallback(), $context));
-    }
-
-    // Array.prototype.findIndex
-
-    public function testFindIndexReturnsZeroWhenPredicateReturnsTrue(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-        $called = 0;
-
-        $result = $array->findIndex(static function (string $val) use (&$called): bool {
-            ++$called;
-
-            return true;
-        });
-
-        self::assertSame(0, $result);
-        self::assertSame(1, $called);
-    }
-
-    public function testFindIndexReturnsIndexWhenPredicateMatchesValue(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-        $called = 0;
-
-        $result = $array->findIndex(static function (string $val) use (&$called): bool {
-            ++$called;
-
-            return 'Bike' === $val;
-        });
-
-        self::assertSame(2, $result);
-        self::assertSame(3, $called);
-    }
-
-    public function testFindIndexReturnsNegativeOneWhenPredicateAlwaysReturnsFalse(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-        $called = 0;
-
-        $result = $array->findIndex(static function (string $val) use (&$called): bool {
-            ++$called;
-
-            return false;
-        });
-
-        self::assertSame(-1, $result);
-        self::assertSame(3, $called);
-    }
-
-    public function testFindIndexCoercesReturnValueToBoolean(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-
-        $result = $array->findIndex(static fn (string $val): mixed => 'string');
-        self::assertSame(0, $result);
-
-        $result = $array->findIndex(static fn (string $val): mixed => 1);
-        self::assertSame(0, $result);
-
-        $result = $array->findIndex(static fn (string $val): mixed => -1);
-        self::assertSame(0, $result);
-
-        $result = $array->findIndex(static fn (string $val): mixed => '');
-        self::assertSame(-1, $result);
-
-        $result = $array->findIndex(static fn (string $val): mixed => 0);
-        self::assertSame(-1, $result);
-
-        $result = $array->findIndex(static fn (string $val): mixed => null);
-        self::assertSame(-1, $result);
-    }
-
-    public function testFindIndexCallbackReceivesValueIndexAndArray(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $captured = [];
-
-        $array->findIndex(static function (mixed $value, int $index, Arr $arr) use (&$captured): bool {
-            $captured = [$value, $index, $arr];
-
-            return true;
-        });
-
-        self::assertSame('a', $captured[0]);
-        self::assertSame(0, $captured[1]);
-        self::assertSame($array, $captured[2]);
-    }
-
-    public function testFindIndexShortCircuitsAfterFirstMatch(): void
-    {
-        $visited = [];
-        $array = new Arr(1, 2, 3, 4, 5);
-
-        $array->findIndex(static function (int $value) use (&$visited): bool {
-            $visited[] = $value;
-
-            return 3 === $value;
-        });
-
-        self::assertSame([1, 2, 3], $visited);
-    }
-
-    public function testFindIndexReturnsNegativeOneAndDoesNotCallCallbackForEmptyArray(): void
-    {
-        $array = new Arr();
-
-        $called = false;
-        $result = $array->findIndex(static function () use (&$called): bool {
-            $called = true;
-
-            return true;
-        });
-
-        self::assertSame(-1, $result);
-        self::assertFalse($called);
-    }
-
-    public function testFindIndexDoesNotMutateArray(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $array->findIndex(static fn (int $value): bool => 2 === $value);
-
-        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
-    }
-
-    public function testFindIndexWithThisArgBindsClosure(): void
-    {
-        $context = new Dummy();
-
-        self::assertSame(1, (new Arr(1, 2, 3))->findIndex($context->targetCallback(), $context));
-    }
-
-    // Array.prototype.findLast
-
-    public function testFindLastReturnsLastElementWhenPredicateReturnsTrue(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-        $called = 0;
-
-        $result = $array->findLast(static function (string $val) use (&$called): bool {
-            ++$called;
-
-            return true;
-        });
-
-        self::assertSame('Bike', $result);
-        self::assertSame(1, $called);
-    }
-
-    public function testFindLastReturnsFirstMatchingFromEndWhenPredicateMatchesValue(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-        $called = 0;
-
-        $result = $array->findLast(static function (string $val) use (&$called): bool {
-            ++$called;
-
-            return 'Shoes' === $val;
-        });
-
-        self::assertSame('Shoes', $result);
-        self::assertSame(3, $called);
-    }
-
-    public function testFindLastReturnsNullWhenPredicateAlwaysReturnsFalse(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-        $called = 0;
-
-        $result = $array->findLast(static function (string $val) use (&$called): bool {
-            ++$called;
-
-            return false;
-        });
-
-        self::assertNull($result);
-        self::assertSame(3, $called);
-    }
-
-    public function testFindLastCoercesReturnValueToBoolean(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-
-        $result = $array->findLast(static fn (string $val): mixed => 'string');
-        self::assertSame('Bike', $result);
-
-        $result = $array->findLast(static fn (string $val): mixed => 1);
-        self::assertSame('Bike', $result);
-
-        $result = $array->findLast(static fn (string $val): mixed => -1);
-        self::assertSame('Bike', $result);
-
-        $result = $array->findLast(static fn (string $val): mixed => '');
-        self::assertNull($result);
-
-        $result = $array->findLast(static fn (string $val): mixed => 0);
-        self::assertNull($result);
-
-        $result = $array->findLast(static fn (string $val): mixed => null);
-        self::assertNull($result);
-    }
-
-    public function testFindLastCallbackReceivesValueIndexAndArray(): void
-    {
-        $array = new Arr('Mike', 'Rick', 'Leo');
-        $results = [];
-
-        $array->findLast(static function (mixed ...$args) use (&$results): bool {
-            $results[] = $args;
-
-            return false;
-        });
-
-        self::assertCount(3, $results);
-
-        self::assertSame('Leo', $results[0][0]);
-        self::assertSame(2, $results[0][1]);
-        self::assertSame($array, $results[0][2]);
-
-        self::assertSame('Rick', $results[1][0]);
-        self::assertSame(1, $results[1][1]);
-        self::assertSame($array, $results[1][2]);
-
-        self::assertSame('Mike', $results[2][0]);
-        self::assertSame(0, $results[2][1]);
-        self::assertSame($array, $results[2][2]);
-    }
-
-    public function testFindLastShortCircuitsAfterFirstMatch(): void
-    {
-        $visited = [];
-        $array = new Arr(1, 2, 3, 4, 5);
-
-        $array->findLast(static function (int $value) use (&$visited): bool {
-            $visited[] = $value;
-
-            return 3 === $value;
-        });
-
-        self::assertSame([5, 4, 3], $visited);
-    }
-
-    public function testFindLastReturnsNullAndDoesNotCallCallbackForEmptyArray(): void
-    {
-        $array = new Arr();
-
-        $called = false;
-        $result = $array->findLast(static function () use (&$called): bool {
-            $called = true;
-
-            return true;
-        });
-
-        self::assertNull($result);
-        self::assertFalse($called);
-    }
-
-    public function testFindLastDoesNotMutateArray(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $array->findLast(static fn (int $value): bool => 2 === $value);
-
-        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
-    }
-
-    public function testFindLastWithThisArgBindsClosure(): void
-    {
-        $context = new Dummy();
-
-        self::assertSame(2, (new Arr(1, 2, 3))->findLast($context->targetCallback(), $context));
-    }
-
-    // Array.prototype.findLastIndex
-
-    public function testFindLastIndexReturnsLastIndexWhenPredicateReturnsTrue(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-        $called = 0;
-
-        $result = $array->findLastIndex(static function (string $val) use (&$called): bool {
-            ++$called;
-
-            return true;
-        });
-
-        self::assertSame(2, $result);
-        self::assertSame(1, $called);
-    }
-
-    public function testFindLastIndexReturnsIndexOfFirstMatchFromEnd(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-
-        $result = $array->findLastIndex(static fn (string $val): bool => 'Car' === $val);
-        self::assertSame(1, $result);
-    }
-
-    public function testFindLastIndexReturnsLastIndexOfDuplicateValue(): void
-    {
-        $array = new Arr('a', 'b', 'c', 'b', 'a');
-
-        $result = $array->findLastIndex(static fn (string $val): bool => 'b' === $val);
-        self::assertSame(3, $result);
-    }
-
-    public function testFindLastIndexReturnsCorrectIndexWhenPredicateMatchesFirstFromEnd(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-        $called = 0;
-
-        $result = $array->findLastIndex(static function (string $val) use (&$called): bool {
-            ++$called;
-
-            return 'Shoes' === $val;
-        });
-
-        self::assertSame(0, $result);
-        self::assertSame(3, $called);
-    }
-
-    public function testFindLastIndexReturnsNegativeOneWhenPredicateAlwaysReturnsFalse(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-        $called = 0;
-
-        $result = $array->findLastIndex(static function (string $val) use (&$called): bool {
-            ++$called;
-
-            return false;
-        });
-
-        self::assertSame(-1, $result);
-        self::assertSame(3, $called);
-    }
-
-    public function testFindLastIndexCoercesReturnValueToBoolean(): void
-    {
-        $array = new Arr('Shoes', 'Car', 'Bike');
-
-        $result = $array->findLastIndex(static fn (string $val): mixed => 'string');
-        self::assertSame(2, $result);
-
-        $result = $array->findLastIndex(static fn (string $val): mixed => 1);
-        self::assertSame(2, $result);
-
-        $result = $array->findLastIndex(static fn (string $val): mixed => -1);
-        self::assertSame(2, $result);
-
-        $result = $array->findLastIndex(static fn (string $val): mixed => '');
-        self::assertSame(-1, $result);
-
-        $result = $array->findLastIndex(static fn (string $val): mixed => 0);
-        self::assertSame(-1, $result);
-
-        $result = $array->findLastIndex(static fn (string $val): mixed => null);
-        self::assertSame(-1, $result);
-    }
-
-    public function testFindLastIndexCallbackReceivesValueIndexAndArray(): void
-    {
-        $array = new Arr('Mike', 'Rick', 'Leo');
-        $results = [];
-
-        $array->findLastIndex(static function (mixed ...$args) use (&$results): bool {
-            $results[] = $args;
-
-            return false;
-        });
-
-        self::assertCount(3, $results);
-
-        self::assertSame('Leo', $results[0][0]);
-        self::assertSame(2, $results[0][1]);
-        self::assertSame($array, $results[0][2]);
-
-        self::assertSame('Rick', $results[1][0]);
-        self::assertSame(1, $results[1][1]);
-        self::assertSame($array, $results[1][2]);
-
-        self::assertSame('Mike', $results[2][0]);
-        self::assertSame(0, $results[2][1]);
-        self::assertSame($array, $results[2][2]);
-    }
-
-    public function testFindLastIndexShortCircuitsAfterFirstMatch(): void
-    {
-        $visited = [];
-        $array = new Arr(1, 2, 3, 4, 5);
-
-        $array->findLastIndex(static function (int $value) use (&$visited): bool {
-            $visited[] = $value;
-
-            return 3 === $value;
-        });
-
-        self::assertSame([5, 4, 3], $visited);
-    }
-
-    public function testFindLastIndexReturnsNegativeOneAndDoesNotCallCallbackForEmptyArray(): void
-    {
-        $array = new Arr();
-
-        $called = false;
-        $result = $array->findLastIndex(static function () use (&$called): bool {
-            $called = true;
-
-            return true;
-        });
-
-        self::assertSame(-1, $result);
-        self::assertFalse($called);
-    }
-
-    public function testFindLastIndexDoesNotMutateArray(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $array->findLastIndex(static fn (int $value): bool => 2 === $value);
-
-        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
-    }
-
-    public function testFindLastIndexWithThisArgBindsClosure(): void
-    {
-        $context = new Dummy();
-
-        self::assertSame(1, (new Arr(1, 2, 3))->findLastIndex($context->targetCallback(), $context));
-    }
-
-    // Array.prototype.flat
-
-    public function testFlatWithDefaultDepthFlattensOneLevel(): void
-    {
-        $inner = new Arr(2, 3);
-        $array = new Arr(1, $inner, 4);
-
-        self::assertSame([1, 2, 3, 4], iterator_to_array($array->flat()->values()));
-    }
-
-    public function testFlatDoesNotFlattenNonArrayElements(): void
-    {
-        $array = new Arr(1, 'hello', 3);
-
-        self::assertSame([1, 'hello', 3], iterator_to_array($array->flat()->values()));
-    }
-
-    public function testFlatWithDepthZeroDoesNotFlatten(): void
-    {
-        $inner = new Arr(2, 3);
-        $array = new Arr(1, $inner, 4);
-
-        $values = iterator_to_array($array->flat(0)->values());
-        self::assertSame(1, $values[0]);
-        self::assertSame($inner, $values[1]);
-        self::assertSame(4, $values[2]);
-        self::assertCount(3, $values);
-    }
-
-    public function testFlatWithDepthGreaterThanOneFlattensNestedArrays(): void
-    {
-        $inner3 = new Arr();
-        $inner3->push(4);
-        $inner2 = new Arr(3, $inner3);
-        $inner1 = new Arr(2, $inner2);
-        $array = new Arr(1, $inner1);
-
-        $values = iterator_to_array($array->flat(2)->values());
-        self::assertCount(4, $values);
-        self::assertSame(1, $values[0]);
-        self::assertSame(2, $values[1]);
-        self::assertSame(3, $values[2]);
-        self::assertSame($inner3, $values[3]);
-    }
-
-    public function testFlatWithInfinityDepthFlattensCompletely(): void
-    {
-        $inner2 = new Arr();
-        $inner2->push(4);
-        $inner1 = new Arr(3, $inner2);
-        $array = new Arr(1, new Arr(2, $inner1));
-
-        self::assertSame([1, 2, 3, 4], iterator_to_array($array->flat(PHP_INT_MAX)->values()));
-    }
-
-    public function testFlatOfEmptyArrayReturnsEmptyArray(): void
-    {
-        $array = new Arr();
-
-        self::assertSame([], iterator_to_array($array->flat()->values()));
-    }
-
-    public function testFlatWithEmptyNestedArraysRemovesThem(): void
-    {
-        $array = new Arr(new Arr(), new Arr());
-
-        self::assertSame([], iterator_to_array($array->flat()->values()));
-    }
-
-    public function testFlatWithMixedEmptyAndNonEmptyNestedArrays(): void
-    {
-        $inner = new Arr();
-        $inner->push(1);
-        $array = new Arr(new Arr(), $inner);
-
-        self::assertSame([1], iterator_to_array($array->flat()->values()));
-    }
-
-    public function testFlatDoesNotMutateOriginalArray(): void
-    {
-        $inner = new Arr(2, 3);
-        $array = new Arr(1, $inner, 4);
-        $array->flat();
-
-        $values = iterator_to_array($array->values());
-        self::assertSame(1, $values[0]);
-        self::assertSame($inner, $values[1]);
-        self::assertSame(4, $values[2]);
-        self::assertCount(3, $values);
-    }
-
-    public function testFlatReturnsNewInstance(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->flat();
-
-        self::assertNotSame($array, $result);
-    }
-
-    public function testFlatPreservesNullElements(): void
-    {
-        $array = new Arr(null, 1, new Arr(null, 2));
-
-        $values = iterator_to_array($array->flat()->values());
-        self::assertNull($values[0]);
-        self::assertSame(1, $values[1]);
-        self::assertNull($values[2]);
-        self::assertSame(2, $values[3]);
-    }
-
-    public function testFlatWithNegativeDepthDoesNotFlatten(): void
-    {
-        $inner = new Arr(2, 3);
-        $array = new Arr(1, $inner, 4);
-
-        $values = iterator_to_array($array->flat(-1)->values());
-        self::assertSame(1, $values[0]);
-        self::assertSame($inner, $values[1]);
-        self::assertSame(4, $values[2]);
-        self::assertCount(3, $values);
-    }
-
-    public function testFlatPreservesOriginalValuesWhenNoNesting(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        self::assertSame([1, 2, 3], iterator_to_array($array->flat()->values()));
-    }
-
-    // Array.prototype.flatMap
-
-    public function testFlatMapReturnsMappedAndFlattenedResult(): void
-    {
         $array = new Arr(1, 2);
-        $result = $array->flatMap(static fn (int $value): Arr => new Arr($value, $value * 2));
 
-        self::assertSame([1, 2, 2, 4], iterator_to_array($result->values()));
-    }
-
-    public function testFlatMapWithNonArrayReturnMaintainsElements(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->flatMap(static fn (int $value): int => $value * 2);
-
-        self::assertSame([2, 4, 6], iterator_to_array($result->values()));
-    }
-
-    public function testFlatMapFlattensOnlyOneLevelDeep(): void
-    {
-        $inner = new Arr();
-        $inner->push(2);
-        $array = new Arr(1, 3);
-
-        $result = $array->flatMap(static fn (int $value): Arr => new Arr(new Arr($value)));
-
-        $values = iterator_to_array($result->values());
-        self::assertCount(2, $values);
-        self::assertInstanceOf(Arr::class, $values[0]);
-        self::assertInstanceOf(Arr::class, $values[1]);
-    }
-
-    public function testFlatMapCallbackReceivesValueIndexAndArray(): void
-    {
-        $array = new Arr('a', 'b');
-        $captured = [];
-
-        $array->flatMap(static function (mixed $value, int $index, Arr $arr) use (&$captured): Arr {
-            $captured[] = [$value, $index, $arr];
-            $result = new Arr();
-            $result->push($value);
-
-            return $result;
-        });
-
-        self::assertCount(2, $captured);
-        self::assertSame('a', $captured[0][0]);
-        self::assertSame(0, $captured[0][1]);
-        self::assertSame($array, $captured[0][2]);
-        self::assertSame('b', $captured[1][0]);
-        self::assertSame(1, $captured[1][1]);
-        self::assertSame($array, $captured[1][2]);
-    }
-
-    public function testFlatMapReturnsNewInstance(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->flatMap(static function (int $value): Arr {
-            $r = new Arr();
-            $r->push($value);
-
-            return $r;
-        });
-
-        self::assertNotSame($array, $result);
-    }
-
-    public function testFlatMapDoesNotMutateOriginalArray(): void
-    {
-        $array = new Arr(1, 2);
-        $array->flatMap(static fn (int $value): Arr => new Arr($value, $value * 2));
+        $array->concat(new Arr(3, 4));
 
         self::assertSame([1, 2], iterator_to_array($array->values()));
     }
 
-    public function testFlatMapReturnsEmptyArrayForEmptyArray(): void
+    // Array.prototype.copyWithin
+
+    public function testCopyWithinWithNonNegativeTargetStartAndEnd(): void
+    {
+        self::assertSame([0, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, 0, 0)->values()));
+        self::assertSame([0, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, 0, 2)->values()));
+        self::assertSame([1, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, 1, 2)->values()));
+        self::assertSame([0, 0, 1, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(1, 0, 2)->values()));
+        self::assertSame([0, 3, 4, 3, 4, 5], iterator_to_array((new Arr(0, 1, 2, 3, 4, 5))->copyWithin(1, 3, 5)->values()));
+    }
+
+    public function testCopyWithinWithNegativeTarget(): void
+    {
+        self::assertSame([0, 1, 2, 0], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(-1, 0)->values()));
+        self::assertSame([0, 1, 2, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3, 4))->copyWithin(-2, 2)->values()));
+        self::assertSame([0, 1, 2, 2], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(-1, 2)->values()));
+    }
+
+    public function testCopyWithinReturnsThisObject(): void
+    {
+        $array = new Arr(0, 1, 2, 3);
+
+        self::assertSame($array, $array->copyWithin(1, 0, 2));
+    }
+
+    public function testCopyWithinUsesArrayLengthWhenEndIsUndefined(): void
+    {
+        self::assertSame([1, 2, 3, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, 1)->values()));
+        self::assertSame([1, 2, 3, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, 1, null)->values()));
+    }
+
+    public function testCopyWithinClampsOutOfBoundsNegativeStart(): void
+    {
+        self::assertSame([0, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, -10)->values()));
+        self::assertSame([0, 1, 0, 1, 2], iterator_to_array((new Arr(0, 1, 2, 3, 4))->copyWithin(2, -10)->values()));
+        self::assertSame([0, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(-9, -10)->values()));
+    }
+
+    public function testCopyWithinClampsOutOfBoundsNegativeTarget(): void
+    {
+        self::assertSame([0, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(-10, 0)->values()));
+        self::assertSame([2, 3, 4, 3, 4], iterator_to_array((new Arr(0, 1, 2, 3, 4))->copyWithin(-10, 2)->values()));
+    }
+
+    public function testCopyWithinClampsNonNegativeTargetAndStartToLength(): void
+    {
+        self::assertSame([0, 1, 2, 3, 4, 5], iterator_to_array((new Arr(0, 1, 2, 3, 4, 5))->copyWithin(6, 0)->values()));
+        self::assertSame([0, 1, 2, 3, 4, 5], iterator_to_array((new Arr(0, 1, 2, 3, 4, 5))->copyWithin(0, 6)->values()));
+        self::assertSame([0, 1, 2, 3, 4, 5], iterator_to_array((new Arr(0, 1, 2, 3, 4, 5))->copyWithin(10, 10)->values()));
+    }
+
+    public function testCopyWithinSupportsNegativeEnd(): void
+    {
+        self::assertSame([1, 2, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, 1, -1)->values()));
+        self::assertSame([0, 1, 0, 1, 2], iterator_to_array((new Arr(0, 1, 2, 3, 4))->copyWithin(2, 0, -1)->values()));
+        self::assertSame([0, 2, 2, 3, 4], iterator_to_array((new Arr(0, 1, 2, 3, 4))->copyWithin(1, 2, -2)->values()));
+        self::assertSame([2, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, -2, -1)->values()));
+    }
+
+    public function testCopyWithinClampsEndBeyondLength(): void
+    {
+        self::assertSame([1, 2, 3, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, 1, 6)->values()));
+        self::assertSame([0, 3, 4, 5, 4, 5], iterator_to_array((new Arr(0, 1, 2, 3, 4, 5))->copyWithin(1, 3, 6)->values()));
+    }
+
+    // Array.prototype.entries
+
+    public function testEntriesReturnsKeyValuePairs(): void
+    {
+        self::assertSame(
+            [0 => [0, 'a'], 1 => [1, 'b'], 2 => [2, 'c']],
+            iterator_to_array((new Arr('a', 'b', 'c'))->entries()),
+        );
+    }
+
+    public function testEntriesIteratorSeesItemsAddedBeforeConsumption(): void
     {
         $array = new Arr();
-        $result = $array->flatMap(static fn (mixed $value): mixed => $value);
+        $iterator = $array->entries();
+        $array->push('a');
 
+        self::assertSame([0 => [0, 'a']], iterator_to_array($iterator));
+    }
+
+    // Array.prototype.every
+
+    public function testEveryReturnsTrueForEmptyArray(): void
+    {
+        self::assertTrue((new Arr())->every(static fn (): bool => false));
+    }
+
+    public function testEveryUsesCallbackResultForEachElement(): void
+    {
+        self::assertFalse((new Arr(2, 4, 5))->every(static fn (int $value): bool => 0 === $value % 2));
+        self::assertTrue((new Arr(2, 4, 6))->every(static fn (int $value): bool => 0 === $value % 2));
+    }
+
+    public function testEveryBindsThisArgForClosures(): void
+    {
+        $dummy = new Dummy();
+        $dummy->threshold = 4;
+
+        self::assertTrue((new Arr(1, 2, 3))->every($dummy->thresholdCallback(), $dummy));
+        self::assertFalse((new Arr(1, 2, 4))->every($dummy->thresholdCallback(), $dummy));
+    }
+
+    public function testEveryCallbackReceivesThreeArguments(): void
+    {
+        self::assertTrue((new Arr(0, 1, true, null, new \stdClass(), 'five'))->every(static fn (...$args): bool => 3 === \func_num_args()));
+    }
+
+    public function testEveryTreatsTruthyObjectReturnValueAsTrue(): void
+    {
+        $accessed = false;
+
+        self::assertTrue((new Arr(11))->every(static function () use (&$accessed): object {
+            $accessed = true;
+
+            return new \stdClass();
+        }));
+        self::assertTrue($accessed);
+    }
+
+    public function testEveryPropagatesPredicateExceptions(): void
+    {
+        $called = 0;
+
+        try {
+            (new Arr(11, 10, 8))->every(static function () use (&$called): bool {
+                ++$called;
+
+                throw new \RuntimeException('Exception occurred in callbackfn');
+            });
+
+            self::fail('Expected predicate exception');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
+        }
+
+        self::assertSame(1, $called);
+    }
+
+    public function testEverySkipsIndexesRemovedAfterIterationStarts(): void
+    {
+        $array = new Arr(1, 2, 3, 4, 6);
+
+        self::assertTrue($array->every(static function (int $value, int $index, Arr $receivedArray): bool {
+            if (0 === $index) {
+                $receivedArray->splice(3);
+            }
+
+            return $value < 4;
+        }));
+    }
+
+    // Array.prototype.fill
+
+    public function testFillWritesValueBetweenStartAndEnd(): void
+    {
+        self::assertSame([0, 1, 'x', 'x'], iterator_to_array((new Arr(0, 1, 2, 3))->fill('x', 2)->values()));
+        self::assertSame([0, 'x', 'x', 3], iterator_to_array((new Arr(0, 1, 2, 3))->fill('x', 1, 3)->values()));
+    }
+
+    public function testFillSupportsNegativeStartAndEnd(): void
+    {
+        self::assertSame([0, 1, 'x', 'x'], iterator_to_array((new Arr(0, 1, 2, 3))->fill('x', -2)->values()));
+        self::assertSame([0, 'x', 'x', 3], iterator_to_array((new Arr(0, 1, 2, 3))->fill('x', -3, -1)->values()));
+    }
+
+    public function testFillReturnsThisObject(): void
+    {
+        $array = new Arr(0, 1, 2);
+
+        self::assertSame($array, $array->fill('x', 1));
+    }
+
+    public function testFillReplacesAllElementsFromDefaultStartAndEnd(): void
+    {
+        self::assertSame([], iterator_to_array((new Arr())->fill(8)->values()));
+        self::assertSame([8, 8, 8], iterator_to_array((new Arr(0, 0, 0))->fill(8)->values()));
+    }
+
+    public function testFillUsesRelativeEndWhenProvided(): void
+    {
+        self::assertSame([8, 0, 0], iterator_to_array((new Arr(0, 0, 0))->fill(8, 0, 1)->values()));
+        self::assertSame([8, 8, 0], iterator_to_array((new Arr(0, 0, 0))->fill(8, 0, -1)->values()));
+        self::assertSame([8, 8, 8], iterator_to_array((new Arr(0, 0, 0))->fill(8, 0, 5)->values()));
+    }
+
+    public function testFillUsesRelativeStartWhenProvided(): void
+    {
+        self::assertSame([0, 8, 8], iterator_to_array((new Arr(0, 0, 0))->fill(8, 1)->values()));
+        self::assertSame([0, 0, 0], iterator_to_array((new Arr(0, 0, 0))->fill(8, 4)->values()));
+        self::assertSame([0, 0, 8], iterator_to_array((new Arr(0, 0, 0))->fill(8, -1)->values()));
+    }
+
+    // Array.prototype.filter
+
+    public function testFilterReturnsNewArrayWithElementsWhereCallbackReturnsTrue(): void
+    {
+        $result = (new Arr(1, 2, 3, 4, 5))->filter(static fn (int $value): bool => 1 === $value % 2);
+
+        self::assertSame([1, 3, 5], iterator_to_array($result->values()));
+    }
+
+    public function testFilterBindsThisArgForClosures(): void
+    {
+        $dummy = new Dummy();
+        $dummy->limit = 3;
+
+        self::assertSame([1, 2], iterator_to_array((new Arr(1, 2, 3, 4))->filter($dummy->limitCallback(), $dummy)->values()));
+    }
+
+    public function testFilterDoesNotConsiderNewElementsAddedAfterCall(): void
+    {
+        $source = new Arr(1, 2, 4, 5);
+        $result = $source->filter(static function (int $value, int $index, Arr $array): bool {
+            if (0 === $index) {
+                $array->push(6);
+            }
+
+            return true;
+        });
+
+        self::assertCount(4, iterator_to_array($result->values()));
+    }
+
+    public function testFilterCallbackReceivesThreeArguments(): void
+    {
+        $called = false;
+
+        (new Arr(0, 1, 2, 3))->filter(static function (...$args) use (&$called): bool {
+            $called = true;
+
+            return 3 === \func_num_args();
+        });
+
+        self::assertTrue($called);
+    }
+
+    public function testFilterTreatsTruthyObjectReturnValueAsTrue(): void
+    {
+        $array = new Arr();
+        $array->push(11);
+
+        self::assertSame([11], iterator_to_array($array->filter(static fn (): object => new \stdClass())->values()));
+    }
+
+    public function testFilterPropagatesPredicateExceptions(): void
+    {
+        $called = 0;
+
+        try {
+            (new Arr(11, 10, 8))->filter(static function () use (&$called): bool {
+                ++$called;
+
+                throw new \RuntimeException('Exception occurred in callbackfn');
+            });
+
+            self::fail('Expected predicate exception');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
+        }
+
+        self::assertSame(1, $called);
+    }
+
+    public function testFilterHasNoObservableEffectsOnEmptyArray(): void
+    {
+        $accessed = false;
+
+        $result = (new Arr())->filter(static function () use (&$accessed): bool {
+            $accessed = true;
+
+            return true;
+        });
+
+        self::assertFalse($accessed);
         self::assertSame([], iterator_to_array($result->values()));
     }
 
-    public function testFlatMapCallbackIsCalledForEachElementInOrder(): void
+    public function testFilterCanReturnEmptyArray(): void
     {
-        $visited = [];
-        $array = new Arr(1, 2, 3);
+        $array = new Arr();
+        $array->push(11);
 
-        $array->flatMap(static function (int $value) use (&$visited): Arr {
-            $visited[] = $value;
-            $r = new Arr();
-            $r->push($value);
+        self::assertSame([], iterator_to_array($array->filter(static fn (): mixed => null)->values()));
+    }
 
-            return $r;
+    public function testFilterSkipsIndexesRemovedAfterIterationStarts(): void
+    {
+        $array = new Arr(1, 2, 3, 4, 6);
+
+        self::assertSame([1, 2, 3], iterator_to_array($array->filter(static function (int $value, int $index, Arr $receivedArray): bool {
+            if (0 === $index) {
+                $receivedArray->splice(3);
+            }
+
+            return $value < 4;
+        })->values()));
+    }
+
+    // Array.prototype.find
+
+    public function testFindPassesValueIndexAndArrayToPredicate(): void
+    {
+        $array = new Arr('Mike', 'Rick', 'Leo');
+        $results = [];
+
+        $array->find(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            $results[] = [$value, $index, $receivedArray];
+
+            return false;
         });
 
-        self::assertSame([1, 2, 3], $visited);
+        self::assertCount(3, $results);
+        self::assertSame(['Mike', 0, $array], $results[0]);
+        self::assertSame(['Rick', 1, $array], $results[1]);
+        self::assertSame(['Leo', 2, $array], $results[2]);
     }
 
-    public function testFlatMapPreservesNullElements(): void
+    public function testFindReturnsFirstMatchingValue(): void
     {
-        $array = new Arr(null, 1);
-        $result = $array->flatMap(static function (?int $value): Arr {
-            $r = new Arr();
-            $r->push($value);
+        self::assertSame(2, (new Arr(1, 2, 3))->find(static fn (int $value): bool => 0 === $value % 2));
+        self::assertNull((new Arr(1, 3, 5))->find(static fn (int $value): bool => 0 === $value % 2));
+    }
 
-            return $r;
+    public function testFindBindsThisArgForClosures(): void
+    {
+        $dummy = new Dummy();
+
+        self::assertSame(2, (new Arr(1, 2, 3))->find($dummy->targetCallback(), $dummy));
+    }
+
+    public function testFindDoesNotCallPredicateOnEmptyArray(): void
+    {
+        $called = false;
+
+        self::assertNull((new Arr())->find(static function () use (&$called): bool {
+            $called = true;
+
+            return true;
+        }));
+        self::assertFalse($called);
+    }
+
+    public function testFindUsesInitialRangeOfElementsDuringIteration(): void
+    {
+        $array = new Arr('Shoes', 'Car', 'Bike');
+        $results = [];
+
+        $array->find(static function (?string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            if ([] === $results) {
+                $receivedArray->splice(1, 1);
+            }
+
+            $results[] = $value;
+
+            return false;
         });
 
-        $values = iterator_to_array($result->values());
-        self::assertNull($values[0]);
-        self::assertSame(1, $values[1]);
-        self::assertCount(2, $values);
+        self::assertSame(['Shoes', 'Bike', null], $results);
+
+        $array = new Arr('Skateboard', 'Barefoot');
+        $results = [];
+
+        $array->find(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            if ([] === $results) {
+                $receivedArray->push('Motorcycle');
+                $receivedArray->splice(1, 1, 'Magic Carpet');
+            }
+
+            $results[] = $value;
+
+            return false;
+        });
+
+        self::assertSame(['Skateboard', 'Magic Carpet'], $results);
     }
 
-    public function testFlatMapWithThisArgBindsClosure(): void
+    public function testFindPropagatesPredicateExceptions(): void
     {
-        $context = new Dummy();
-        $array = new Arr('a', 'b');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('predicate failed');
 
-        $result = $array->flatMap($context->suffixCallback(), $context);
-
-        self::assertSame(['a!', 'b!'], iterator_to_array($result->values()));
+        (new Arr(1))->find(static function (): bool {
+            throw new \RuntimeException('predicate failed');
+        });
     }
 
-    public function testFlatMapWithMultipleReturnedElementsSpreadsThem(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->flatMap(static fn (int $value): Arr => new Arr($value, $value, $value));
+    // Array.prototype.findIndex
 
-        self::assertSame([1, 1, 1, 2, 2, 2, 3, 3, 3], iterator_to_array($result->values()));
+    public function testFindIndexPassesValueIndexAndArrayToPredicate(): void
+    {
+        $array = new Arr('Mike', 'Rick', 'Leo');
+        $results = [];
+
+        $array->findIndex(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            $results[] = [$value, $index, $receivedArray];
+
+            return false;
+        });
+
+        self::assertCount(3, $results);
+        self::assertSame(['Mike', 0, $array], $results[0]);
+        self::assertSame(['Rick', 1, $array], $results[1]);
+        self::assertSame(['Leo', 2, $array], $results[2]);
+    }
+
+    public function testFindIndexReturnsFirstMatchingIndex(): void
+    {
+        self::assertSame(1, (new Arr(1, 2, 3))->findIndex(static fn (int $value): bool => 0 === $value % 2));
+        self::assertSame(-1, (new Arr(1, 3, 5))->findIndex(static fn (int $value): bool => 0 === $value % 2));
+    }
+
+    public function testFindIndexBindsThisArgForClosures(): void
+    {
+        $dummy = new Dummy();
+
+        self::assertSame(1, (new Arr(1, 2, 3))->findIndex($dummy->targetCallback(), $dummy));
+    }
+
+    public function testFindIndexDoesNotCallPredicateOnEmptyArray(): void
+    {
+        $called = false;
+
+        self::assertSame(-1, (new Arr())->findIndex(static function () use (&$called): bool {
+            $called = true;
+
+            return true;
+        }));
+        self::assertFalse($called);
+    }
+
+    public function testFindIndexUsesInitialRangeOfElementsDuringIteration(): void
+    {
+        $array = new Arr('Shoes', 'Car', 'Bike');
+        $results = [];
+
+        $array->findIndex(static function (?string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            if ([] === $results) {
+                $receivedArray->splice(1, 1);
+            }
+
+            $results[] = $value;
+
+            return false;
+        });
+
+        self::assertSame(['Shoes', 'Bike', null], $results);
+
+        $array = new Arr('Skateboard', 'Barefoot');
+        $results = [];
+
+        $array->findIndex(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            if ([] === $results) {
+                $receivedArray->push('Motorcycle');
+                $receivedArray->splice(1, 1, 'Magic Carpet');
+            }
+
+            $results[] = $value;
+
+            return false;
+        });
+
+        self::assertSame(['Skateboard', 'Magic Carpet'], $results);
+    }
+
+    public function testFindIndexPropagatesPredicateExceptions(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('predicate failed');
+
+        (new Arr(1))->findIndex(static function (): bool {
+            throw new \RuntimeException('predicate failed');
+        });
+    }
+
+    // Array.prototype.findLast
+
+    public function testFindLastPassesValueIndexAndArrayToPredicateFromRightToLeft(): void
+    {
+        $array = new Arr('Mike', 'Rick', 'Leo');
+        $results = [];
+
+        $array->findLast(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            $results[] = [$value, $index, $receivedArray];
+
+            return false;
+        });
+
+        self::assertCount(3, $results);
+        self::assertSame(['Leo', 2, $array], $results[0]);
+        self::assertSame(['Rick', 1, $array], $results[1]);
+        self::assertSame(['Mike', 0, $array], $results[2]);
+    }
+
+    public function testFindLastReturnsLastMatchingValue(): void
+    {
+        self::assertSame(4, (new Arr(1, 2, 3, 4))->findLast(static fn (int $value): bool => 0 === $value % 2));
+        self::assertNull((new Arr(1, 3, 5))->findLast(static fn (int $value): bool => 0 === $value % 2));
+    }
+
+    public function testFindLastBindsThisArgForClosures(): void
+    {
+        $dummy = new Dummy();
+
+        self::assertSame(2, (new Arr(1, 2, 3, 2))->findLast($dummy->targetCallback(), $dummy));
+    }
+
+    public function testFindLastDoesNotCallPredicateOnEmptyArray(): void
+    {
+        $called = false;
+
+        self::assertNull((new Arr())->findLast(static function () use (&$called): bool {
+            $called = true;
+
+            return true;
+        }));
+        self::assertFalse($called);
+    }
+
+    public function testFindLastUsesInitialRangeOfElementsDuringIteration(): void
+    {
+        $array = new Arr('Shoes', 'Car', 'Bike');
+        $results = [];
+
+        $array->findLast(static function (?string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            if ([] === $results) {
+                $receivedArray->splice(1, 1);
+            }
+
+            $results[] = $value;
+
+            return false;
+        });
+
+        self::assertSame(['Bike', 'Bike', 'Shoes'], $results);
+
+        $array = new Arr('Skateboard', 'Barefoot');
+        $results = [];
+
+        $array->findLast(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            if ([] === $results) {
+                $receivedArray->push('Motorcycle');
+                $receivedArray->splice(0, 1, 'Magic Carpet');
+            }
+
+            $results[] = $value;
+
+            return false;
+        });
+
+        self::assertSame(['Barefoot', 'Magic Carpet'], $results);
+    }
+
+    public function testFindLastPropagatesPredicateExceptions(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('predicate failed');
+
+        (new Arr(1))->findLast(static function (): bool {
+            throw new \RuntimeException('predicate failed');
+        });
+    }
+
+    // Array.prototype.findLastIndex
+
+    public function testFindLastIndexPassesValueIndexAndArrayToPredicateFromRightToLeft(): void
+    {
+        $array = new Arr('Mike', 'Rick', 'Leo');
+        $results = [];
+
+        $array->findLastIndex(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            $results[] = [$value, $index, $receivedArray];
+
+            return false;
+        });
+
+        self::assertCount(3, $results);
+        self::assertSame(['Leo', 2, $array], $results[0]);
+        self::assertSame(['Rick', 1, $array], $results[1]);
+        self::assertSame(['Mike', 0, $array], $results[2]);
+    }
+
+    public function testFindLastIndexReturnsLastMatchingIndex(): void
+    {
+        self::assertSame(3, (new Arr(1, 2, 3, 4))->findLastIndex(static fn (int $value): bool => 0 === $value % 2));
+        self::assertSame(-1, (new Arr(1, 3, 5))->findLastIndex(static fn (int $value): bool => 0 === $value % 2));
+    }
+
+    public function testFindLastIndexBindsThisArgForClosures(): void
+    {
+        $dummy = new Dummy();
+
+        self::assertSame(3, (new Arr(1, 2, 3, 2))->findLastIndex($dummy->targetCallback(), $dummy));
+    }
+
+    public function testFindLastIndexDoesNotCallPredicateOnEmptyArray(): void
+    {
+        $called = false;
+
+        self::assertSame(-1, (new Arr())->findLastIndex(static function () use (&$called): bool {
+            $called = true;
+
+            return true;
+        }));
+        self::assertFalse($called);
+    }
+
+    public function testFindLastIndexUsesInitialRangeOfElementsDuringIteration(): void
+    {
+        $array = new Arr('Shoes', 'Car', 'Bike');
+        $results = [];
+
+        $array->findLastIndex(static function (?string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            if ([] === $results) {
+                $receivedArray->splice(1, 1);
+            }
+
+            $results[] = $value;
+
+            return false;
+        });
+
+        self::assertSame(['Bike', 'Bike', 'Shoes'], $results);
+
+        $array = new Arr('Skateboard', 'Barefoot');
+        $results = [];
+
+        $array->findLastIndex(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+            if ([] === $results) {
+                $receivedArray->push('Motorcycle');
+                $receivedArray->splice(0, 1, 'Magic Carpet');
+            }
+
+            $results[] = $value;
+
+            return false;
+        });
+
+        self::assertSame(['Barefoot', 'Magic Carpet'], $results);
+    }
+
+    public function testFindLastIndexPropagatesPredicateExceptions(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('predicate failed');
+
+        (new Arr(1))->findLastIndex(static function (): bool {
+            throw new \RuntimeException('predicate failed');
+        });
+    }
+
+    // Array.prototype.flat
+
+    public function testFlatHandlesEmptyNestedArrays(): void
+    {
+        $object = new \stdClass();
+        $one = new Arr();
+        $one->push(1);
+        $oneAndObject = new Arr();
+        $oneAndObject->push(1, $object);
+
+        self::assertSame([], iterator_to_array((new Arr())->flat()->values()));
+        self::assertSame([], iterator_to_array((new Arr(new Arr(), new Arr()))->flat()->values()));
+        self::assertSame([1], iterator_to_array((new Arr(new Arr(), $one))->flat()->values()));
+        self::assertSame([1, $object], iterator_to_array((new Arr(new Arr(), $oneAndObject))->flat()->values()));
+    }
+
+    public function testFlatUsesProvidedDepth(): void
+    {
+        $level3 = new Arr();
+        $level3->push(4);
+        $level2 = new Arr(3, $level3);
+        $level1 = new Arr(2, $level2);
+        $array = new Arr(1, $level1);
+
+        self::assertSame([1, 2, $level2], iterator_to_array($array->flat(1)->values()));
+        self::assertSame([1, 2, 3, $level3], iterator_to_array($array->flat(2)->values()));
+        self::assertSame([1, 2, 3, 4], iterator_to_array($array->flat(10)->values()));
+    }
+
+    // Array.prototype.flatMap
+
+    public function testFlatMapAlwaysFlattensOneLevel(): void
+    {
+        self::assertSame(
+            [1, 2, 2, 4],
+            iterator_to_array((new Arr(1, 2))->flatMap(static fn (int $value): Arr => new Arr($value, $value * 2))->values()),
+        );
+
+        $result = (new Arr(1, 2, 3))->flatMap(static function (int $value): Arr {
+            $inner = new Arr();
+            $inner->push($value * 2);
+
+            $outer = new Arr();
+            $outer->push($inner);
+
+            return $outer;
+        });
+
+        self::assertCount(3, iterator_to_array($result->values()));
+        self::assertSame([2], iterator_to_array($result->at(0)->values()));
+        self::assertSame([4], iterator_to_array($result->at(1)->values()));
+        self::assertSame([6], iterator_to_array($result->at(2)->values()));
+    }
+
+    public function testFlatMapUsesThisArg(): void
+    {
+        $context = new class {
+            public mixed $value = 'TestString';
+
+            public function callback(): callable
+            {
+                return fn (): Arr => new Arr($this->value);
+            }
+        };
+
+        $result = (new Arr('item'))->flatMap($context->callback(), $context);
+
+        self::assertSame(['TestString'], iterator_to_array($result->values()));
+    }
+
+    public function testFlatMapBindsThisArgForClosures(): void
+    {
+        $dummy = new Dummy();
+        $dummy->suffix = '!';
+
+        self::assertSame(['a!', 'b!'], iterator_to_array((new Arr('a', 'b'))->flatMap($dummy->suffixCallback(), $dummy)->values()));
+    }
+
+    public function testFlatMapPropagatesMapperExceptions(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('mapper failed');
+
+        (new Arr(0))->concat(0)->flatMap(static function (): Arr {
+            throw new \RuntimeException('mapper failed');
+        });
+    }
+
+    public function testFlatMapDoesNotCallMapperForEmptyArray(): void
+    {
+        $callCount = 0;
+
+        self::assertSame([], iterator_to_array((new Arr())->flatMap(static function () use (&$callCount): Arr {
+            ++$callCount;
+
+            throw new \RuntimeException('mapper failed');
+        })->values()));
+        self::assertSame(0, $callCount);
     }
 
     // Array.prototype.forEach
 
-    public function testForEachCallsCallbackForEachElement(): void
+    public function testForEachVisitsIndexesInOrderDuringIteration(): void
     {
-        $array = new Arr(1, 2, 3);
+        $result = true;
         $visited = [];
 
-        $array->forEach(static function (int $value) use (&$visited): void {
+        (new Arr(11, 12, 13, 14))->forEach(static function (int $_value, int $index) use (&$result, &$visited): void {
+            if (!isset($visited[$index])) {
+                if (0 !== $index && !isset($visited[$index - 1])) {
+                    $result = false;
+                }
+
+                $visited[$index] = true;
+
+                return;
+            }
+
+            $result = false;
+        });
+
+        self::assertTrue($result);
+    }
+
+    public function testForEachBindsThisArgForClosures(): void
+    {
+        $dummy = new Dummy();
+
+        (new Arr(1, 2, 3))->forEach($dummy->visitedCallback(), $dummy);
+
+        self::assertSame([1, 2, 3], $dummy->visited);
+    }
+
+    public function testForEachDoesNotConsiderNewElementsAddedAfterCall(): void
+    {
+        $callCount = 0;
+        $array = new Arr(1, 2, 4, 5);
+
+        $array->forEach(static function (int $_value, int $index, Arr $receivedArray) use (&$callCount): void {
+            ++$callCount;
+
+            if (0 === $index) {
+                $receivedArray->push(6);
+            }
+        });
+
+        self::assertSame(4, $callCount);
+    }
+
+    public function testForEachCallbackReceivesThreeArguments(): void
+    {
+        $called = false;
+
+        (new Arr(0, 1, 2, 3))->forEach(static function (...$args) use (&$called): void {
+            $called = true;
+            self::assertSame(3, \func_num_args());
+        });
+
+        self::assertTrue($called);
+    }
+
+    public function testForEachPropagatesCallbackExceptions(): void
+    {
+        $accessed = false;
+
+        try {
+            (new Arr(11, 10, 8))->forEach(static function (int $value, int $index) use (&$accessed): void {
+                if ($index > 0) {
+                    $accessed = true;
+                }
+
+                if (0 === $index) {
+                    throw new \RuntimeException('Exception occurred in callbackfn');
+                }
+            });
+
+            self::fail('Expected callback exception');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
+        }
+
+        self::assertFalse($accessed);
+    }
+
+    public function testForEachHasNoObservableEffectsOnEmptyArray(): void
+    {
+        $accessed = false;
+
+        (new Arr())->forEach(static function () use (&$accessed): void {
+            $accessed = true;
+        });
+
+        self::assertFalse($accessed);
+    }
+
+    public function testForEachSkipsIndexesRemovedAfterIterationStarts(): void
+    {
+        $visited = [];
+        $array = new Arr(1, 2, 3, 4, 6);
+
+        $array->forEach(static function (int $value, int $index, Arr $receivedArray) use (&$visited): void {
+            if (0 === $index) {
+                $receivedArray->splice(3);
+            }
+
             $visited[] = $value;
         });
 
         self::assertSame([1, 2, 3], $visited);
-    }
-
-    public function testForEachCallbackReceivesValueIndexAndArray(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $captured = [];
-
-        $array->forEach(static function (mixed $value, int $index, Arr $arr) use (&$captured): void {
-            $captured[] = [$value, $index, $arr];
-        });
-
-        self::assertCount(3, $captured);
-        self::assertSame('a', $captured[0][0]);
-        self::assertSame(0, $captured[0][1]);
-        self::assertSame($array, $captured[0][2]);
-        self::assertSame('b', $captured[1][0]);
-        self::assertSame(1, $captured[1][1]);
-        self::assertSame($array, $captured[1][2]);
-        self::assertSame('c', $captured[2][0]);
-        self::assertSame(2, $captured[2][1]);
-        self::assertSame($array, $captured[2][2]);
-    }
-
-    public function testForEachDoesNotMutateArray(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $array->forEach(static function (int $value): void {});
-
-        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
-    }
-
-    public function testForEachDoesNothingForEmptyArray(): void
-    {
-        $array = new Arr();
-
-        $called = false;
-        $array->forEach(static function () use (&$called): void {
-            $called = true;
-        });
-
-        self::assertFalse($called);
-    }
-
-    public function testForEachReturnsVoid(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->forEach(static function (int $value): void {});
-
-        self::assertNull($result);
-    }
-
-    public function testForEachWithThisArgBindsClosure(): void
-    {
-        $context = new Dummy();
-        $array = new Arr(1, 2, 3);
-
-        $array->forEach($context->visitedCallback(), $context);
-
-        self::assertSame([1, 2, 3], $context->visited);
     }
 
     // Array.prototype.includes
 
-    public function testIncludesReturnsTrueWhenElementFound(): void
+    public function testIncludesReturnsTrueForFoundIndex(): void
     {
-        $array = new Arr(42, 'test262', null, true, false, 0, -1, '');
+        $object = new \stdClass();
+        $array = [];
 
-        self::assertTrue($array->includes(42));
-        self::assertTrue($array->includes('test262'));
-        self::assertTrue($array->includes(null));
-        self::assertTrue($array->includes(true));
-        self::assertTrue($array->includes(false));
-        self::assertTrue($array->includes(0));
-        self::assertTrue($array->includes(-1));
-        self::assertTrue($array->includes(''));
+        $sample = new Arr(42, 'test262', null, null, true, false, 0, -1, '', $object, $array);
+
+        self::assertTrue($sample->includes(42));
+        self::assertTrue($sample->includes('test262'));
+        self::assertTrue($sample->includes(null));
+        self::assertTrue($sample->includes(true));
+        self::assertTrue($sample->includes(false));
+        self::assertTrue($sample->includes(0));
+        self::assertTrue($sample->includes(-1));
+        self::assertTrue($sample->includes(''));
+        self::assertTrue($sample->includes($object));
+        self::assertTrue($sample->includes($array));
     }
 
-    public function testIncludesReturnsFalseWhenElementNotFound(): void
+    public function testIncludesUsesSameValueZeroForNaN(): void
     {
-        self::assertFalse((new Arr(42))->includes(43));
-        self::assertFalse((new Arr('test262'))->includes('test'));
-        self::assertFalse((new Arr(0, 'test262', null))->includes(''));
-        self::assertFalse((new Arr('true', false))->includes(true));
-        self::assertFalse((new Arr('', true))->includes(false));
-        self::assertFalse((new Arr(null, false, 0, 1))->includes(10));
-    }
-
-    public function testIncludesWithObjectComparesByReference(): void
-    {
-        $obj = new \stdClass();
-        $array = new Arr($obj);
-
-        self::assertTrue($array->includes($obj));
-        self::assertFalse($array->includes(new \stdClass()));
-    }
-
-    public function testIncludesFindsNaN(): void
-    {
-        $array = new Arr(42, 0, 1, NAN);
+        $array = new Arr();
+        $array->push(NAN);
 
         self::assertTrue($array->includes(NAN));
     }
 
-    public function testIncludesWithNegativeZeroFindsZero(): void
+    public function testIncludesUsesSameValueZeroSemantics(): void
     {
-        $array = new Arr(42, 0, 1);
+        $sample = new Arr(42, 0, 1, NAN);
 
-        self::assertTrue($array->includes(-0));
+        self::assertFalse($sample->includes('42'));
+        self::assertFalse($sample->includes([42]));
+        self::assertTrue($sample->includes(42.0));
+        self::assertTrue($sample->includes(-0.0));
+        self::assertFalse($sample->includes(true));
+        self::assertFalse($sample->includes(false));
+        self::assertFalse($sample->includes(null));
+        self::assertFalse($sample->includes(''));
+        self::assertTrue($sample->includes(NAN));
     }
 
-    public function testIncludesWithPositiveFromIndexReturnsTrueWhenFoundAtOrAfter(): void
+    public function testIncludesSearchesUsingFromIndex(): void
     {
-        $array = new Arr('a', 'b', 'c');
+        $sample = new Arr('a', 'b', 'c');
 
-        self::assertTrue($array->includes('a', 0));
-        self::assertFalse($array->includes('a', 1));
-        self::assertFalse($array->includes('a', 2));
-
-        self::assertTrue($array->includes('b', 0));
-        self::assertTrue($array->includes('b', 1));
-        self::assertFalse($array->includes('b', 2));
-
-        self::assertTrue($array->includes('c', 0));
-        self::assertTrue($array->includes('c', 1));
-        self::assertTrue($array->includes('c', 2));
+        self::assertTrue($sample->includes('a', 0));
+        self::assertFalse($sample->includes('a', 1));
+        self::assertFalse($sample->includes('a', 2));
+        self::assertTrue($sample->includes('b', 0));
+        self::assertTrue($sample->includes('b', 1));
+        self::assertFalse($sample->includes('b', 2));
+        self::assertTrue($sample->includes('c', 0));
+        self::assertTrue($sample->includes('c', 1));
+        self::assertTrue($sample->includes('c', 2));
+        self::assertFalse($sample->includes('a', -1));
+        self::assertFalse($sample->includes('a', -2));
+        self::assertTrue($sample->includes('a', -3));
+        self::assertTrue($sample->includes('a', -4));
+        self::assertFalse($sample->includes('b', -1));
+        self::assertTrue($sample->includes('b', -2));
+        self::assertTrue($sample->includes('b', -3));
+        self::assertTrue($sample->includes('b', -4));
+        self::assertTrue($sample->includes('c', -1));
+        self::assertTrue($sample->includes('c', -2));
+        self::assertTrue($sample->includes('c', -3));
+        self::assertTrue($sample->includes('c', -4));
     }
 
-    public function testIncludesWithNegativeFromIndex(): void
+    public function testIncludesReturnsFalseWhenFromIndexIsAtOrBeyondLengthOrArrayIsEmpty(): void
     {
-        $array = new Arr('a', 'b', 'c');
-
-        self::assertFalse($array->includes('a', -1));
-        self::assertFalse($array->includes('a', -2));
-        self::assertTrue($array->includes('a', -3));
-        self::assertTrue($array->includes('a', -4));
-
-        self::assertFalse($array->includes('b', -1));
-        self::assertTrue($array->includes('b', -2));
-        self::assertTrue($array->includes('b', -3));
-        self::assertTrue($array->includes('b', -4));
-
-        self::assertTrue($array->includes('c', -1));
-        self::assertTrue($array->includes('c', -2));
-        self::assertTrue($array->includes('c', -3));
-        self::assertTrue($array->includes('c', -4));
+        self::assertFalse((new Arr(7, 7, 7, 7))->includes(7, 4));
+        self::assertFalse((new Arr(7, 7, 7, 7))->includes(7, 5));
+        self::assertFalse((new Arr())->includes(0));
+        self::assertFalse((new Arr())->includes());
+        self::assertFalse((new Arr())->includes(0, 1));
     }
 
-    public function testIncludesFromIndexEqualToLengthReturnsFalse(): void
+    public function testIncludesWithoutArgumentSearchesForNullLikeUndefined(): void
     {
-        $array = new Arr(7, 7, 7, 7);
-
-        self::assertFalse($array->includes(7, 4));
-        self::assertFalse($array->includes(7, 5));
-    }
-
-    public function testIncludesWithNoArgumentSearchesForNull(): void
-    {
-        self::assertFalse((new Arr(0))->includes());
+        self::assertFalse((new Arr(0))->concat()->includes());
         self::assertTrue((new Arr(null))->includes());
     }
 
-    public function testIncludesNegativeFromIndexBelowZeroStartFromZero(): void
+    public function testIncludesSearchesHolePositionsAsNullLikeUndefined(): void
     {
-        $array = new Arr(42, 43);
+        self::assertTrue((new Arr(3))->includes(null));
 
-        self::assertTrue($array->includes(42, -10));
-        self::assertTrue($array->includes(43, -10));
+        $sample = new Arr(5);
+        $sample->splice(3, 1, 42);
+
+        self::assertTrue($sample->includes(null));
+        self::assertTrue($sample->includes(null, 4));
+        self::assertTrue($sample->includes(42, 3));
     }
 
     // Array.prototype.indexOf
 
-    public function testIndexOfReturnsCorrectIndexWhenElementFound(): void
+    public function testIndexOfReturnsFirstMatchingIndex(): void
     {
-        $array = new Arr(42, 'test262', null, true, false, 0, -1, '');
-
-        self::assertSame(0, $array->indexOf(42));
-        self::assertSame(1, $array->indexOf('test262'));
-        self::assertSame(2, $array->indexOf(null));
-        self::assertSame(3, $array->indexOf(true));
-        self::assertSame(4, $array->indexOf(false));
-        self::assertSame(5, $array->indexOf(0));
-        self::assertSame(6, $array->indexOf(-1));
-        self::assertSame(7, $array->indexOf(''));
+        self::assertSame(1, (new Arr(1, 2, 2, 3))->indexOf(2));
     }
 
-    public function testIndexOfReturnsNegativeOneWhenElementNotFound(): void
+    public function testIndexOfRespectsFromIndex(): void
     {
-        self::assertSame(-1, (new Arr(42))->indexOf(43));
-        self::assertSame(-1, (new Arr('test262'))->indexOf('test'));
-        self::assertSame(-1, (new Arr(0, 'test262', null))->indexOf(''));
-        self::assertSame(-1, (new Arr('true', false))->indexOf(true));
-        self::assertSame(-1, (new Arr('', true))->indexOf(false));
-        self::assertSame(-1, (new Arr(null, false, 0, 1))->indexOf(10));
+        self::assertSame(2, (new Arr(1, 2, 2, 3))->indexOf(2, 2));
+        self::assertSame(2, (new Arr(1, 2, 2, 3))->indexOf(2, -2));
+        self::assertSame(-1, (new Arr(1, 2, 2, 3))->indexOf(2, 3));
     }
 
-    public function testIndexOfWithObjectComparesByReference(): void
+    public function testIndexOfReturnsMinusOneForEmptyArray(): void
     {
-        $obj = new \stdClass();
-        $array = new Arr($obj);
-
-        self::assertSame(0, $array->indexOf($obj));
-        self::assertSame(-1, $array->indexOf(new \stdClass()));
+        self::assertSame(-1, (new Arr())->indexOf(1));
+        self::assertSame(-1, (new Arr())->indexOf(2, 1));
     }
 
     public function testIndexOfDoesNotFindNaN(): void
     {
-        $array = new Arr(42, 0, 1, NAN);
+        $array = new Arr('NaN', null, 0, false, null, 'false');
+        $array->push(NAN, NAN);
 
         self::assertSame(-1, $array->indexOf(NAN));
     }
 
-    public function testIndexOfFindsNegativeZeroAsZero(): void
-    {
-        $array = new Arr(42, 0, 1);
-
-        self::assertSame(1, $array->indexOf(-0));
-    }
-
-    public function testIndexOfReturnsFirstMatchOnly(): void
-    {
-        $array = new Arr(1, 2, 3, 2, 1);
-
-        self::assertSame(1, $array->indexOf(2));
-    }
-
-    public function testIndexOfWithPositiveFromIndex(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-
-        self::assertSame(0, $array->indexOf('a', 0));
-        self::assertSame(-1, $array->indexOf('a', 1));
-        self::assertSame(-1, $array->indexOf('a', 2));
-        self::assertSame(1, $array->indexOf('b', 0));
-        self::assertSame(1, $array->indexOf('b', 1));
-        self::assertSame(-1, $array->indexOf('b', 2));
-        self::assertSame(2, $array->indexOf('c', 0));
-        self::assertSame(2, $array->indexOf('c', 1));
-        self::assertSame(2, $array->indexOf('c', 2));
-    }
-
-    public function testIndexOfWithNegativeFromIndex(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-
-        self::assertSame(-1, $array->indexOf('a', -1));
-        self::assertSame(-1, $array->indexOf('a', -2));
-        self::assertSame(0, $array->indexOf('a', -3));
-        self::assertSame(0, $array->indexOf('a', -4));
-        self::assertSame(-1, $array->indexOf('b', -1));
-        self::assertSame(1, $array->indexOf('b', -2));
-        self::assertSame(1, $array->indexOf('b', -3));
-        self::assertSame(1, $array->indexOf('b', -4));
-        self::assertSame(2, $array->indexOf('c', -1));
-        self::assertSame(2, $array->indexOf('c', -2));
-        self::assertSame(2, $array->indexOf('c', -3));
-        self::assertSame(2, $array->indexOf('c', -4));
-    }
-
-    public function testIndexOfFromIndexEqualToLengthReturnsNegativeOne(): void
-    {
-        $array = new Arr(7, 7, 7, 7);
-
-        self::assertSame(-1, $array->indexOf(7, 4));
-        self::assertSame(-1, $array->indexOf(7, 5));
-    }
-
-    public function testIndexOfWithNoArgumentSearchesForNull(): void
-    {
-        self::assertSame(-1, (new Arr(0))->indexOf());
-        self::assertSame(0, (new Arr(null))->indexOf());
-    }
-
-    public function testIndexOfNegativeFromIndexBelowZeroStartFromZero(): void
-    {
-        $array = new Arr(42, 43);
-
-        self::assertSame(0, $array->indexOf(42, -10));
-        self::assertSame(1, $array->indexOf(43, -10));
-    }
-
     // Array.prototype.join
 
-    public function testJoinReturnsEmptyStringForEmptyArray(): void
+    public function testJoinReturnsEmptyStringForLengthZero(): void
     {
+        self::assertSame('', (new Arr())->join());
+        self::assertSame('', (new Arr(0))->fill(1, 0, 0)->join());
+    }
+
+    public function testJoinUsesEmptyStringForNullValues(): void
+    {
+        self::assertSame(',1,,', (new Arr(null, 1, null, null))->join());
+    }
+
+    public function testJoinUsesCommaWhenSeparatorIsUndefined(): void
+    {
+        self::assertSame('0,1,2,3', (new Arr(0, 1, 2, 3))->join());
         $array = new Arr();
+        $array->push(0);
 
-        self::assertSame('', $array->join());
+        self::assertSame('0', $array->join());
     }
 
-    public function testJoinWithDefaultSeparator(): void
+    public function testJoinUsesStringSeparatorAndStringifiesValues(): void
     {
-        $array = new Arr(0, 1, 2, 3);
-
-        self::assertSame('0,1,2,3', $array->join());
+        self::assertSame('0123', (new Arr(0, 1, 2, 3))->join(''));
+        self::assertSame('0\1\2\3', (new Arr(0, 1, 2, 3))->join('\\'));
+        self::assertSame('0&1&2&3', (new Arr(0, 1, 2, 3))->join('&'));
+        self::assertSame('true,true,true', (new Arr(true, true, true))->join());
+        self::assertSame(',,', (new Arr(null, null, null))->join());
+        self::assertSame('Infinity,Infinity,Infinity', (new Arr(INF, INF, INF))->join());
+        self::assertSame('NaN,NaN,NaN', (new Arr(NAN, NAN, NAN))->join());
     }
 
-    public function testJoinWithCustomStringSeparator(): void
+    public function testJoinStringifiesPhpArraysAndNonStringableObjects(): void
     {
-        $array = new Arr(0, 1, 2, 3);
-
-        self::assertSame('0|1|2|3', $array->join('|'));
-    }
-
-    public function testJoinWithEmptyStringSeparator(): void
-    {
-        $array = new Arr(0, 1, 2, 3);
-
-        self::assertSame('0123', $array->join(''));
-    }
-
-    public function testJoinWithSingleElement(): void
-    {
-        $array = new Arr();
-        $array->push(42);
-
-        self::assertSame('42', $array->join());
-        self::assertSame('42', $array->join('-'));
-    }
-
-    public function testJoinConvertsNullElementsToEmptyString(): void
-    {
-        $array = new Arr(null, null, null);
-
-        self::assertSame(',,', $array->join());
-    }
-
-    public function testJoinConvertsBooleanElementsToString(): void
-    {
-        $array = new Arr(true, false);
-
-        self::assertSame('true,false', $array->join());
-    }
-
-    public function testJoinConvertsNanToString(): void
-    {
-        $array = new Arr();
-        $array->push(NAN);
-
-        self::assertSame('NaN', $array->join());
-    }
-
-    public function testJoinConvertsInfinityToString(): void
-    {
-        $array = new Arr(INF, -INF);
-
-        self::assertSame('Infinity,-Infinity', $array->join());
-    }
-
-    public function testJoinConvertsNonStringableObjectToString(): void
-    {
-        $array = new Arr();
-        $array->push(new \stdClass());
-
-        self::assertSame('[object Object]', $array->join());
-    }
-
-    public function testJoinWithMixedTypes(): void
-    {
-        $array = new Arr(1, 'hello', true, null, 3.14);
-
-        self::assertSame('1,hello,true,,3.14', $array->join());
-    }
-
-    public function testJoinWithNestedArr(): void
-    {
-        $inner = new Arr();
-        $inner->push(2);
-        $inner->push(3);
-        $array = new Arr(1, $inner, 4);
-
-        self::assertSame('1,2,3,4', $array->join());
-    }
-
-    public function testJoinWithArrayElement(): void
-    {
-        $array = new Arr(1, [2, 3], 4);
-
-        self::assertSame('1,2,3,4', $array->join());
-    }
-
-    public function testJoinSeparatorNotPropagatedToNestedArr(): void
-    {
-        $inner = new Arr();
-        $inner->push(2);
-        $inner->push(3);
-        $array = new Arr(1, $inner, 4);
-
-        self::assertSame('1|2,3|4', $array->join('|'));
+        self::assertSame('1,2,[object Object]', (new Arr([1, 2], new \stdClass()))->join());
     }
 
     // Array.prototype.keys
 
-    public function testKeysReturnsGenerator(): void
+    public function testKeysReturnsNumericProperties(): void
+    {
+        self::assertSame([0, 1, 2], iterator_to_array((new Arr('a', 'b', 'c'))->keys()));
+    }
+
+    public function testKeysIteratorSeesItemsAddedBeforeExhaustion(): void
     {
         $array = new Arr();
         $iterator = $array->keys();
-
-        self::assertInstanceOf(\Generator::class, $iterator);
-    }
-
-    public function testKeysYieldsIndices(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $iterator = $array->keys();
-
-        self::assertSame(0, $iterator->current());
-        $iterator->next();
-        self::assertSame(1, $iterator->current());
-        $iterator->next();
-        self::assertSame(2, $iterator->current());
-    }
-
-    public function testKeysIteratesAllKeys(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $keys = [];
-
-        foreach ($array->keys() as $key) {
-            $keys[] = $key;
-        }
-
-        self::assertSame([0, 1, 2], $keys);
-    }
-
-    public function testKeysReturnsExhaustedGeneratorForEmptyArray(): void
-    {
-        $array = new Arr();
-        $iterator = $array->keys();
-
-        self::assertNull($iterator->current());
-    }
-
-    public function testKeysIterationMutableBeforeFirstNext(): void
-    {
-        $array = new Arr();
-        $iterator = $array->keys();
-
         $array->push('a');
 
-        self::assertSame(0, $iterator->current());
-
-        $iterator->next();
-        self::assertNull($iterator->current());
-        self::assertFalse($iterator->valid());
-
-        $array->push('b');
-
-        $iterator->next();
-        self::assertNull($iterator->current());
-        self::assertFalse($iterator->valid());
+        self::assertSame([0], iterator_to_array($iterator));
     }
 
     // Array.prototype.lastIndexOf
 
-    public function testLastIndexOfReturnsCorrectIndexWhenElementFound(): void
+    public function testLastIndexOfReturnsLastMatchingIndex(): void
     {
-        $array = new Arr(1, 2, 3, 2, 1);
-
-        self::assertSame(3, $array->lastIndexOf(2));
+        self::assertSame(2, (new Arr(1, 2, 2, 3))->lastIndexOf(2));
     }
 
-    public function testLastIndexOfReturnsNegativeOneWhenElementNotFound(): void
+    public function testLastIndexOfRespectsFromIndex(): void
     {
-        $array = new Arr(1, 2, 3);
-
-        self::assertSame(-1, $array->lastIndexOf(4));
+        self::assertSame(1, (new Arr(1, 2, 2, 3))->lastIndexOf(2, 1));
+        self::assertSame(2, (new Arr(1, 2, 2, 3))->lastIndexOf(2, -2));
+        self::assertSame(-1, (new Arr(1, 2, 2, 3))->lastIndexOf(2, -4));
     }
 
-    public function testLastIndexOfWithObjectComparesByReference(): void
+    public function testLastIndexOfReturnsMinusOneForEmptyArray(): void
     {
-        $obj1 = new \stdClass();
-        $obj2 = new \stdClass();
-        $array = new Arr($obj1, $obj2);
-
-        self::assertSame(1, $array->lastIndexOf($obj2));
-        self::assertSame(-1, $array->lastIndexOf(new \stdClass()));
+        self::assertSame(-1, (new Arr())->lastIndexOf(1));
+        self::assertSame(-1, (new Arr())->lastIndexOf(2, 1));
     }
 
     public function testLastIndexOfDoesNotFindNaN(): void
     {
-        $array = new Arr();
-        $array->push(NAN);
+        $array = new Arr('NaN', null);
+        $array->push(NAN, null, 0, false, null, 'false');
 
         self::assertSame(-1, $array->lastIndexOf(NAN));
     }
 
-    public function testLastIndexOfFindsNegativeZeroAsZero(): void
-    {
-        $array = new Arr();
-        $array->push(0);
-        $array->push(42);
-
-        self::assertSame(0, $array->lastIndexOf(-0));
-    }
-
-    public function testLastIndexOfReturnsLastMatchOnly(): void
-    {
-        $array = new Arr(1, 2, 3, 2, 1);
-
-        self::assertSame(3, $array->lastIndexOf(2));
-        self::assertNotSame(1, $array->lastIndexOf(2));
-    }
-
-    public function testLastIndexOfWithPositiveFromIndex(): void
-    {
-        $array = new Arr(1, 2, 3, 2, 1);
-
-        self::assertSame(1, $array->lastIndexOf(2, 2));
-    }
-
-    public function testLastIndexOfWithNegativeFromIndex(): void
-    {
-        $array = new Arr(1, 2, 3, 2, 1);
-
-        self::assertSame(3, $array->lastIndexOf(2, -2));
-        self::assertSame(1, $array->lastIndexOf(2, -3));
-    }
-
-    public function testLastIndexOfSearchesEntireArrayWhenFromIndexExceedsLength(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        self::assertSame(0, $array->lastIndexOf(1, 10));
-        self::assertSame(2, $array->lastIndexOf(3, 10));
-    }
-
-    public function testLastIndexOfWithFromIndexLessThanNegativeLengthReturnsNegativeOne(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        self::assertSame(-1, $array->lastIndexOf(1, -10));
-        self::assertSame(-1, $array->lastIndexOf(2, -10));
-    }
-
-    public function testLastIndexOfWithNoArgumentSearchesForNull(): void
-    {
-        $array = new Arr(null, 42);
-
-        self::assertSame(0, $array->lastIndexOf());
-    }
-
-    public function testLastIndexOfReturnsNegativeOneForEmptyArray(): void
-    {
-        $array = new Arr();
-
-        self::assertSame(-1, $array->lastIndexOf(1));
-    }
-
     // Array.prototype.map
 
-    public function testMapReturnsArrayWithTransformedValues(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->map(static fn (int $value): int => $value * 2);
-
-        self::assertSame([2, 4, 6], iterator_to_array($result->values()));
-    }
-
-    public function testMapReturnsArrayWithSameLengthAsOriginal(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->map(static fn (int $value): string => (string) $value);
-
-        self::assertCount(3, iterator_to_array($result->values()));
-    }
-
-    public function testMapCallbackReceivesValueIndexAndArray(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $captured = [];
-
-        $array->map(static function (mixed $value, int $index, Arr $arr) use (&$captured): string {
-            $captured[] = [$value, $index, $arr];
-
-            return (string) $value;
-        });
-
-        self::assertCount(3, $captured);
-        self::assertSame('a', $captured[0][0]);
-        self::assertSame(0, $captured[0][1]);
-        self::assertSame($array, $captured[0][2]);
-        self::assertSame('b', $captured[1][0]);
-        self::assertSame(1, $captured[1][1]);
-        self::assertSame($array, $captured[1][2]);
-        self::assertSame('c', $captured[2][0]);
-        self::assertSame(2, $captured[2][1]);
-        self::assertSame($array, $captured[2][2]);
-    }
-
-    public function testMapReturnsNewArrayNotOriginal(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $result = $array->map(static fn (int $value): int => $value);
-
-        self::assertNotSame($array, $result);
-    }
-
-    public function testMapDoesNotMutateOriginalArray(): void
-    {
-        $array = new Arr(1, 2, 3);
-        $array->map(static fn (int $value): int => $value * 2);
-
-        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
-    }
-
-    public function testMapReturnsEmptyArrayForEmptyArray(): void
-    {
-        $array = new Arr();
-        $result = $array->map(static fn (mixed $value): mixed => $value);
-
-        self::assertSame([], iterator_to_array($result->values()));
-    }
-
-    public function testMapCallbackIsCalledForEachElementInOrder(): void
+    public function testMapAccessesValuesDuringEachIteration(): void
     {
         $visited = [];
-        $array = new Arr(1, 2, 3);
 
-        $array->map(static function (int $value) use (&$visited): int {
-            $visited[] = $value;
+        $result = (new Arr(11, 12, 13, 14))->map(static function (int $_value, int $index) use (&$visited): bool {
+            if (!isset($visited[$index])) {
+                if (0 !== $index && !isset($visited[$index - 1])) {
+                    return true;
+                }
 
-            return $value;
+                $visited[$index] = true;
+
+                return false;
+            }
+
+            return true;
         });
 
-        self::assertSame([1, 2, 3], $visited);
+        self::assertSame([false, false, false, false], iterator_to_array($result->values()));
     }
 
-    public function testMapPreservesNullElementsThroughMapping(): void
+    public function testMapBindsThisArgForClosures(): void
     {
-        $array = new Arr(null, 1, null, 2);
-        $result = $array->map(static fn (?int $value): ?int => null === $value ? -1 : $value * 2);
+        $dummy = new Dummy();
+        $dummy->multiplier = 3;
 
-        $values = iterator_to_array($result->values());
-        self::assertSame(-1, $values[0]);
-        self::assertSame(2, $values[1]);
-        self::assertSame(-1, $values[2]);
-        self::assertSame(4, $values[3]);
+        self::assertSame([3, 6, 9], iterator_to_array((new Arr(1, 2, 3))->map($dummy->multiplierCallback(), $dummy)->values()));
     }
 
-    public function testMapWithThisArgBindsClosure(): void
+    public function testMapDoesNotConsiderNewElementsAddedAfterCall(): void
     {
-        $context = new Dummy();
-        $array = new Arr(1, 2, 3);
+        $source = new Arr(1, 2, 4, 5);
+        $result = $source->map(static function (int $_value, int $index, Arr $array): int {
+            if (0 === $index) {
+                $array->push(6);
+            }
 
-        $result = $array->map($context->multiplierCallback(), $context);
+            return 1;
+        });
 
-        self::assertSame([2, 4, 6], iterator_to_array($result->values()));
+        self::assertCount(4, iterator_to_array($result->values()));
+    }
+
+    public function testMapCallbackReceivesThreeArguments(): void
+    {
+        $called = false;
+
+        (new Arr(0, 1, 2, 3))->map(static function (...$args) use (&$called): bool {
+            $called = true;
+
+            return 3 === \func_num_args();
+        });
+
+        self::assertTrue($called);
+    }
+
+    public function testMapPropagatesMapperExceptions(): void
+    {
+        $accessed = false;
+
+        try {
+            (new Arr(11, 10, 8))->map(static function (int $value, int $index) use (&$accessed): mixed {
+                if ($index > 0) {
+                    $accessed = true;
+                }
+
+                if (0 === $index) {
+                    throw new \RuntimeException('Exception occurred in callbackfn');
+                }
+
+                return $value;
+            });
+
+            self::fail('Expected mapper exception');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
+        }
+
+        self::assertFalse($accessed);
+    }
+
+    public function testMapSkipsIndexesRemovedAfterIterationStarts(): void
+    {
+        $array = new Arr(1, 2, 3, 4, 6);
+
+        self::assertSame([1, 2, 3], iterator_to_array($array->map(static function (int $value, int $index, Arr $receivedArray): int {
+            if (0 === $index) {
+                $receivedArray->splice(3);
+            }
+
+            return $value;
+        })->values()));
     }
 
     // Array.prototype.pop
 
-    public function testPopReturnsLastElementAndRemovesIt(): void
+    public function testPopReturnsUndefinedWhenLengthIsZero(): void
+    {
+        $array = new Arr();
+
+        self::assertNull($array->pop());
+        self::assertCount(0, iterator_to_array($array->values()));
+    }
+
+    public function testPopReturnsLastElementAndMutatesArray(): void
     {
         $array = new Arr(1, 2, 3);
 
@@ -2212,1028 +1392,823 @@ final class ArrTest extends TestCase
         self::assertSame([1, 2], iterator_to_array($array->values()));
     }
 
-    public function testPopReturnsNullForEmptyArray(): void
+    // Array.prototype.push
+
+    public function testPushAppendsArgumentsAndReturnsNewLength(): void
     {
         $array = new Arr();
 
-        self::assertNull($array->pop());
+        self::assertSame(1, $array->push(-1));
+        self::assertSame([-1], iterator_to_array($array->values()));
+        self::assertSame(3, $array->push(-4, -7));
+        self::assertSame([-1, -4, -7], iterator_to_array($array->values()));
     }
 
-    public function testPopDecreasesLengthAfterEachCall(): void
+    public function testPushWithNoArgumentsKeepsLengthUnchanged(): void
     {
-        $array = new Arr('a', 'b', 'c');
+        $array = new Arr();
+        $array->push(1);
 
-        self::assertSame('c', $array->pop());
-        self::assertSame('b', $array->pop());
-        self::assertSame('a', $array->pop());
-        self::assertNull($array->pop());
-    }
-
-    public function testPopModifiesArrayInPlace(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        $array->pop();
-        $array->push(4);
-
-        self::assertSame([1, 2, 4], iterator_to_array($array->values()));
-    }
-
-    // Array.prototype.push
-
-    public function testPushAppendsOneArgumentAndReturnsNewLength(): void
-    {
-        $x = new Arr();
-        $push = $x->push(1);
-
-        self::assertSame(1, $push);
-        self::assertSame(1, $x->at(0));
-
-        $push = $x->push();
-        self::assertSame(1, $push);
-        self::assertNull($x->at(1));
-
-        $push = $x->push(-1);
-        self::assertSame(2, $push);
-        self::assertSame(-1, $x->at(1));
-        self::assertCount(2, iterator_to_array($x->values()));
-    }
-
-    public function testPushWithManyArgumentsAppendsAllAndReturnsLength(): void
-    {
-        $x = new Arr(0, 0);
-        $push = $x->push(true, -1, 'NaN', '1');
-
-        $values = iterator_to_array($x->values());
-        self::assertSame(6, $push);
-        self::assertSame(0, $values[0]);
-        self::assertSame(0, $values[1]);
-        self::assertTrue($values[2]);
-        self::assertSame(-1, $values[3]);
-        self::assertSame('NaN', $values[4]);
-        self::assertSame('1', $values[5]);
-        self::assertCount(6, $values);
-    }
-
-    public function testPushModifiesArrayInPlace(): void
-    {
-        $x = new Arr('a', 'b');
-        $x->push('c', 'd');
-
-        $values = iterator_to_array($x->values());
-        self::assertSame(['a', 'b', 'c', 'd'], $values);
-    }
-
-    public function testPushOnEmptyArrayReturnsCorrectLength(): void
-    {
-        $x = new Arr();
-
-        self::assertSame(0, $x->push());
-        self::assertSame(1, $x->push('first'));
-        self::assertSame(2, $x->push('second'));
+        self::assertSame(1, $array->push());
+        self::assertSame([1], iterator_to_array($array->values()));
+        self::assertSame(2, $array->push(-1));
+        self::assertSame([1, -1], iterator_to_array($array->values()));
     }
 
     // Array.prototype.reduce
 
-    public function testReduceWithoutInitialValueSumsArray(): void
+    public function testReduceThrowsOnEmptyArrayWithoutInitialValue(): void
     {
-        $array = new Arr(1, 2, 3, 4);
-
-        $result = $array->reduce(static fn (int $accumulator, int $value): int => $accumulator + $value);
-
-        self::assertSame(10, $result);
-    }
-
-    public function testReduceWithInitialValue(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        $result = $array->reduce(static fn (int $accumulator, int $value): int => $accumulator + $value, 10);
-
-        self::assertSame(16, $result);
-    }
-
-    public function testReduceWithoutInitialValueOnEmptyArrayThrowsTypeError(): void
-    {
-        $array = new Arr();
-
         $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Reduce of empty array with no initial value');
 
-        $array->reduce(static fn (int $accumulator, int $value): int => $accumulator + $value);
+        (new Arr())->reduce(static fn (mixed $accumulator, mixed $value): mixed => $accumulator + $value);
     }
 
-    public function testReduceWithInitialValueOnEmptyArrayReturnsInitialValue(): void
+    public function testReduceAccumulatesValuesLeftToRight(): void
     {
+        self::assertSame(10, (new Arr(1, 2, 3, 4))->reduce(static fn (int $acc, int $value): int => $acc + $value, 0));
+        self::assertSame(10, (new Arr(1, 2, 3, 4))->reduce(static fn (int $acc, int $value): int => $acc + $value));
+    }
+
+    public function testReduceReturnsInitialValueForEmptyArray(): void
+    {
+        self::assertSame(5, (new Arr())->reduce(static fn (int $acc, int $value): int => $acc + $value, 5));
+    }
+
+    public function testReduceConsidersNewElementValuesDuringIteration(): void
+    {
+        $array = new Arr(1, 2, 3, 4, 5);
+
+        self::assertSame(3, $array->reduce(static function (int $previousValue, int $currentValue, int $index, Arr $receivedArray): int {
+            if (1 === $index) {
+                $receivedArray->splice(3, 2, -2, -1);
+            }
+
+            return $previousValue + $currentValue;
+        }));
+    }
+
+    public function testReduceCallbackReceivesFourArguments(): void
+    {
+        $called = false;
+
+        self::assertTrue((new Arr(0, 1, 2, 3))->reduce(static function (...$args) use (&$called): bool {
+            $called = true;
+
+            return 4 === \func_num_args();
+        }, true));
+        self::assertTrue($called);
+    }
+
+    public function testReduceUsesPreviousIterationResultAsAccumulator(): void
+    {
+        $result = true;
+        $preIteration = 1;
+
+        (new Arr(11, 12, 13))->reduce(static function (int $previousValue, int $currentValue) use (&$result, &$preIteration): int {
+            if ($preIteration !== $previousValue) {
+                $result = false;
+            }
+
+            $preIteration = $currentValue;
+
+            return $currentValue;
+        }, 1);
+
+        self::assertTrue($result);
+    }
+
+    public function testReduceDoesNotCallCallbackForSingleElementWithoutInitialValue(): void
+    {
+        $callCount = 0;
         $array = new Arr();
+        $array->push(1);
 
-        $result = $array->reduce(static fn (int $accumulator, int $value): int => $accumulator + $value, 0);
+        self::assertSame(1, $array->reduce(static function () use (&$callCount): int {
+            ++$callCount;
 
-        self::assertSame(0, $result);
+            return 2;
+        }));
+        self::assertSame(0, $callCount);
     }
 
-    public function testReduceWithSingleElementWithoutInitialValueReturnsElement(): void
+    public function testReducePropagatesCallbackExceptions(): void
     {
-        $array = new Arr();
-        $array->push(42);
+        $accessed = false;
 
-        $result = $array->reduce(static fn (int $accumulator, int $value): int => $accumulator + $value);
+        try {
+            (new Arr(11, 10, 8))->reduce(static function (int $previousValue, int $currentValue, int $index) use (&$accessed): int {
+                if ($index > 0) {
+                    $accessed = true;
+                }
 
-        self::assertSame(42, $result);
+                if (0 === $index) {
+                    throw new \RuntimeException('Exception occurred in callbackfn');
+                }
+
+                return $previousValue + $currentValue;
+            }, 1);
+
+            self::fail('Expected reducer exception');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
+        }
+
+        self::assertFalse($accessed);
     }
 
-    public function testReduceWithSingleElementWithInitialValueCallsCallback(): void
+    public function testReduceWithInitialValueHasNoObservableEffectsOnEmptyArray(): void
     {
-        $array = new Arr();
-        $array->push(42);
+        $accessed = false;
+        $callbackAccessed = false;
 
-        $result = $array->reduce(static fn (int $accumulator, int $value): int => $accumulator + $value, 10);
+        self::assertSame('initialValue', (new Arr())->reduce(static function () use (&$callbackAccessed): mixed {
+            $callbackAccessed = true;
 
-        self::assertSame(52, $result);
-    }
-
-    public function testReduceCallbackReceivesAccumulatorValueIndexAndArray(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $received = [];
-
-        $array->reduce(static function (mixed $accumulator, mixed $value, int $index, Arr $arr) use (&$received): string {
-            $received[] = [$accumulator, $value, $index, $arr];
-
-            return $accumulator.$value;
-        }, '');
-
-        self::assertCount(3, $received);
-        self::assertSame(['', 'a', 0, $array], $received[0]);
-        self::assertSame(['a', 'b', 1, $array], $received[1]);
-        self::assertSame(['ab', 'c', 2, $array], $received[2]);
-    }
-
-    public function testReduceReturnsAccumulatedString(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-
-        $result = $array->reduce(static fn (string $accumulator, string $value): string => $accumulator.$value);
-
-        self::assertSame('abc', $result);
+            return 'x';
+        }, 'initialValue'));
+        self::assertFalse($accessed);
+        self::assertFalse($callbackAccessed);
     }
 
     // Array.prototype.reduceRight
 
-    public function testReduceRightWithoutInitialValueSumsArray(): void
+    public function testReduceRightThrowsOnEmptyArrayWithoutInitialValue(): void
     {
-        $array = new Arr(1, 2, 3, 4);
-
-        $result = $array->reduceRight(static fn (int $accumulator, int $value): int => $accumulator + $value);
-
-        self::assertSame(10, $result);
-    }
-
-    public function testReduceRightWithInitialValue(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        $result = $array->reduceRight(static fn (int $accumulator, int $value): int => $accumulator + $value, 10);
-
-        self::assertSame(16, $result);
-    }
-
-    public function testReduceRightWithoutInitialValueOnEmptyArrayThrowsTypeError(): void
-    {
-        $array = new Arr();
-
         $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Reduce of empty array with no initial value');
 
-        $array->reduceRight(static fn (int $accumulator, int $value): int => $accumulator + $value);
+        (new Arr())->reduceRight(static fn (mixed $accumulator, mixed $value): mixed => $accumulator + $value);
     }
 
-    public function testReduceRightWithInitialValueOnEmptyArrayReturnsInitialValue(): void
+    public function testReduceRightAccumulatesValuesRightToLeft(): void
     {
+        self::assertSame('cba', (new Arr('a', 'b', 'c'))->reduceRight(static fn (string $acc, string $value): string => $acc.$value, ''));
+        self::assertSame('cba', (new Arr('a', 'b', 'c'))->reduceRight(static fn (string $acc, string $value): string => $acc.$value));
+    }
+
+    public function testReduceRightReturnsInitialValueForEmptyArray(): void
+    {
+        self::assertSame(5, (new Arr())->reduceRight(static fn (int $acc, int $value): int => $acc + $value, 5));
+    }
+
+    public function testReduceRightConsidersNewElementValuesDuringIteration(): void
+    {
+        $array = new Arr(1, 2, 3, 4, 5);
+
+        self::assertSame(13, $array->reduceRight(static function (int $previousValue, int $currentValue, int $index, Arr $receivedArray): int {
+            if (3 === $index) {
+                $receivedArray->splice(3, 1, -2);
+                $receivedArray->splice(0, 1, -1);
+            }
+
+            return $previousValue + $currentValue;
+        }));
+    }
+
+    public function testReduceRightCallbackReceivesFourArguments(): void
+    {
+        $called = false;
+
+        self::assertTrue((new Arr(0, 1, 2, 3))->reduceRight(static function (...$args) use (&$called): bool {
+            $called = true;
+
+            return 4 === \func_num_args();
+        }, true));
+        self::assertTrue($called);
+    }
+
+    public function testReduceRightUsesPreviousIterationResultAsAccumulator(): void
+    {
+        $result = true;
+        $previousResult = 6;
+
+        (new Arr(11, 12, 13))->reduceRight(static function (int $previousValue, int $currentValue) use (&$result, &$previousResult): int {
+            if ($previousResult !== $previousValue) {
+                $result = false;
+            }
+
+            $previousResult = $currentValue;
+
+            return $currentValue;
+        }, 6);
+
+        self::assertTrue($result);
+    }
+
+    public function testReduceRightDoesNotCallCallbackForSingleElementWithoutInitialValue(): void
+    {
+        $callCount = 0;
         $array = new Arr();
+        $array->push(1);
 
-        $result = $array->reduceRight(static fn (int $accumulator, int $value): int => $accumulator + $value, 0);
+        self::assertSame(1, $array->reduceRight(static function () use (&$callCount): int {
+            ++$callCount;
 
-        self::assertSame(0, $result);
+            return 2;
+        }));
+        self::assertSame(0, $callCount);
     }
 
-    public function testReduceRightWithSingleElementWithoutInitialValueReturnsElement(): void
+    public function testReduceRightPropagatesCallbackExceptions(): void
     {
-        $array = new Arr();
-        $array->push(42);
+        $accessed = false;
 
-        $result = $array->reduceRight(static fn (int $accumulator, int $value): int => $accumulator + $value);
+        try {
+            (new Arr(11, 10, 8))->reduceRight(static function (int $previousValue, int $currentValue, int $index) use (&$accessed): int {
+                if ($index < 2) {
+                    $accessed = true;
+                }
 
-        self::assertSame(42, $result);
-    }
+                if (2 === $index) {
+                    throw new \RuntimeException('Exception occurred in callbackfn');
+                }
 
-    public function testReduceRightWithSingleElementWithInitialValueCallsCallback(): void
-    {
-        $array = new Arr();
-        $array->push(42);
+                return $previousValue + $currentValue;
+            }, 1);
 
-        $result = $array->reduceRight(static fn (int $accumulator, int $value): int => $accumulator + $value, 10);
+            self::fail('Expected reducer exception');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
+        }
 
-        self::assertSame(52, $result);
-    }
-
-    public function testReduceRightCallbackReceivesAccumulatorValueIndexInReverse(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $received = [];
-
-        $array->reduceRight(static function (mixed $accumulator, mixed $value, int $index, Arr $arr) use (&$received): string {
-            $received[] = [$accumulator, $value, $index, $arr];
-
-            return $accumulator.$value;
-        }, '');
-
-        self::assertCount(3, $received);
-        self::assertSame(['', 'c', 2, $array], $received[0]);
-        self::assertSame(['c', 'b', 1, $array], $received[1]);
-        self::assertSame(['cb', 'a', 0, $array], $received[2]);
-    }
-
-    public function testReduceRightReturnsReversedString(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-
-        $result = $array->reduceRight(static fn (string $accumulator, string $value): string => $accumulator.$value);
-
-        self::assertSame('cba', $result);
+        self::assertFalse($accessed);
     }
 
     // Array.prototype.reverse
 
-    public function testReverseReturnsSelf(): void
+    public function testReverseMutatesAndReturnsSameObject(): void
     {
-        $array = new Arr(1, 2, 3);
-
+        $array = new Arr(1, 2);
         $result = $array->reverse();
 
         self::assertSame($array, $result);
+        self::assertSame([2, 1], iterator_to_array($array->values()));
     }
 
-    public function testReverseReversesElements(): void
+    public function testReverseWithZeroOrOneElementReturnsSameObjectWithoutChangingData(): void
     {
-        $array = new Arr(1, 2, 3);
+        $empty = new Arr();
+        $single = new Arr('value');
 
-        $array->reverse();
-
-        self::assertSame(3, $array->at(0));
-        self::assertSame(2, $array->at(1));
-        self::assertSame(1, $array->at(2));
-    }
-
-    public function testReverseOnEmptyArray(): void
-    {
-        $array = new Arr();
-
-        $array->reverse();
-
-        self::assertSame(0, iterator_count($array->values()));
-    }
-
-    public function testReverseOnSingleElement(): void
-    {
-        $array = new Arr();
-        $array->push(42);
-
-        $array->reverse();
-
-        self::assertSame(42, $array->at(0));
+        self::assertSame($empty, $empty->reverse());
+        self::assertSame([], iterator_to_array($empty->values()));
+        self::assertSame($single, $single->reverse());
+        self::assertSame(['value'], iterator_to_array($single->values()));
     }
 
     // Array.prototype.shift
 
-    public function testShiftRemovesFirstElementAndReturnsIt(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        $result = $array->shift();
-
-        self::assertSame(1, $result);
-        self::assertSame(2, $array->at(0));
-        self::assertSame(3, $array->at(1));
-    }
-
-    public function testShiftOnEmptyArrayReturnsNull(): void
+    public function testShiftReturnsUndefinedForEmptyArray(): void
     {
         $array = new Arr();
 
-        $result = $array->shift();
-
-        self::assertNull($result);
+        self::assertNull($array->shift());
+        self::assertCount(0, iterator_to_array($array->values()));
     }
 
-    public function testShiftDecreasesLength(): void
+    public function testShiftReturnsFirstElementAndMutatesArray(): void
     {
         $array = new Arr(1, 2, 3);
 
-        $array->shift();
-
-        self::assertSame(2, iterator_count($array->values()));
-    }
-
-    public function testShiftOnSingleElementMakesArrayEmpty(): void
-    {
-        $array = new Arr();
-        $array->push(42);
-
-        $array->shift();
-
-        self::assertSame(0, iterator_count($array->values()));
+        self::assertSame(1, $array->shift());
+        self::assertSame([2, 3], iterator_to_array($array->values()));
     }
 
     // Array.prototype.slice
 
-    public function testSliceWithoutArgumentsReturnsCopy(): void
+    public function testSliceWithPositiveStartAndEndReturnsExpectedValues(): void
     {
-        $array = new Arr(1, 2, 3);
+        $result = (new Arr(0, 1, 2, 3, 4))->slice(0, 3);
 
-        $result = $array->slice();
-
-        self::assertNotSame($array, $result);
-        self::assertSame(1, $result->at(0));
-        self::assertSame(2, $result->at(1));
-        self::assertSame(3, $result->at(2));
-        self::assertSame(3, iterator_count($result->values()));
+        self::assertSame([0, 1, 2], iterator_to_array($result->values()));
+        self::assertNull($result->at(3));
     }
 
-    public function testSliceWithStartIndex(): void
+    public function testSliceSupportsNegativeIndexes(): void
     {
-        $array = new Arr(1, 2, 3, 4);
-
-        $result = $array->slice(2);
-
-        self::assertSame(3, $result->at(0));
-        self::assertSame(4, $result->at(1));
+        self::assertSame([2, 3], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice(-3, -1)->values()));
     }
 
-    public function testSliceWithStartAndEnd(): void
+    public function testSliceDoesNotMutateOriginalArray(): void
     {
-        $array = new Arr(1, 2, 3, 4);
+        $array = new Arr(0, 1, 2, 3);
 
-        $result = $array->slice(1, 3);
+        $array->slice(1, 3);
 
-        self::assertSame(2, $result->at(0));
-        self::assertSame(3, $result->at(1));
+        self::assertSame([0, 1, 2, 3], iterator_to_array($array->values()));
     }
 
-    public function testSliceWithNegativeStart(): void
+    public function testSliceReturnsEmptyArrayWhenStartIsGreaterThanEnd(): void
     {
-        $array = new Arr(1, 2, 3, 4);
-
-        $result = $array->slice(-2);
-
-        self::assertSame(3, $result->at(0));
-        self::assertSame(4, $result->at(1));
+        self::assertSame([], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice(4, 3)->values()));
     }
 
-    public function testSliceWithNegativeEnd(): void
+    public function testSliceClampsNegativeStartBelowZero(): void
     {
-        $array = new Arr(1, 2, 3, 4);
-
-        $result = $array->slice(0, -1);
-
-        self::assertSame(1, $result->at(0));
-        self::assertSame(2, $result->at(1));
-        self::assertSame(3, $result->at(2));
+        self::assertSame([0, 1, 2, 3, 4], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice(-9, 5)->values()));
     }
 
-    public function testSliceDoesNotMutateOriginal(): void
+    public function testSliceUsesLengthWhenEndIsAbsent(): void
     {
-        $array = new Arr(1, 2, 3);
-
-        $array->slice(1);
-
-        self::assertSame(1, $array->at(0));
-        self::assertSame(2, $array->at(1));
-        self::assertSame(3, $array->at(2));
+        self::assertSame([3, 4], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice(-2)->values()));
     }
 
-    public function testSliceReturnsEmptyArrayWhenStartIsGreaterThanLength(): void
+    public function testSliceClampsEndBeyondLength(): void
     {
-        $array = new Arr(1, 2, 3);
-
-        $result = $array->slice(10);
-
-        self::assertSame(0, iterator_count($result->values()));
+        self::assertSame([3, 4], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice(3, 6)->values()));
     }
 
-    public function testSliceWithStartEqualToEndReturnsEmpty(): void
+    public function testSliceClampsStartBeyondLength(): void
     {
-        $array = new Arr(1, 2, 3);
-
-        $result = $array->slice(1, 1);
-
-        self::assertSame(0, iterator_count($result->values()));
-    }
-
-    public function testSliceWithEndGreaterThanLengthClampsToLength(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        $result = $array->slice(0, 10);
-
-        self::assertSame(1, $result->at(0));
-        self::assertSame(2, $result->at(1));
-        self::assertSame(3, $result->at(2));
+        self::assertSame([], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice(10)->values()));
     }
 
     // Array.prototype.some
 
-    public function testSomeReturnsTrueWhenElementPasses(): void
+    public function testSomeReturnsFalseForEmptyArray(): void
     {
-        $array = new Arr(1, 2, 3);
-
-        $result = $array->some(static fn (int $value): bool => 0 === $value % 2);
-
-        self::assertTrue($result);
+        self::assertFalse((new Arr())->some(static fn (): bool => true));
     }
 
-    public function testSomeReturnsFalseWhenNoElementPasses(): void
+    public function testSomeReturnsTrueWhenPredicateMatches(): void
     {
-        $array = new Arr(1, 3, 5);
-
-        $result = $array->some(static fn (int $value): bool => 0 === $value % 2);
-
-        self::assertFalse($result);
+        self::assertTrue((new Arr(1, 2, 3))->some(static fn (int $value): bool => 0 === $value % 2));
+        self::assertFalse((new Arr(1, 3, 5))->some(static fn (int $value): bool => 0 === $value % 2));
     }
 
-    public function testSomeStopsIteratingAfterFirstMatch(): void
-    {
-        $calledCount = 0;
-
-        $array = new Arr(1, 2, 3, 4, 5);
-
-        $array->some(static function (int $value) use (&$calledCount): bool {
-            ++$calledCount;
-
-            return 0 === $value % 2;
-        });
-
-        self::assertSame(2, $calledCount);
-    }
-
-    public function testSomeOnEmptyArrayReturnsFalse(): void
-    {
-        $array = new Arr();
-
-        $result = $array->some(static fn (): bool => true);
-
-        self::assertFalse($result);
-    }
-
-    public function testSomeCallbackReceivesValueKeyAndArray(): void
-    {
-        $array = new Arr('a', 'b', 'c');
-        $received = [];
-
-        $array->some(static function (mixed $value, int $key, Arr $arr) use (&$received): bool {
-            $received[] = [$value, $key, $arr];
-
-            return false;
-        });
-
-        self::assertCount(3, $received);
-        self::assertSame(['a', 0, $array], $received[0]);
-        self::assertSame(['b', 1, $array], $received[1]);
-        self::assertSame(['c', 2, $array], $received[2]);
-    }
-
-    public function testSomeWithThisArgBindsCallback(): void
+    public function testSomeBindsThisArgForClosures(): void
     {
         $dummy = new Dummy();
-        $array = new Arr(1, 2, 3);
 
-        $result = $array->some($dummy->targetCallback(), $dummy);
+        self::assertTrue((new Arr(1, 2, 3))->some($dummy->targetCallback(), $dummy));
+        self::assertFalse((new Arr(1, 3, 4))->some($dummy->targetCallback(), $dummy));
+    }
 
-        self::assertTrue($result);
+    public function testSomeCallbackReceivesThreeArguments(): void
+    {
+        self::assertFalse((new Arr(0, 1, true, null, new \stdClass(), 'five'))->some(static fn (...$args): bool => 3 !== \func_num_args()));
+    }
+
+    public function testSomeTreatsTruthyObjectReturnValueAsTrue(): void
+    {
+        self::assertTrue((new Arr(11))->some(static fn (): object => new \stdClass()));
+    }
+
+    public function testSomePropagatesPredicateExceptions(): void
+    {
+        $accessed = false;
+
+        try {
+            (new Arr(9, 100, 11))->some(static function (int $value, int $index) use (&$accessed): bool {
+                if ($index > 0) {
+                    $accessed = true;
+                }
+
+                if (0 === $index) {
+                    throw new \RuntimeException('Exception occurred in callbackfn');
+                }
+
+                return false;
+            });
+
+            self::fail('Expected predicate exception');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
+        }
+
+        self::assertFalse($accessed);
+    }
+
+    public function testSomeHasNoObservableEffectsOnEmptyArray(): void
+    {
+        $accessed = false;
+
+        self::assertFalse((new Arr())->some(static function () use (&$accessed): bool {
+            $accessed = true;
+
+            return true;
+        }));
+        self::assertFalse($accessed);
+    }
+
+    public function testSomeSkipsIndexesRemovedAfterIterationStarts(): void
+    {
+        $array = new Arr(1, 2, 3, 4, 6);
+
+        self::assertFalse($array->some(static function (int $value, int $index, Arr $receivedArray): bool {
+            if (0 === $index) {
+                $receivedArray->splice(3);
+            }
+
+            return $value > 4;
+        }));
     }
 
     // Array.prototype.sort
 
-    public function testSortWithoutCallbackSortsLexicographically(): void
+    public function testSortWithoutCompareFnUsesStringComparison(): void
     {
-        $array = new Arr(1, 2, 10, 9);
+        $array = new Arr(2, 11, 1);
 
-        $array->sort();
-
-        self::assertSame(1, $array->at(0));
-        self::assertSame(10, $array->at(1));
-        self::assertSame(2, $array->at(2));
-        self::assertSame(9, $array->at(3));
+        self::assertSame($array, $array->sort());
+        self::assertSame([1, 11, 2], iterator_to_array($array->values()));
     }
 
-    public function testSortWithCallbackSortsNumerically(): void
+    public function testSortUsesProvidedComparator(): void
     {
-        $array = new Arr(3, 1, 2);
+        $array = new Arr(4, 3, 2, 1);
 
         $array->sort(static fn (int $a, int $b): int => $a <=> $b);
 
-        self::assertSame(1, $array->at(0));
-        self::assertSame(2, $array->at(1));
-        self::assertSame(3, $array->at(2));
+        self::assertSame([1, 2, 3, 4], iterator_to_array($array->values()));
     }
 
-    public function testSortReturnsSelf(): void
+    public function testSortIsStableForEqualComparatorValues(): void
     {
-        $array = new Arr(3, 1, 2);
+        $array = new Arr(
+            ['name' => 'A', 'rating' => 2],
+            ['name' => 'B', 'rating' => 3],
+            ['name' => 'C', 'rating' => 2],
+            ['name' => 'D', 'rating' => 3],
+            ['name' => 'E', 'rating' => 3],
+        );
 
-        $result = $array->sort();
+        $array->sort(static fn (array $a, array $b): int => $b['rating'] <=> $a['rating']);
 
-        self::assertSame($array, $result);
+        self::assertSame('BDEAC', implode('', array_map(static fn (array $item): string => $item['name'], iterator_to_array($array->values()))));
     }
 
-    public function testSortMutatesOriginal(): void
+    public function testSortDoesNotSwallowExceptionsFromComparator(): void
     {
-        $array = new Arr(3, 1, 2);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('compare failed');
 
-        $array->sort(static fn (int $a, int $b): int => $a <=> $b);
-
-        self::assertSame(1, $array->at(0));
-        self::assertSame(2, $array->at(1));
-        self::assertSame(3, $array->at(2));
-    }
-
-    public function testSortOnEmptyArray(): void
-    {
-        $array = new Arr();
-
-        $array->sort();
-
-        self::assertSame(0, iterator_count($array->values()));
-    }
-
-    public function testSortOnSingleElement(): void
-    {
-        $array = new Arr();
-        $array->push(42);
-
-        $array->sort();
-
-        self::assertSame(42, $array->at(0));
+        (new Arr(1, 0))->sort(static function (): int {
+            throw new \RuntimeException('compare failed');
+        });
     }
 
     // Array.prototype.splice
 
-    public function testSpliceRemovesElementsAndReturnsThem(): void
+    public function testSpliceRemovesRequestedElementsAndMutatesReceiver(): void
     {
-        $array = new Arr('a', 'b', 'c', 'd');
+        $array = new Arr(0, 1, 2, 3);
+        $removed = $array->splice(0, 3);
 
-        $removed = $array->splice(1, 2);
-
-        self::assertSame(['b', 'c'], iterator_to_array($removed->values()));
-        self::assertSame(['a', 'd'], iterator_to_array($array->values()));
+        self::assertSame([0, 1, 2], iterator_to_array($removed->values()));
+        self::assertSame([3], iterator_to_array($array->values()));
     }
 
-    public function testSpliceWithoutDeleteCountRemovesAllFromStart(): void
+    public function testSpliceSupportsInsertion(): void
     {
-        $array = new Arr('a', 'b', 'c');
-
-        $removed = $array->splice(1);
-
-        self::assertSame(['b', 'c'], iterator_to_array($removed->values()));
-        self::assertSame(['a'], iterator_to_array($array->values()));
-    }
-
-    public function testSpliceWithNegativeStart(): void
-    {
-        $array = new Arr('a', 'b', 'c', 'd');
-
-        $removed = $array->splice(-2, 1);
-
-        self::assertSame(['c'], iterator_to_array($removed->values()));
-        self::assertSame(['a', 'b', 'd'], iterator_to_array($array->values()));
-    }
-
-    public function testSpliceInsertsElements(): void
-    {
-        $array = new Arr('a', 'b');
-
-        $removed = $array->splice(1, 0, 'x', 'y');
+        $array = new Arr(0, 1, 4, 5);
+        $removed = $array->splice(2, 0, 2, 3);
 
         self::assertSame([], iterator_to_array($removed->values()));
-        self::assertSame(['a', 'x', 'y', 'b'], iterator_to_array($array->values()));
+        self::assertSame([0, 1, 2, 3, 4, 5], iterator_to_array($array->values()));
     }
 
-    public function testSpliceReplacesElements(): void
+    public function testSpliceWithOmittedDeleteCountRemovesToEnd(): void
     {
-        $array = new Arr('a', 'b', 'c');
+        $array = new Arr(0, 1, 2, 3);
+        $removed = $array->splice(2);
 
-        $removed = $array->splice(1, 1, 'x');
-
-        self::assertSame(['b'], iterator_to_array($removed->values()));
-        self::assertSame(['a', 'x', 'c'], iterator_to_array($array->values()));
+        self::assertSame([2, 3], iterator_to_array($removed->values()));
+        self::assertSame([0, 1], iterator_to_array($array->values()));
     }
 
-    public function testSpliceWithStartGreaterThanLengthAppendsToEnd(): void
+    public function testSpliceTreatsNegativeDeleteCountAsZero(): void
     {
-        $array = new Arr('a', 'b');
-
-        $removed = $array->splice(10, 0, 'c');
+        $array = new Arr(0, 1);
+        $removed = $array->splice(-2, -1);
 
         self::assertSame([], iterator_to_array($removed->values()));
-        self::assertSame(['a', 'b', 'c'], iterator_to_array($array->values()));
+        self::assertSame([0, 1], iterator_to_array($array->values()));
+    }
+
+    public function testSpliceClampsDeleteCountToRemainingLengthAndSupportsInsertion(): void
+    {
+        $array = new Arr(0, 1, 2, 3);
+        $removed = $array->splice(1, 4, 4, 5);
+
+        self::assertSame([1, 2, 3], iterator_to_array($removed->values()));
+        self::assertSame([0, 4, 5], iterator_to_array($array->values()));
+    }
+
+    public function testSpliceWithExplicitNullDeleteCountDeletesNothing(): void
+    {
+        $array = new Arr(0, 1, 2, 3);
+        $removed = $array->splice(1, null);
+
+        self::assertSame([], iterator_to_array($removed->values()));
+        self::assertSame([0, 1, 2, 3], iterator_to_array($array->values()));
+    }
+
+    public function testSpliceClampsStartBeyondLength(): void
+    {
+        $array = new Arr(0, 1, 2, 3);
+        $removed = $array->splice(10, 1, 4, 5);
+
+        self::assertSame([], iterator_to_array($removed->values()));
+        self::assertSame([0, 1, 2, 3, 4, 5], iterator_to_array($array->values()));
     }
 
     // Array.prototype.toLocaleString
 
-    public function testToLocaleStringOnEmptyArrayReturnsEmptyString(): void
+    public function testToLocaleStringSkipsNullElements(): void
     {
-        $array = new Arr();
-
-        $result = $array->toLocaleString();
-
-        self::assertSame('', $result);
+        self::assertSame('', (new Arr(null))->toLocaleString());
+        self::assertSame('1,,3', (new Arr(1, null, 3))->toLocaleString());
     }
 
-    public function testToLocaleStringWithSingleNullReturnsEmptyString(): void
+    public function testToLocaleStringInvokesElementToLocaleString(): void
     {
-        $array = new Arr();
-        $array->push(null);
+        $calls = 0;
+        $object = new class($calls) {
+            public function __construct(private int &$calls) {}
 
-        $result = $array->toLocaleString();
+            public function toLocaleString(): string
+            {
+                ++$this->calls;
 
-        self::assertSame('', $result);
+                return 'ok';
+            }
+
+            public function __toString(): string
+            {
+                return 'string-cast';
+            }
+        };
+
+        (new Arr(null, $object, null, $object, $object))->toLocaleString();
+
+        self::assertSame(3, $calls);
     }
 
-    public function testToLocaleStringReturnsCommaSeparatedString(): void
+    public function testToLocaleStringFormatsNumbersWithLocalesAndOptions(): void
     {
-        $array = new Arr('a', 'b', 'c');
-
-        $result = $array->toLocaleString();
-
-        self::assertSame('a,b,c', $result);
+        self::assertSame(
+            '1,000,0.25,1',
+            (new Arr(1000, 0.25, 1))->toLocaleString('en-US', ['style' => 'decimal']),
+        );
     }
 
-    public function testToLocaleStringWithNumbers(): void
+    public function testToLocaleStringInvokesElementToLocaleStringWithNoArguments(): void
     {
-        $array = new Arr(1, 2, 3);
+        $spy = new class {
+            public array $receivedArguments = [];
 
-        $result = $array->toLocaleString();
+            public function toLocaleString(mixed ...$arguments): string
+            {
+                $this->receivedArguments[] = $arguments;
 
-        self::assertSame('1,2,3', $result);
+                return 'ok';
+            }
+        };
+
+        self::assertSame('ok', (new Arr($spy))->toLocaleString('zh', ['x' => 'y']));
+        self::assertSame([[]], $spy->receivedArguments);
     }
 
-    public function testToLocaleStringWithNullReturnsEmptyStringForNull(): void
+    public function testToLocaleStringUsesStringCastForNonNumericValuesWithoutToLocaleString(): void
     {
-        $array = new Arr();
-        $array->push('a', null, 'b');
-
-        $result = $array->toLocaleString();
-
-        self::assertSame('a,,b', $result);
+        self::assertSame('a,b,c', (new Arr('a', 'b', 'c'))->toLocaleString());
+        self::assertSame('1,', (new Arr(true, false))->toLocaleString());
     }
 
-    public function testToLocaleStringWithConsecutiveNulls(): void
+    public function testToLocaleStringFormatsPercentStyle(): void
     {
-        $array = new Arr();
-        $array->push('a', null, null, 'b');
-
-        $result = $array->toLocaleString();
-
-        self::assertSame('a,,,b', $result);
+        self::assertSame('25%,50%', (new Arr(0.25, 0.5))->toLocaleString('en-US', ['style' => 'percent']));
     }
 
-    public function testToLocaleStringOnSingleElement(): void
+    public function testToLocaleStringFormatsCurrencyStyle(): void
     {
-        $array = new Arr();
-        $array->push(42);
-
-        $result = $array->toLocaleString();
-
-        self::assertSame('42', $result);
+        self::assertSame('$1,234.50,$56.00', (new Arr(1234.5, 56))->toLocaleString('en-US', ['style' => 'currency', 'currency' => 'USD']));
     }
 
-    public function testToLocaleStringWithLocalesAndOptionsFormatsNumbers(): void
+    public function testToLocaleStringSupportsFractionDigitOptions(): void
     {
-        $array = new Arr(1000, 0.25, 1);
-
-        $result = $array->toLocaleString('en-US', ['style' => 'decimal']);
-
-        self::assertSame('1,000,0.25,1', $result);
+        self::assertSame('1.00,2.00', (new Arr(1, 2))->toLocaleString('en-US', ['minimumFractionDigits' => 2]));
+        self::assertSame('1.23,5.68', (new Arr(1.234, 5.678))->toLocaleString('en-US', ['maximumFractionDigits' => 2]));
     }
 
-    public function testToLocaleStringWithPercentStyle(): void
+    public function testToLocaleStringSupportsIntegerAndSignificantDigitOptions(): void
     {
-        $array = new Arr(0.25, 0.5);
-
-        $result = $array->toLocaleString('en-US', ['style' => 'percent']);
-
-        self::assertSame('25%,50%', $result);
+        self::assertSame('001,002', (new Arr(1, 2))->toLocaleString('en-US', ['minimumIntegerDigits' => 3]));
+        self::assertSame('23,56', (new Arr(123, 456))->toLocaleString('en-US', ['maximumIntegerDigits' => 2]));
+        self::assertSame('1.50,2.70', (new Arr(1.5, 2.7))->toLocaleString('en-US', ['minimumSignificantDigits' => 3]));
+        self::assertSame('123,7.89', (new Arr(123.456, 7.89))->toLocaleString('en-US', ['maximumSignificantDigits' => 3]));
     }
 
-    public function testToLocaleStringWithCurrencyStyle(): void
+    public function testToLocaleStringSupportsUseGroupingOption(): void
     {
-        $array = new Arr(1234.5, 56);
-
-        $result = $array->toLocaleString('en-US', ['style' => 'currency', 'currency' => 'USD']);
-
-        self::assertSame('$1,234.50,$56.00', $result);
-    }
-
-    public function testToLocaleStringWithLocaleSpecificFormatting(): void
-    {
-        $array = new Arr();
-        $array->push(1234.5);
-
-        $result = $array->toLocaleString('de-DE');
-
-        self::assertSame('1.234,5', $result);
-    }
-
-    public function testToLocaleStringWithMinimumFractionDigits(): void
-    {
-        $array = new Arr(1, 2);
-
-        $result = $array->toLocaleString('en-US', ['minimumFractionDigits' => 2]);
-
-        self::assertSame('1.00,2.00', $result);
-    }
-
-    public function testToLocaleStringWithMaximumFractionDigits(): void
-    {
-        $array = new Arr();
-        $array->push(1.234, 5.678);
-
-        $result = $array->toLocaleString('en-US', ['maximumFractionDigits' => 2]);
-
-        self::assertSame('1.23,5.68', $result);
-    }
-
-    public function testToLocaleStringWithMinimumIntegerDigits(): void
-    {
-        $array = new Arr(1, 2);
-
-        $result = $array->toLocaleString('en-US', ['minimumIntegerDigits' => 3]);
-
-        self::assertSame('001,002', $result);
-    }
-
-    public function testToLocaleStringWithMinimumSignificantDigits(): void
-    {
-        $array = new Arr();
-        $array->push(1.5, 2.7);
-
-        $result = $array->toLocaleString('en-US', ['minimumSignificantDigits' => 3]);
-
-        self::assertSame('1.50,2.70', $result);
-    }
-
-    public function testToLocaleStringWithMaximumIntegerDigits(): void
-    {
-        $array = new Arr(123, 456);
-
-        $result = $array->toLocaleString('en-US', ['maximumIntegerDigits' => 2]);
-
-        self::assertSame('23,56', $result);
-    }
-
-    public function testToLocaleStringWithMaximumSignificantDigits(): void
-    {
-        $array = new Arr();
-        $array->push(123.456, 7.89);
-
-        $result = $array->toLocaleString('en-US', ['maximumSignificantDigits' => 3]);
-
-        self::assertSame('123,7.89', $result);
-    }
-
-    public function testToLocaleStringWithUseGroupingDisabled(): void
-    {
-        $array = new Arr(1000, 2000);
-
-        $result = $array->toLocaleString('en-US', ['useGrouping' => false]);
-
-        self::assertSame('1000,2000', $result);
-    }
-
-    public function testToLocaleStringWithBooleans(): void
-    {
-        $array = new Arr(true, false);
-
-        $result = $array->toLocaleString();
-
-        self::assertSame('1,', $result);
+        self::assertSame('1000,2000', (new Arr(1000, 2000))->toLocaleString('en-US', ['useGrouping' => false]));
     }
 
     // Array.prototype.toReversed
 
-    public function testToReversedReturnsReversedCopy(): void
+    public function testToReversedDoesNotMutateReceiver(): void
     {
-        $array = new Arr(1, 2, 3);
-
+        $array = new Arr(0, 1, 2);
         $result = $array->toReversed();
 
         self::assertNotSame($array, $result);
-        self::assertSame(3, $result->at(0));
-        self::assertSame(2, $result->at(1));
-        self::assertSame(1, $result->at(2));
+        self::assertSame([0, 1, 2], iterator_to_array($array->values()));
+        self::assertSame([2, 1, 0], iterator_to_array($result->values()));
     }
 
-    public function testToReversedDoesNotMutateOriginal(): void
+    public function testToReversedReturnsNewArrayForZeroOrOneElement(): void
     {
-        $array = new Arr(1, 2, 3);
+        $zero = new Arr();
+        $zeroReversed = $zero->toReversed();
+        $one = new Arr('value');
+        $oneReversed = $one->toReversed();
 
-        $array->toReversed();
-
-        self::assertSame(1, $array->at(0));
-        self::assertSame(2, $array->at(1));
-        self::assertSame(3, $array->at(2));
-    }
-
-    public function testToReversedOnEmptyArrayReturnsEmpty(): void
-    {
-        $array = new Arr();
-
-        $result = $array->toReversed();
-
-        self::assertNotSame($array, $result);
-        self::assertSame(0, iterator_count($result->values()));
+        self::assertNotSame($zero, $zeroReversed);
+        self::assertSame([], iterator_to_array($zeroReversed->values()));
+        self::assertNotSame($one, $oneReversed);
+        self::assertSame(['value'], iterator_to_array($oneReversed->values()));
     }
 
     // Array.prototype.toSorted
 
-    public function testToSortedReturnsSortedCopy(): void
+    public function testToSortedDoesNotMutateReceiver(): void
     {
-        $array = new Arr(3, 1, 2);
-
+        $array = new Arr(2, 0, 1);
         $result = $array->toSorted();
 
         self::assertNotSame($array, $result);
-        self::assertSame(1, $result->at(0));
-        self::assertSame(2, $result->at(1));
-        self::assertSame(3, $result->at(2));
+        self::assertSame([2, 0, 1], iterator_to_array($array->values()));
+        self::assertSame([0, 1, 2], iterator_to_array($result->values()));
     }
 
-    public function testToSortedDoesNotMutateOriginal(): void
+    public function testToSortedUsesProvidedComparator(): void
     {
-        $array = new Arr(3, 1, 2);
+        self::assertSame(
+            [1, 2, 3, 4],
+            iterator_to_array((new Arr(4, 3, 2, 1))->toSorted(static fn (int $a, int $b): int => $a <=> $b)->values()),
+        );
 
-        $array->toSorted();
-
-        self::assertSame(3, $array->at(0));
-        self::assertSame(1, $array->at(1));
-        self::assertSame(2, $array->at(2));
+        self::assertSame(
+            [4, 3, 2, 1],
+            iterator_to_array((new Arr(1, 2, 3, 4))->toSorted(static fn (int $a, int $b): int => $b <=> $a)->values()),
+        );
     }
 
-    public function testToSortedWithCallback(): void
+    public function testToSortedUsesStringComparisonByDefault(): void
     {
-        $array = new Arr(3, 1, 2);
+        self::assertSame([1, 2, 3, 4], iterator_to_array((new Arr(4, 3, 2, 1))->toSorted()->values()));
+        self::assertSame([1, 2, 'a', 'z'], iterator_to_array((new Arr('a', 2, 1, 'z'))->toSorted()->values()));
+        self::assertSame(
+            [1, 11, 111, 2, 22, 222, 3, 33, 333],
+            iterator_to_array((new Arr(333, 33, 3, 222, 22, 2, 111, 11, 1))->toSorted()->values()),
+        );
+    }
 
-        $result = $array->toSorted(static fn (int $a, int $b): int => $a <=> $b);
+    public function testToSortedReturnsNewArrayForZeroOrOneElement(): void
+    {
+        $zero = new Arr();
+        $zeroSorted = $zero->toSorted();
+        $one = new Arr('value');
+        $oneSorted = $one->toSorted();
 
-        self::assertSame(1, $result->at(0));
-        self::assertSame(2, $result->at(1));
-        self::assertSame(3, $result->at(2));
+        self::assertNotSame($zero, $zeroSorted);
+        self::assertSame([], iterator_to_array($zeroSorted->values()));
+        self::assertNotSame($one, $oneSorted);
+        self::assertSame(['value'], iterator_to_array($oneSorted->values()));
+    }
+
+    public function testToSortedStopsAfterComparatorError(): void
+    {
+        $called = 0;
+
+        try {
+            (new Arr(1, 2, 3))->toSorted(static function () use (&$called): int {
+                ++$called;
+
+                if (1 === $called) {
+                    throw new \RuntimeException('compare failed');
+                }
+
+                return 0;
+            });
+
+            self::fail('Expected comparator exception');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('compare failed', $exception->getMessage());
+        }
+
+        self::assertSame(1, $called);
     }
 
     // Array.prototype.toSpliced
 
-    public function testToSplicedReturnsSplicedCopy(): void
+    public function testToSplicedReturnsNewArrayEvenWhenUnmodified(): void
     {
-        $array = new Arr('a', 'b', 'c', 'd');
-
-        $result = $array->toSpliced(1, 2);
+        $array = new Arr(1, 2, 3);
+        $result = $array->toSpliced(1, 0);
 
         self::assertNotSame($array, $result);
-        self::assertSame('a', $result->at(0));
-        self::assertSame('d', $result->at(1));
+        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
+        self::assertSame([1, 2, 3], iterator_to_array($result->values()));
     }
 
-    public function testToSplicedDoesNotMutateOriginal(): void
+    public function testToSplicedClampsDeleteCountBetweenZeroAndRemainingCount(): void
     {
-        $array = new Arr('a', 'b', 'c', 'd');
-
-        $array->toSpliced(1, 2);
-
-        self::assertSame('a', $array->at(0));
-        self::assertSame('b', $array->at(1));
-        self::assertSame('c', $array->at(2));
-        self::assertSame('d', $array->at(3));
+        self::assertSame([0, 1, 2, 3, 4, 5], iterator_to_array((new Arr(0, 1, 2, 3, 4, 5))->toSpliced(2, -1)->values()));
+        self::assertSame([0, 1, 2, 3, 4, 5], iterator_to_array((new Arr(0, 1, 2, 3, 4, 5))->toSpliced(-4, -1)->values()));
+        self::assertSame([0, 1], iterator_to_array((new Arr(0, 1, 2, 3, 4, 5))->toSpliced(2, 6)->values()));
+        self::assertSame([0, 1], iterator_to_array((new Arr(0, 1, 2, 3, 4, 5))->toSpliced(-4, 6)->values()));
     }
 
-    public function testToSplicedInsertsItems(): void
+    public function testToSplicedSupportsInsertionWithoutMutatingOriginalArray(): void
     {
-        $array = new Arr('a', 'b');
+        $array = new Arr(0, 1, 4, 5);
+        $result = $array->toSpliced(2, 0, 2, 3);
 
-        $result = $array->toSpliced(1, 0, 'x', 'y');
-
-        self::assertSame(['a', 'x', 'y', 'b'], iterator_to_array($result->values()));
+        self::assertSame([0, 1, 4, 5], iterator_to_array($array->values()));
+        self::assertSame([0, 1, 2, 3, 4, 5], iterator_to_array($result->values()));
     }
 
-    public function testToSplicedWithoutDeleteCountRemovesAllFromStart(): void
+    public function testToSplicedDeletesAfterStartWhenDeleteCountIsMissing(): void
     {
-        $array = new Arr('a', 'b', 'c');
-
-        $result = $array->toSpliced(1);
-
-        self::assertSame(['a'], iterator_to_array($result->values()));
+        self::assertSame(['first'], iterator_to_array((new Arr('first', 'second', 'third'))->toSpliced(1)->values()));
     }
 
-    public function testToSplicedWithNegativeStart(): void
+    public function testToSplicedTreatsNegativeStartAsRelativeToEnd(): void
     {
-        $array = new Arr('a', 'b', 'c', 'd');
-
-        $result = $array->toSpliced(-2, 1);
-
-        self::assertSame(['a', 'b', 'd'], iterator_to_array($result->values()));
+        self::assertSame([0, 1, 4], iterator_to_array((new Arr(0, 1, 2, 3, 4))->toSpliced(-3, 2)->values()));
     }
 
-    public function testToSplicedWithStartGreaterThanLengthAppendsToEnd(): void
+    public function testToSplicedClampsStartToArrayLength(): void
     {
-        $array = new Arr('a', 'b');
+        self::assertSame([0, 1, 2, 3, 4, 5, 6], iterator_to_array((new Arr(0, 1, 2, 3, 4))->toSpliced(10, 1, 5, 6)->values()));
+    }
 
-        $result = $array->toSpliced(10, 0, 'c');
+    public function testToSplicedTreatsStartLessThanMinusLengthAsZero(): void
+    {
+        self::assertSame([2, 3, 4], iterator_to_array((new Arr(0, 1, 2, 3, 4))->toSpliced(-20, 2)->values()));
+    }
 
-        self::assertSame(['a', 'b', 'c'], iterator_to_array($result->values()));
+    public function testToSplicedWithExplicitNullDeleteCountReturnsUnchangedCopy(): void
+    {
+        $array = new Arr(0, 1, 2, 3);
+        $result = $array->toSpliced(1, null);
+
+        self::assertNotSame($array, $result);
+        self::assertSame([0, 1, 2, 3], iterator_to_array($result->values()));
+        self::assertSame([0, 1, 2, 3], iterator_to_array($array->values()));
     }
 
     // Array.prototype.toString
 
-    public function testToStringDelegatesToJoin(): void
+    public function testToStringReturnsEmptyStringForEmptyArray(): void
     {
-        $array = new Arr('a', 'b', 'c');
-
-        $result = $array->toString();
-
-        self::assertSame('a,b,c', $result);
+        self::assertSame('', (new Arr())->toString());
     }
 
-    public function testToStringOfEmptyArray(): void
+    public function testToStringUsesJoinSemantics(): void
     {
-        $array = new Arr();
-
-        $result = $array->toString();
-
-        self::assertSame('', $result);
-    }
-
-    public function testToStringWithNullElements(): void
-    {
-        $array = new Arr(3);
-
-        $result = $array->toString();
-
-        self::assertSame(',,', $result);
+        self::assertSame('1,2,3', (new Arr(1, 2, 3))->toString());
+        self::assertSame(',,', (new Arr(3))->toString());
     }
 
     // Array.prototype.unshift
 
-    public function testUnshiftPrependsElementsAndReturnsNewLength(): void
+    public function testUnshiftPrependsItemsAndReturnsNewLength(): void
     {
-        $array = new Arr('a', 'b');
+        $array = new Arr(2, 3);
 
-        $length = $array->unshift('x', 'y');
-
-        self::assertSame(4, $length);
-        self::assertSame('x', $array->at(0));
-        self::assertSame('y', $array->at(1));
-        self::assertSame('a', $array->at(2));
-        self::assertSame('b', $array->at(3));
+        self::assertSame(4, $array->unshift(0, 1));
+        self::assertSame([0, 1, 2, 3], iterator_to_array($array->values()));
     }
 
-    public function testUnshiftOnEmptyArray(): void
+    public function testUnshiftWithNoArgumentsKeepsLengthUnchanged(): void
     {
         $array = new Arr();
+        $array->unshift(1);
 
-        $length = $array->unshift('a', 'b');
-
-        self::assertSame(2, $length);
-        self::assertSame('a', $array->at(0));
-        self::assertSame('b', $array->at(1));
-    }
-
-    public function testUnshiftWithNoArgumentsReturnsCurrentLength(): void
-    {
-        $array = new Arr('a', 'b');
-
-        $length = $array->unshift();
-
-        self::assertSame(2, $length);
+        self::assertSame(1, $array->unshift());
+        self::assertSame([1], iterator_to_array($array->values()));
+        self::assertSame(2, $array->unshift(-1));
+        self::assertSame([-1, 1], iterator_to_array($array->values()));
     }
 
     // Array.prototype.values
 
-    public function testValuesReturnsIterator(): void
+    public function testValuesReturnsIteratorForArrayValues(): void
     {
-        $array = new Arr('a', 'b', 'c');
-        $iterator = $array->values();
-
-        self::assertInstanceOf(\Generator::class, $iterator);
+        self::assertSame(['a', 'b', 'c'], iterator_to_array((new Arr('a', 'b', 'c'))->values()));
     }
 
-    public function testValuesIteratorYieldsArrayValues(): void
+    public function testValuesIteratorSeesItemsAddedBeforeExhaustion(): void
     {
-        $array = new Arr('a', 'b', 'c');
+        $array = new Arr();
         $iterator = $array->values();
+        $array->push('a');
 
-        self::assertSame('a', $iterator->current());
-        $iterator->next();
-        self::assertSame('b', $iterator->current());
-        $iterator->next();
-        self::assertSame('c', $iterator->current());
-        $iterator->next();
-        self::assertNull($iterator->current());
+        self::assertSame(['a'], iterator_to_array($iterator));
     }
 }

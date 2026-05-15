@@ -126,7 +126,15 @@ final class Arr implements \Stringable
             $callback = self::bindCallback($callback, $thisArg);
         }
 
-        foreach ($this->data as $key => $value) {
+        $len = \count($this->data);
+
+        for ($key = 0; $key < $len; ++$key) {
+            if (!\array_key_exists($key, $this->data)) {
+                continue;
+            }
+
+            $value = $this->data[$key];
+
             if (!$callback($value, $key, $this)) {
                 return false;
             }
@@ -168,7 +176,15 @@ final class Arr implements \Stringable
 
         $result = new self();
 
-        foreach ($this->data as $key => $value) {
+        $len = \count($this->data);
+
+        for ($key = 0; $key < $len; ++$key) {
+            if (!\array_key_exists($key, $this->data)) {
+                continue;
+            }
+
+            $value = $this->data[$key];
+
             if ($callback($value, $key, $this)) {
                 $result->data[] = $value;
             }
@@ -188,7 +204,11 @@ final class Arr implements \Stringable
             $callback = self::bindCallback($callback, $thisArg);
         }
 
-        foreach ($this->data as $key => $value) {
+        $len = \count($this->data);
+
+        for ($key = 0; $key < $len; ++$key) {
+            $value = $this->data[$key] ?? null;
+
             if ($callback($value, $key, $this)) {
                 return $value;
             }
@@ -206,7 +226,11 @@ final class Arr implements \Stringable
             $callback = self::bindCallback($callback, $thisArg);
         }
 
-        foreach ($this->data as $key => $value) {
+        $len = \count($this->data);
+
+        for ($key = 0; $key < $len; ++$key) {
+            $value = $this->data[$key] ?? null;
+
             if ($callback($value, $key, $this)) {
                 return $key;
             }
@@ -294,7 +318,15 @@ final class Arr implements \Stringable
             $callback = self::bindCallback($callback, $thisArg);
         }
 
-        foreach ($this->data as $key => $value) {
+        $len = \count($this->data);
+
+        for ($key = 0; $key < $len; ++$key) {
+            if (!\array_key_exists($key, $this->data)) {
+                continue;
+            }
+
+            $value = $this->data[$key];
+
             $callback($value, $key, $this);
         }
     }
@@ -309,6 +341,17 @@ final class Arr implements \Stringable
             $value = $this->data[$k];
 
             if ($value === $searchElement) {
+                return true;
+            }
+
+            // JavaScript numbers do not distinguish int/float the way PHP does.
+            if (
+                (\is_int($searchElement) || \is_float($searchElement))
+                && (\is_int($value) || \is_float($value))
+                && !(\is_float($searchElement) && is_nan($searchElement))
+                && !(\is_float($value) && is_nan($value))
+                && (float) $value === (float) $searchElement
+            ) {
                 return true;
             }
 
@@ -406,7 +449,15 @@ final class Arr implements \Stringable
 
         $result = new self();
 
-        foreach ($this->data as $key => $value) {
+        $len = \count($this->data);
+
+        for ($key = 0; $key < $len; ++$key) {
+            if (!\array_key_exists($key, $this->data)) {
+                continue;
+            }
+
+            $value = $this->data[$key];
+
             $result->data[] = $callback($value, $key, $this);
         }
 
@@ -553,7 +604,15 @@ final class Arr implements \Stringable
             $callback = self::bindCallback($callback, $thisArg);
         }
 
-        foreach ($this->data as $key => $value) {
+        $len = \count($this->data);
+
+        for ($key = 0; $key < $len; ++$key) {
+            if (!\array_key_exists($key, $this->data)) {
+                continue;
+            }
+
+            $value = $this->data[$key];
+
             if ($callback($value, $key, $this)) {
                 return true;
             }
@@ -586,6 +645,7 @@ final class Arr implements \Stringable
     public function splice(int $start, ?int $deleteCount = null, mixed ...$items): self
     {
         $len = \count($this->data);
+        $numArgs = \func_num_args();
 
         if ($start < 0) {
             $start = max(0, $len + $start);
@@ -595,8 +655,12 @@ final class Arr implements \Stringable
             $start = $len;
         }
 
-        if (null === $deleteCount) {
+        if (2 > $numArgs) {
             $deleteCount = $len - $start;
+        } elseif (0 > $deleteCount) {
+            $deleteCount = 0;
+        } elseif (null === $deleteCount) {
+            $deleteCount = 0;
         }
 
         $removed = \array_slice($this->data, $start, $deleteCount);
@@ -621,6 +685,8 @@ final class Arr implements \Stringable
                 $strings[] = '';
             } elseif (\is_int($value) || \is_float($value)) {
                 $strings[] = self::formatNumberToLocale($value, $locales, $options);
+            } elseif (\is_object($value) && method_exists($value, 'toLocaleString')) {
+                $strings[] = (string) $value->toLocaleString();
             } else {
                 $strings[] = (string) $value;
             }
@@ -676,8 +742,14 @@ final class Arr implements \Stringable
             $start = $len;
         }
 
-        if (null === $deleteCount) {
+        if (2 > \func_num_args()) {
             $deleteCount = $len - $start;
+        } else {
+            if (null === $deleteCount) {
+                $deleteCount = 0;
+            }
+
+            $deleteCount = max(0, min($deleteCount, $len - $start));
         }
 
         $newData = $this->data;
