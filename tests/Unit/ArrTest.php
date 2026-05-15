@@ -127,6 +127,13 @@ final class ArrTest extends TestCase
         self::assertSame('1,2,3', $array->__toString());
     }
 
+    public function testJsonSerializeReturnsInternalDataAsArray(): void
+    {
+        $array = new Arr(1, 'two', null, true);
+
+        self::assertSame([1, 'two', null, true], $array->jsonSerialize());
+    }
+
     // Array.prototype.at
 
     public function testAtReturnsItemValueAtSpecifiedIndex(): void
@@ -1975,7 +1982,7 @@ final class ArrTest extends TestCase
     public function testToLocaleStringUsesStringCastForNonNumericValuesWithoutToLocaleString(): void
     {
         self::assertSame('a,b,c', (new Arr('a', 'b', 'c'))->toLocaleString());
-        self::assertSame('1,', (new Arr(true, false))->toLocaleString());
+        self::assertSame('true,false', (new Arr(true, false))->toLocaleString());
     }
 
     public function testToLocaleStringFormatsPercentStyle(): void
@@ -2005,6 +2012,28 @@ final class ArrTest extends TestCase
     public function testToLocaleStringSupportsUseGroupingOption(): void
     {
         self::assertSame('1000,2000', (new Arr(1000, 2000))->toLocaleString('en-US', ['useGrouping' => false]));
+    }
+
+    public function testToLocaleStringSupportsUseGroupingAsInt(): void
+    {
+        self::assertSame('1000,2000', (new Arr(1000, 2000))->toLocaleString('en-US', ['useGrouping' => 0]));
+        self::assertSame('1,000,2,000', (new Arr(1000, 2000))->toLocaleString('en-US', ['useGrouping' => 1]));
+    }
+
+    public function testToLocaleStringThrowsOnNonStringCurrency(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Number formatting failed');
+
+        (new Arr(1, 100))->toLocaleString('en-US', ['style' => 'currency', 'currency' => 123]);
+    }
+
+    public function testToLocaleStringThrowsOnFormatCurrencyFailure(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Number formatting failed');
+
+        (new Arr(1, 100))->toLocaleString('en-US', ['style' => 'currency', 'currency' => '@@@']);
     }
 
     // Array.prototype.toReversed

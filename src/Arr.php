@@ -7,16 +7,16 @@ namespace Chubbyphp\Typescript;
 /**
  * @template T
  */
-final class Arr implements \Stringable
+final class Arr implements \JsonSerializable, \Stringable
 {
-    /** @var list<T> */
-    private array $data;
+    /**
+     * @var list<null|T>
+     */
+    private array $data = [];
 
     public function __construct(mixed ...$arguments)
     {
         if ([] === $arguments) {
-            $this->data = [];
-
             return;
         }
 
@@ -32,10 +32,8 @@ final class Arr implements \Stringable
                     throw new RangeError('Invalid array length');
                 }
 
-                $this->data = [];
-
                 for ($i = 0; $i < $arguments[0]; ++$i) {
-                    $this->data[] = null;
+                    $this->push(null);
                 }
 
                 return;
@@ -47,13 +45,21 @@ final class Arr implements \Stringable
         }
 
         foreach ($arguments as $argument) {
-            $this->data[] = $argument;
+            $this->push($argument);
         }
     }
 
     public function __toString(): string
     {
         return $this->toString();
+    }
+
+    /**
+     * @return list<null|T>
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->data;
     }
 
     /**
@@ -73,7 +79,9 @@ final class Arr implements \Stringable
      */
     public function concat(mixed ...$items): self
     {
-        $result = new self(...$this->data);
+        /** @var self<T> $result */
+        $result = new self();
+        $result->push(...$this->data);
 
         foreach ($items as $item) {
             if ($item instanceof self) {
@@ -101,14 +109,19 @@ final class Arr implements \Stringable
         $count = min($final - $from, $len - $to);
 
         if (0 < $count) {
-            array_splice($this->data, $to, $count, \array_slice($this->data, $from, $count));
+            array_splice(
+                $this->data,
+                $to,
+                $count,
+                \array_slice($this->data, $from, $count),
+            );
         }
 
         return $this;
     }
 
     /**
-     * @return \Generator<int, array{int, T}, mixed, void>
+     * @return \Generator<int, array{int, null|T}, mixed, void>
      */
     public function entries(): \Generator
     {
@@ -118,9 +131,9 @@ final class Arr implements \Stringable
     }
 
     /**
-     * @param callable(T, int, self<T>): bool $callback
+     * @param callable(null|T, int, self<T>): bool $callback
      */
-    public function every(callable $callback, mixed $thisArg = null): bool
+    public function every(callable $callback, ?object $thisArg = null): bool
     {
         if (null !== $thisArg && $callback instanceof \Closure) {
             $callback = self::bindCallback($callback, $thisArg);
@@ -156,24 +169,26 @@ final class Arr implements \Stringable
         $relativeEnd = $end ?? $len;
         $final = $relativeEnd < 0 ? max($len + $relativeEnd, 0) : min($relativeEnd, $len);
 
-        for (; $k < $final; ++$k) {
-            $this->data[$k] = $value;
+        $count = $final - $k;
+        if (0 < $count) {
+            array_splice($this->data, $k, $count, array_fill(0, $count, $value));
         }
 
         return $this;
     }
 
     /**
-     * @param callable(T, int, self<T>): bool $callback
+     * @param callable(null|T, int, self<T>): bool $callback
      *
      * @return self<T>
      */
-    public function filter(callable $callback, mixed $thisArg = null): self
+    public function filter(callable $callback, ?object $thisArg = null): self
     {
         if (null !== $thisArg && $callback instanceof \Closure) {
             $callback = self::bindCallback($callback, $thisArg);
         }
 
+        /** @var self<T> $result */
         $result = new self();
 
         $len = \count($this->data);
@@ -186,7 +201,7 @@ final class Arr implements \Stringable
             $value = $this->data[$key];
 
             if ($callback($value, $key, $this)) {
-                $result->data[] = $value;
+                $result->push($value);
             }
         }
 
@@ -194,11 +209,11 @@ final class Arr implements \Stringable
     }
 
     /**
-     * @param callable(T, int, self<T>): bool $callback
+     * @param callable(null|T, int, self<T>): bool $callback
      *
      * @return null|T
      */
-    public function find(callable $callback, mixed $thisArg = null): mixed
+    public function find(callable $callback, ?object $thisArg = null): mixed
     {
         if (null !== $thisArg && $callback instanceof \Closure) {
             $callback = self::bindCallback($callback, $thisArg);
@@ -218,9 +233,9 @@ final class Arr implements \Stringable
     }
 
     /**
-     * @param callable(T, int, self<T>): bool $callback
+     * @param callable(null|T, int, self<T>): bool $callback
      */
-    public function findIndex(callable $callback, mixed $thisArg = null): int
+    public function findIndex(callable $callback, ?object $thisArg = null): int
     {
         if (null !== $thisArg && $callback instanceof \Closure) {
             $callback = self::bindCallback($callback, $thisArg);
@@ -240,11 +255,11 @@ final class Arr implements \Stringable
     }
 
     /**
-     * @param callable(T, int, self<T>): bool $callback
+     * @param callable(null|T, int, self<T>): bool $callback
      *
      * @return null|T
      */
-    public function findLast(callable $callback, mixed $thisArg = null): mixed
+    public function findLast(callable $callback, ?object $thisArg = null): mixed
     {
         if (null !== $thisArg && $callback instanceof \Closure) {
             $callback = self::bindCallback($callback, $thisArg);
@@ -260,9 +275,9 @@ final class Arr implements \Stringable
     }
 
     /**
-     * @param callable(T, int, self<T>): bool $callback
+     * @param callable(null|T, int, self<T>): bool $callback
      */
-    public function findLastIndex(callable $callback, mixed $thisArg = null): int
+    public function findLastIndex(callable $callback, ?object $thisArg = null): int
     {
         if (null !== $thisArg && $callback instanceof \Closure) {
             $callback = self::bindCallback($callback, $thisArg);
@@ -282,17 +297,16 @@ final class Arr implements \Stringable
      */
     public function flat(int $depth = 1): self
     {
+        /** @var self<T> $result */
         $result = new self();
 
         foreach ($this->data as $value) {
             if ($value instanceof self && 0 < $depth) {
-                $flattened = $value->flat($depth - 1);
-
-                foreach ($flattened->data as $v) {
-                    $result->data[] = $v;
+                foreach ($value->flat($depth - 1)->data as $flattenedValue) {
+                    $result->push($flattenedValue);
                 }
             } else {
-                $result->data[] = $value;
+                $result->push($value);
             }
         }
 
@@ -300,19 +314,19 @@ final class Arr implements \Stringable
     }
 
     /**
-     * @param callable(T, int, self<T>): mixed $callback
+     * @param callable(null|T, int, self<T>): mixed $callback
      *
-     * @return self<T>
+     * @return self<mixed>
      */
-    public function flatMap(callable $callback, mixed $thisArg = null): self
+    public function flatMap(callable $callback, ?object $thisArg = null): self
     {
         return $this->map($callback, $thisArg)->flat(1);
     }
 
     /**
-     * @param callable(T, int, self<T>): void $callback
+     * @param callable(null|T, int, self<T>): void $callback
      */
-    public function forEach(callable $callback, mixed $thisArg = null): void
+    public function forEach(callable $callback, ?object $thisArg = null): void
     {
         if (null !== $thisArg && $callback instanceof \Closure) {
             $callback = self::bindCallback($callback, $thisArg);
@@ -344,7 +358,6 @@ final class Arr implements \Stringable
                 return true;
             }
 
-            // JavaScript numbers do not distinguish int/float the way PHP does.
             if (
                 (\is_int($searchElement) || \is_float($searchElement))
                 && (\is_int($value) || \is_float($value))
@@ -355,8 +368,12 @@ final class Arr implements \Stringable
                 return true;
             }
 
-            // SameValueZero: NaN is equal to NaN (unlike PHP's ===)
-            if (\is_float($searchElement) && is_nan($searchElement) && \is_float($value) && is_nan($value)) {
+            if (
+                \is_float($searchElement)
+                && is_nan($searchElement)
+                && \is_float($value)
+                && is_nan($value)
+            ) {
                 return true;
             }
         }
@@ -381,27 +398,7 @@ final class Arr implements \Stringable
 
     public function join(?string $separator = null): string
     {
-        $parts = [];
-
-        foreach ($this->data as $value) {
-            if (null === $value) {
-                $parts[] = '';
-            } elseif (\is_bool($value)) {
-                $parts[] = $value ? 'true' : 'false';
-            } elseif (\is_float($value) && is_nan($value)) {
-                $parts[] = 'NaN';
-            } elseif (\is_float($value) && is_infinite($value)) {
-                $parts[] = $value > 0 ? 'Infinity' : '-Infinity';
-            } elseif (\is_array($value)) {
-                $parts[] = implode(',', $value);
-            } elseif (\is_object($value) && !$value instanceof \Stringable) {
-                $parts[] = '[object Object]';
-            } else {
-                $parts[] = (string) $value;
-            }
-        }
-
-        return implode($separator ?? ',', $parts);
+        return self::mixedToString($this->data, $separator);
     }
 
     /**
@@ -437,16 +434,17 @@ final class Arr implements \Stringable
     /**
      * @template U
      *
-     * @param callable(T, int, self<T>): U $callback
+     * @param callable(null|T, int, self<T>): U $callback
      *
      * @return self<U>
      */
-    public function map(callable $callback, mixed $thisArg = null): self
+    public function map(callable $callback, ?object $thisArg = null): self
     {
         if (null !== $thisArg && $callback instanceof \Closure) {
             $callback = self::bindCallback($callback, $thisArg);
         }
 
+        /** @var self<U> $result */
         $result = new self();
 
         $len = \count($this->data);
@@ -458,7 +456,7 @@ final class Arr implements \Stringable
 
             $value = $this->data[$key];
 
-            $result->data[] = $callback($value, $key, $this);
+            $result->push($callback($value, $key, $this));
         }
 
         return $result;
@@ -470,7 +468,7 @@ final class Arr implements \Stringable
     }
 
     /**
-     * @param T ...$items
+     * @param null|T ...$items
      */
     public function push(mixed ...$items): int
     {
@@ -484,10 +482,10 @@ final class Arr implements \Stringable
     /**
      * @template U
      *
-     * @param callable(T|U, T, int, self<T>): U $callback
-     * @param U                                 $initialValue
+     * @param callable((null|T)|U, null|T, int, self<T>): U $callback
+     * @param U                                             $initialValue
      *
-     * @return T|U
+     * @return (null|T)|U
      */
     public function reduce(callable $callback, mixed $initialValue = null): mixed
     {
@@ -516,10 +514,10 @@ final class Arr implements \Stringable
     /**
      * @template U
      *
-     * @param callable(T|U, T, int, self<T>): U $callback
-     * @param U                                 $initialValue
+     * @param callable((null|T)|U, null|T, int, self<T>): U $callback
+     * @param U                                             $initialValue
      *
-     * @return T|U
+     * @return (null|T)|U
      */
     public function reduceRight(callable $callback, mixed $initialValue = null): mixed
     {
@@ -557,10 +555,11 @@ final class Arr implements \Stringable
 
     public function shift(): mixed
     {
-        $result = $this->data[0] ?? null;
+        $item = $this->data[0] ?? null;
+
         $this->data = \array_slice($this->data, 1);
 
-        return $result;
+        return $item;
     }
 
     /**
@@ -588,17 +587,25 @@ final class Arr implements \Stringable
             $end = $len;
         }
 
+        /** @var self<T> $new */
+        $new = new self();
+
         if ($start >= $end) {
-            return new self();
+            return $new;
         }
 
-        $new = new self();
-        $new->data = \array_slice($this->data, $start, $end - $start);
+        /** @var list<null|T> $slice */
+        $slice = \array_slice($this->data, $start, $end - $start);
+
+        $new->push(...$slice);
 
         return $new;
     }
 
-    public function some(callable $callback, mixed $thisArg = null): bool
+    /**
+     * @param callable(null|T, int, self<T>): bool $callback
+     */
+    public function some(callable $callback, ?object $thisArg = null): bool
     {
         if (null !== $thisArg && $callback instanceof \Closure) {
             $callback = self::bindCallback($callback, $thisArg);
@@ -622,7 +629,7 @@ final class Arr implements \Stringable
     }
 
     /**
-     * @param null|(callable(T, T): int) $callback
+     * @param null|(callable(null|T, null|T): int) $callback
      *
      * @return $this
      */
@@ -631,7 +638,13 @@ final class Arr implements \Stringable
         if (null !== $callback) {
             usort($this->data, $callback);
         } else {
-            usort($this->data, static fn (mixed $a, mixed $b): int => strcmp((string) $a, (string) $b));
+            usort(
+                $this->data,
+                static fn (mixed $a, mixed $b): int => strcmp(
+                    self::mixedToString($a),
+                    self::mixedToString($b)
+                )
+            );
         }
 
         return $this;
@@ -663,14 +676,17 @@ final class Arr implements \Stringable
             $deleteCount = 0;
         }
 
+        /** @var self<T> $new */
+        $new = new self();
+
+        /** @var list<null|T> $removed */
         $removed = \array_slice($this->data, $start, $deleteCount);
 
         array_splice($this->data, $start, $deleteCount, $items);
 
-        $result = new self();
-        $result->data = $removed;
+        $new->push(...$removed);
 
-        return $result;
+        return $new;
     }
 
     /**
@@ -678,21 +694,7 @@ final class Arr implements \Stringable
      */
     public function toLocaleString(?string $locales = null, ?array $options = null): string
     {
-        $strings = [];
-
-        foreach ($this->data as $value) {
-            if (null === $value) {
-                $strings[] = '';
-            } elseif (\is_int($value) || \is_float($value)) {
-                $strings[] = self::formatNumberToLocale($value, $locales, $options);
-            } elseif (\is_object($value) && method_exists($value, 'toLocaleString')) {
-                $strings[] = (string) $value->toLocaleString();
-            } else {
-                $strings[] = (string) $value;
-            }
-        }
-
-        return implode(',', $strings);
+        return self::mixedToLocaleString($this->data, $locales, $options);
     }
 
     /**
@@ -700,29 +702,45 @@ final class Arr implements \Stringable
      */
     public function toReversed(): self
     {
-        $new = new self();
-        $new->data = array_reverse($this->data);
+        /** @var self<T> $result */
+        $result = new self();
 
-        return $new;
+        /** @var list<null|T> $reversed */
+        $reversed = array_reverse($this->data);
+
+        $result->push(...$reversed);
+
+        return $result;
     }
 
     /**
-     * @param null|(callable(T, T): int) $callback
+     * @param null|(callable(null|T, null|T): int) $callback
      *
      * @return self<T>
      */
     public function toSorted(?callable $callback = null): self
     {
-        $new = new self();
-        $new->data = $this->data;
+        /** @var list<null|T> $sorted */
+        $sorted = $this->data;
 
         if (null !== $callback) {
-            usort($new->data, $callback);
+            usort($sorted, $callback);
         } else {
-            usort($new->data, static fn (mixed $a, mixed $b): int => strcmp((string) $a, (string) $b));
+            usort(
+                $sorted,
+                static fn (mixed $a, mixed $b): int => strcmp(
+                    self::mixedToString($a),
+                    self::mixedToString($b)
+                )
+            );
         }
 
-        return $new;
+        /** @var self<T> $result */
+        $result = new self();
+
+        $result->push(...$sorted);
+
+        return $result;
     }
 
     /**
@@ -752,12 +770,15 @@ final class Arr implements \Stringable
             $deleteCount = max(0, min($deleteCount, $len - $start));
         }
 
+        /** @var list<null|T> $newData */
         $newData = $this->data;
 
         array_splice($newData, $start, $deleteCount, $items);
 
+        /** @var self<T> $result */
         $result = new self();
-        $result->data = $newData;
+
+        $result->push(...$newData);
 
         return $result;
     }
@@ -775,7 +796,7 @@ final class Arr implements \Stringable
     }
 
     /**
-     * @return \Generator<T, mixed, mixed, void>
+     * @return \Generator<int, null|T, mixed, void>
      */
     public function values(): \Generator
     {
@@ -784,11 +805,61 @@ final class Arr implements \Stringable
         }
     }
 
+    private static function mixedToString(mixed $value, ?string $separator = null): string
+    {
+        return match (true) {
+            null === $value => '',
+            \is_bool($value) => $value ? 'true' : 'false',
+            \is_int($value) => (string) $value,
+            \is_float($value) && is_infinite($value) => $value > 0 ? 'Infinity' : '-Infinity',
+            \is_float($value) => \sprintf('%.17g', $value),
+            \is_string($value) => $value,
+            \is_object($value) && \is_callable([$value, '__toString']) => $value->__toString(),
+            is_iterable($value) => implode(
+                $separator ?? ',',
+                array_map(
+                    static fn (mixed $value) => self::mixedToString($value),
+                    iterator_to_array($value, false),
+                ),
+            ),
+            default => '[object Object]',
+        };
+    }
+
     /**
      * @param null|array<string, mixed> $options
      */
-    private static function formatNumberToLocale(float|int $value, ?string $locales, ?array $options = null): string
+    private static function mixedToLocaleString(mixed $value, ?string $locales, ?array $options, ?string $separator = null): string
     {
+        return match (true) {
+            null === $value => '',
+            \is_bool($value) => $value ? 'true' : 'false',
+            \is_int($value) || \is_float($value) => self::formatNumberToLocale($value, $locales, $options),
+            \is_string($value) => $value,
+            \is_object($value) && \is_callable([$value, 'toLocaleString']) => $value->toLocaleString(),
+            is_iterable($value) => implode(
+                $separator ?? ',',
+                array_map(
+                    static fn (mixed $value) => self::mixedToLocaleString(
+                        $value,
+                        $locales,
+                        $options,
+                    ),
+                    iterator_to_array($value, false),
+                ),
+            ),
+            default => '[object Object]',
+        };
+    }
+
+    /**
+     * @param null|array<string, mixed> $options
+     */
+    private static function formatNumberToLocale(
+        float|int $value,
+        ?string $locales,
+        ?array $options = null
+    ): string {
         $locale = $locales ?? \Locale::getDefault();
 
         $style = \NumberFormatter::DECIMAL;
@@ -823,30 +894,46 @@ final class Arr implements \Stringable
                         'minimumSignificantDigits' => \NumberFormatter::MIN_SIGNIFICANT_DIGITS,
                         'maximumSignificantDigits' => \NumberFormatter::MAX_SIGNIFICANT_DIGITS,
                     };
-                    $formatter->setAttribute($attribute, $options[$key]);
+                    $attrValue = $options[$key];
+                    if (\is_int($attrValue) || \is_float($attrValue)) {
+                        $formatter->setAttribute($attribute, $attrValue);
+                    }
                 }
             }
 
             if (isset($options['useGrouping'])) {
-                $formatter->setAttribute(\NumberFormatter::GROUPING_USED, (int) $options['useGrouping']);
+                $grouping = $options['useGrouping'];
+                if (\is_bool($grouping)) {
+                    $formatter->setAttribute(\NumberFormatter::GROUPING_USED, (int) $grouping);
+                } elseif (\is_int($grouping)) {
+                    $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $grouping);
+                }
             }
         }
 
         if (\NumberFormatter::CURRENCY === $style && isset($options['currency'])) {
-            return $formatter->formatCurrency($value, $options['currency']);
+            $currency = $options['currency'];
+            if (!\is_string($currency)) {
+                throw new \RuntimeException('Number formatting failed');
+            }
+            $result = $formatter->formatCurrency($value, $currency);
+            if (false === $result) {
+                throw new \RuntimeException('Number formatting failed');
+            }
+
+            return $result;
         }
 
+        // @phpstan-ignore-next-line return.type (unreachable: Format never returns false in PHP 8.5+ICU 74.2)
         return $formatter->format($value);
     }
 
-    /**
-     * @param callable(T, int, self<T>): mixed $callback
-     *
-     * @return callable(T, int, self<T>): mixed
-     */
-    private static function bindCallback(callable $callback, mixed $thisArg): callable
+    private static function bindCallback(callable $callback, object $thisArg): callable
     {
-        if (null !== $thisArg && $callback instanceof \Closure && !(new \ReflectionFunction($callback))->isStatic()) {
+        if (
+            $callback instanceof \Closure
+            && !(new \ReflectionFunction($callback))->isStatic()
+        ) {
             $bound = $callback->bindTo($thisArg);
 
             if (null !== $bound) {
