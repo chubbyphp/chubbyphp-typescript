@@ -37,9 +37,6 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
                     throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
                 }
 
-                /** @var list<null|T> $fill */
-                $fill = array_fill(0, $argument, null);
-                $this->data = $fill;
                 $this->length = $argument;
 
                 return;
@@ -146,12 +143,16 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
     public function concat(mixed ...$items): self
     {
         /** @var self<T> $result */
-        $result = new self();
-        $result->push(...$this->data);
+        $result = new self($this->length);
+        $result->data = $this->data;
 
         foreach ($items as $item) {
             if ($item instanceof self) {
-                $result->push(...$item->data);
+                $offset = $result->length;
+                foreach ($item->data as $key => $value) {
+                    $result->data[$offset + $key] = $value;
+                }
+                $result->length += $item->length;
             } else {
                 $result->push($item);
             }
@@ -175,13 +176,22 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
         $count = min($final - $from, $len - $to);
 
         if (0 < $count) {
-            array_splice(
-                $this->data,
-                $to,
-                $count,
-                \array_slice($this->data, $from, $count),
-            );
-            $this->length = \count($this->data);
+            $copied = [];
+            for ($i = 0; $i < $count; ++$i) {
+                $fromKey = $from + $i;
+                if (\array_key_exists($fromKey, $this->data)) {
+                    $copied[$i] = $this->data[$fromKey];
+                }
+            }
+
+            for ($i = 0; $i < $count; ++$i) {
+                $toKey = $to + $i;
+                if (\array_key_exists($i, $copied)) {
+                    $this->data[$toKey] = $copied[$i];
+                } else {
+                    unset($this->data[$toKey]);
+                }
+            }
         }
 
         return $this;
@@ -232,10 +242,8 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
         $relativeEnd = $end ?? $len;
         $final = $relativeEnd < 0 ? max($len + $relativeEnd, 0) : min($relativeEnd, $len);
 
-        $count = $final - $k;
-        if (0 < $count) {
-            array_splice($this->data, $k, $count, array_fill(0, $count, $value));
-            $this->length = max($this->length, \count($this->data));
+        for (; $k < $final; ++$k) {
+            $this->data[$k] = $value;
         }
 
         return $this;
@@ -250,17 +258,20 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        /** @var list<null|T> $filtered */
-        $filtered = array_values(array_filter(
-            $this->data,
-            fn (mixed $value, int $key): bool => (bool) $callback($value, $key, $this),
-            ARRAY_FILTER_USE_BOTH,
-        ));
-
         /** @var self<T> $result */
         $result = new self();
 
-        $result->push(...$filtered);
+        $len = $this->length;
+        for ($key = 0; $key < $len; ++$key) {
+            if (!\array_key_exists($key, $this->data)) {
+                continue;
+            }
+
+            $value = $this->data[$key];
+            if ($callback($value, $key, $this)) {
+                $result->push($value);
+            }
+        }
 
         return $result;
     }
@@ -416,7 +427,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
         $k = $fromIndex < 0 ? max($this->length + $fromIndex, 0) : $fromIndex;
 
         for ($i = $k; $i < $this->length; ++$i) {
-            if (self::strictlyEqual($this->data[$i] ?? null, $searchElement)) {
+            if (\array_key_exists($i, $this->data) && self::strictlyEqual($this->data[$i], $searchElement)) {
                 return $i;
             }
         }
@@ -426,7 +437,13 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
 
     public function join(?string $separator = null): string
     {
-        return self::mixedToString($this->data, $separator);
+        $values = [];
+
+        for ($key = 0; $key < $this->length; ++$key) {
+            $values[] = self::mixedToString($this->data[$key] ?? null);
+        }
+
+        return implode($separator ?? ',', $values);
     }
 
     /**
@@ -453,7 +470,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
         $k = $n >= 0 ? min($n, $len - 1) : $len + $n;
 
         for (; $k >= 0; --$k) {
-            if (self::strictlyEqual($this->data[$k] ?? null, $searchElement)) {
+            if (\array_key_exists($k, $this->data) && self::strictlyEqual($this->data[$k], $searchElement)) {
                 return $k;
             }
         }
@@ -473,7 +490,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
         $callback = self::bindCallback($callback, $thisArg);
 
         /** @var self<U> $result */
-        $result = new self();
+        $result = new self($this->length);
 
         $len = $this->length;
 
@@ -484,7 +501,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
 
             $value = $this->data[$key];
 
-            $result->push($callback($value, $key, $this));
+            $result->data[$key] = $callback($value, $key, $this);
         }
 
         return $result;
@@ -533,21 +550,32 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
     {
         $len = $this->length;
         $numArgs = \func_num_args();
-
-        if (0 === $len && 2 > $numArgs) {
-            throw new \TypeError('Reduce of empty array with no initial value');
-        }
+        $accumulator = null;
 
         if (2 <= $numArgs) {
             $accumulator = $initialValue;
             $i = 0;
         } else {
-            $accumulator = $this->data[0] ?? null;
-            $i = 1;
+            $found = false;
+            for ($i = 0; $i < $len; ++$i) {
+                if (\array_key_exists($i, $this->data)) {
+                    $accumulator = $this->data[$i];
+                    $found = true;
+                    ++$i;
+
+                    break;
+                }
+            }
+
+            if (!$found) {
+                throw new \TypeError('Reduce of empty array with no initial value');
+            }
         }
 
         for (; $i < $len; ++$i) {
-            $accumulator = $callback($accumulator, $this->data[$i] ?? null, $i, $this);
+            if (\array_key_exists($i, $this->data)) {
+                $accumulator = $callback($accumulator, $this->data[$i], $i, $this);
+            }
         }
 
         return $accumulator;
@@ -565,21 +593,32 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
     {
         $len = $this->length;
         $numArgs = \func_num_args();
-
-        if (0 === $len && 2 > $numArgs) {
-            throw new \TypeError('Reduce of empty array with no initial value');
-        }
+        $accumulator = null;
 
         if (2 <= $numArgs) {
             $accumulator = $initialValue;
             $i = $len - 1;
         } else {
-            $accumulator = $this->data[$len - 1] ?? null;
-            $i = $len - 2;
+            $found = false;
+            for ($i = $len - 1; $i >= 0; --$i) {
+                if (\array_key_exists($i, $this->data)) {
+                    $accumulator = $this->data[$i];
+                    $found = true;
+                    --$i;
+
+                    break;
+                }
+            }
+
+            if (!$found) {
+                throw new \TypeError('Reduce of empty array with no initial value');
+            }
         }
 
         for (; $i >= 0; --$i) {
-            $accumulator = $callback($accumulator, $this->data[$i] ?? null, $i, $this);
+            if (\array_key_exists($i, $this->data)) {
+                $accumulator = $callback($accumulator, $this->data[$i], $i, $this);
+            }
         }
 
         return $accumulator;
@@ -590,7 +629,15 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function reverse(): static
     {
-        $this->data = array_reverse($this->data);
+        $reversed = [];
+        foreach ($this->data as $key => $value) {
+            $reversed[$this->length - 1 - $key] = $value;
+        }
+
+        ksort($reversed);
+
+        /** @var array<int, null|T> $reversed */
+        $this->data = $reversed;
 
         return $this;
     }
@@ -601,9 +648,19 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
             return null;
         }
 
+        $value = $this->data[0] ?? null;
+        $newData = [];
+
+        foreach ($this->data as $key => $item) {
+            if (0 < $key) {
+                $newData[$key - 1] = $item;
+            }
+        }
+
+        $this->data = $newData;
         --$this->length;
 
-        return array_shift($this->data);
+        return $value;
     }
 
     /**
@@ -631,17 +688,18 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
             $end = $len;
         }
 
-        /** @var self<T> $new */
-        $new = new self();
-
         if ($start >= $end) {
-            return $new;
+            return new self();
         }
 
-        /** @var list<null|T> $slice */
-        $slice = \array_slice($this->data, $start, $end - $start);
+        /** @var self<T> $new */
+        $new = new self($end - $start);
 
-        $new->push(...$slice);
+        for ($key = $start; $key < $end; ++$key) {
+            if (\array_key_exists($key, $this->data)) {
+                $new->data[$key - $start] = $this->data[$key];
+            }
+        }
 
         return $new;
     }
@@ -677,16 +735,12 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function sort(?callable $callback = null): static
     {
-        if (null !== $callback) {
-            usort($this->data, $callback);
-        } else {
-            usort(
-                $this->data,
-                static fn (mixed $a, mixed $b): int => strcmp(
-                    self::mixedToString($a),
-                    self::mixedToString($b)
-                )
-            );
+        $sorted = array_values($this->data);
+        self::sortValues($sorted, $callback);
+
+        $this->data = [];
+        foreach ($sorted as $key => $value) {
+            $this->data[$key] = $value;
         }
 
         return $this;
@@ -718,16 +772,39 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
             $deleteCount = 0;
         }
 
+        $deleteCount = min($deleteCount, $len - $start);
+
         /** @var self<T> $new */
-        $new = new self();
+        $new = new self($deleteCount);
 
-        /** @var list<null|T> $removed */
-        $removed = \array_slice($this->data, $start, $deleteCount);
+        for ($i = 0; $i < $deleteCount; ++$i) {
+            if (\array_key_exists($start + $i, $this->data)) {
+                $new->data[$i] = $this->data[$start + $i];
+            }
+        }
 
-        array_splice($this->data, $start, $deleteCount, $items);
-        $this->length = \count($this->data);
+        $items = array_values($items);
+        $itemCount = \count($items);
+        $shift = $itemCount - $deleteCount;
+        $newData = [];
 
-        $new->push(...$removed);
+        foreach ($this->data as $key => $value) {
+            if ($key < $start) {
+                $newData[$key] = $value;
+            } elseif ($key >= $start + $deleteCount) {
+                $newData[$key + $shift] = $value;
+            }
+        }
+
+        foreach ($items as $i => $item) {
+            $newData[$start + $i] = $item;
+        }
+
+        ksort($newData);
+
+        /** @var array<int, null|T> $newData */
+        $this->data = $newData;
+        $this->length = $len - $deleteCount + $itemCount;
 
         return $new;
     }
@@ -737,7 +814,13 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function toLocaleString(?string $locales = null, ?array $options = null): string
     {
-        return self::mixedToLocaleString($this->data, $locales, $options);
+        $values = [];
+
+        for ($key = 0; $key < $this->length; ++$key) {
+            $values[] = self::mixedToLocaleString($this->data[$key] ?? null, $locales, $options);
+        }
+
+        return implode(',', $values);
     }
 
     /**
@@ -746,12 +829,11 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
     public function toReversed(): self
     {
         /** @var self<T> $result */
-        $result = new self();
+        $result = new self($this->length);
 
-        /** @var list<null|T> $reversed */
-        $reversed = array_reverse($this->data);
-
-        $result->push(...$reversed);
+        foreach ($this->data as $key => $value) {
+            $result->data[$this->length - 1 - $key] = $value;
+        }
 
         return $result;
     }
@@ -763,25 +845,15 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function toSorted(?callable $callback = null): self
     {
-        /** @var list<null|T> $sorted */
-        $sorted = $this->data;
-
-        if (null !== $callback) {
-            usort($sorted, $callback);
-        } else {
-            usort(
-                $sorted,
-                static fn (mixed $a, mixed $b): int => strcmp(
-                    self::mixedToString($a),
-                    self::mixedToString($b)
-                )
-            );
-        }
+        $sorted = array_values($this->data);
+        self::sortValues($sorted, $callback);
 
         /** @var self<T> $result */
-        $result = new self();
+        $result = new self($this->length);
 
-        $result->push(...$sorted);
+        foreach ($sorted as $key => $value) {
+            $result->data[$key] = $value;
+        }
 
         return $result;
     }
@@ -813,15 +885,10 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
             $deleteCount = max(0, min($deleteCount, $len - $start));
         }
 
-        /** @var list<null|T> $newData */
-        $newData = $this->data;
-
-        array_splice($newData, $start, $deleteCount, $items);
-
         /** @var self<T> $result */
-        $result = new self();
-
-        $result->push(...$newData);
+        $result = new self($this->length);
+        $result->data = $this->data;
+        $result->splice($start, $deleteCount, ...$items);
 
         return $result;
     }
@@ -833,8 +900,20 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
 
     public function unshift(mixed ...$items): int
     {
-        array_splice($this->data, 0, 0, $items);
-        $this->length += \count($items);
+        $items = array_values($items);
+        $itemCount = \count($items);
+        $newData = [];
+
+        foreach ($items as $key => $item) {
+            $newData[$key] = $item;
+        }
+
+        foreach ($this->data as $key => $value) {
+            $newData[$key + $itemCount] = $value;
+        }
+
+        $this->data = $newData;
+        $this->length += $itemCount;
 
         return $this->length;
     }
@@ -923,6 +1002,27 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
             ),
             default => '[object Object]',
         };
+    }
+
+    /**
+     * @param array<int, mixed>                    $values
+     * @param null|(callable(null|T, null|T): int) $callback
+     */
+    private static function sortValues(array &$values, ?callable $callback = null): void
+    {
+        if (null !== $callback) {
+            usort($values, $callback);
+
+            return;
+        }
+
+        usort(
+            $values,
+            static fn (mixed $a, mixed $b): int => strcmp(
+                self::mixedToString($a),
+                self::mixedToString($b)
+            )
+        );
     }
 
     /**
