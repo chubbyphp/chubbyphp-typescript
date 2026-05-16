@@ -38,6 +38,20 @@ composer require chubbyphp/chubbyphp-typescript "^1.0"
 
 ## Usage
 
+### [`Arr`](doc/Arr.md)
+
+A PHP port of the JavaScript `Array` class. See the [full documentation](doc/Arr.md) for API reference and examples.
+
+```php
+use Chubbyphp\Typescript\Arr;
+
+$arr = new Arr(1, 2, 3, 4, 5);
+$arr->push(6);
+$arr->pop();
+$arr->map(static fn (int $v): int => $v ** 2);
+// iterator_to_array($arr->values()) => [1, 4, 9, 16, 25]
+```
+
 ## Copyright
 
 2026 Dominik Zogg
