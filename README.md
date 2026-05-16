@@ -38,7 +38,7 @@ composer require chubbyphp/chubbyphp-typescript "^1.0"
 
 ## Usage
 
-### [`Arr`](doc/Arr.md)
+### Arr (Array)
 
 A PHP port of the JavaScript `Array` class. See the [full documentation](doc/Arr.md) for API reference and examples.
 
