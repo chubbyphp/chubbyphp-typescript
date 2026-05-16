@@ -890,40 +890,7 @@ final class Arr implements \JsonSerializable, \Stringable
         $formatter = new \NumberFormatter($locale, $style);
 
         if (null !== $options) {
-            foreach (
-                [
-                    'minimumFractionDigits',
-                    'maximumFractionDigits',
-                    'minimumIntegerDigits',
-                    'maximumIntegerDigits',
-                    'minimumSignificantDigits',
-                    'maximumSignificantDigits',
-                ] as $key
-            ) {
-                if (isset($options[$key])) {
-                    $attribute = match ($key) {
-                        'minimumFractionDigits' => \NumberFormatter::MIN_FRACTION_DIGITS,
-                        'maximumFractionDigits' => \NumberFormatter::MAX_FRACTION_DIGITS,
-                        'minimumIntegerDigits' => \NumberFormatter::MIN_INTEGER_DIGITS,
-                        'maximumIntegerDigits' => \NumberFormatter::MAX_INTEGER_DIGITS,
-                        'minimumSignificantDigits' => \NumberFormatter::MIN_SIGNIFICANT_DIGITS,
-                        'maximumSignificantDigits' => \NumberFormatter::MAX_SIGNIFICANT_DIGITS,
-                    };
-                    $attrValue = $options[$key];
-                    if (\is_int($attrValue) || \is_float($attrValue)) {
-                        $formatter->setAttribute($attribute, $attrValue);
-                    }
-                }
-            }
-
-            if (isset($options['useGrouping'])) {
-                $grouping = $options['useGrouping'];
-                if (\is_bool($grouping)) {
-                    $formatter->setAttribute(\NumberFormatter::GROUPING_USED, (int) $grouping);
-                } elseif (\is_int($grouping)) {
-                    $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $grouping);
-                }
-            }
+            self::applyNumberFormatterOptions($formatter, $options);
         }
 
         if (\NumberFormatter::CURRENCY === $style && isset($options['currency'])) {
@@ -941,6 +908,47 @@ final class Arr implements \JsonSerializable, \Stringable
 
         // @phpstan-ignore-next-line return.type (unreachable: Format never returns false in PHP 8.5+ICU 74.2)
         return $formatter->format($value);
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    private static function applyNumberFormatterOptions(\NumberFormatter $formatter, array $options): void
+    {
+        foreach (
+            [
+                'minimumFractionDigits',
+                'maximumFractionDigits',
+                'minimumIntegerDigits',
+                'maximumIntegerDigits',
+                'minimumSignificantDigits',
+                'maximumSignificantDigits',
+            ] as $key
+        ) {
+            if (isset($options[$key])) {
+                $attribute = match ($key) {
+                    'minimumFractionDigits' => \NumberFormatter::MIN_FRACTION_DIGITS,
+                    'maximumFractionDigits' => \NumberFormatter::MAX_FRACTION_DIGITS,
+                    'minimumIntegerDigits' => \NumberFormatter::MIN_INTEGER_DIGITS,
+                    'maximumIntegerDigits' => \NumberFormatter::MAX_INTEGER_DIGITS,
+                    'minimumSignificantDigits' => \NumberFormatter::MIN_SIGNIFICANT_DIGITS,
+                    'maximumSignificantDigits' => \NumberFormatter::MAX_SIGNIFICANT_DIGITS,
+                };
+                $attrValue = $options[$key];
+                if (\is_int($attrValue) || \is_float($attrValue)) {
+                    $formatter->setAttribute($attribute, $attrValue);
+                }
+            }
+        }
+
+        if (isset($options['useGrouping'])) {
+            $grouping = $options['useGrouping'];
+            if (\is_bool($grouping)) {
+                $formatter->setAttribute(\NumberFormatter::GROUPING_USED, (int) $grouping);
+            } elseif (\is_int($grouping)) {
+                $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $grouping);
+            }
+        }
     }
 
     private static function bindCallback(callable $callback, ?object $thisArg = null): callable
