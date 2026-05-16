@@ -551,6 +551,15 @@ final class ArrTest extends TestCase
         })->values()));
     }
 
+    public function testFilterDoesNotMutateOriginalArray(): void
+    {
+        $array = new Arr(1, 2, 3, 4);
+
+        $array->filter(static fn (int $value): bool => $value > 2);
+
+        self::assertSame([1, 2, 3, 4], iterator_to_array($array->values()));
+    }
+
     // Array.prototype.find
 
     public function testFindPassesValueIndexAndArrayToPredicate(): void
@@ -932,6 +941,16 @@ final class ArrTest extends TestCase
         self::assertSame([1, 2, 3, 4], iterator_to_array($array->flat(10)->values()));
     }
 
+    public function testFlatDoesNotMutateOriginalArray(): void
+    {
+        $inner = new Arr(2);
+        $array = new Arr(1, $inner);
+
+        $array->flat();
+
+        self::assertSame([1, $inner], iterator_to_array($array->values()));
+    }
+
     // Array.prototype.flatMap
 
     public function testFlatMapAlwaysFlattensOneLevel(): void
@@ -1001,6 +1020,15 @@ final class ArrTest extends TestCase
             throw new \RuntimeException('mapper failed');
         })->values()));
         self::assertSame(0, $callCount);
+    }
+
+    public function testFlatMapDoesNotMutateOriginalArray(): void
+    {
+        $array = new Arr(1, 2);
+
+        $array->flatMap(static fn (int $value): Arr => new Arr($value, $value * 2));
+
+        self::assertSame([1, 2], iterator_to_array($array->values()));
     }
 
     // Array.prototype.forEach
@@ -1416,6 +1444,15 @@ final class ArrTest extends TestCase
 
             return $value;
         })->values()));
+    }
+
+    public function testMapDoesNotMutateOriginalArray(): void
+    {
+        $array = new Arr(1, 2, 3);
+
+        $array->map(static fn (int $value): int => $value * 2);
+
+        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
     }
 
     // Array.prototype.pop
