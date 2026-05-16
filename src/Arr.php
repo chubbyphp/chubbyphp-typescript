@@ -20,10 +20,6 @@ final class Arr implements \JsonSerializable, \Stringable
 
     public function __construct(mixed ...$arguments)
     {
-        if ([] === $arguments) {
-            return;
-        }
-
         if (1 === \count($arguments)) {
             $argument = $arguments[0];
 
@@ -36,9 +32,9 @@ final class Arr implements \JsonSerializable, \Stringable
                     throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
                 }
 
-                for ($i = 0; $i < $arguments[0]; ++$i) {
-                    $this->push(null);
-                }
+                /** @var list<null|T> $fill */
+                $fill = array_fill(0, $argument, null);
+                $this->data = $fill;
 
                 return;
             }
@@ -48,9 +44,8 @@ final class Arr implements \JsonSerializable, \Stringable
             }
         }
 
-        foreach ($arguments as $argument) {
-            $this->push($argument);
-        }
+        /** @var list<null|T> $arguments */
+        $this->data = $arguments;
     }
 
     public function __toString(): string
