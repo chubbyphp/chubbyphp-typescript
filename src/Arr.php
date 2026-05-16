@@ -80,6 +80,20 @@ final class Arr implements \JsonSerializable, \Stringable
     }
 
     /**
+     * @return list<mixed>
+     */
+    public function toArray(): array
+    {
+        return array_map(static function (mixed $value): mixed {
+            if ($value instanceof self) {
+                return $value->toArray();
+            }
+
+            return $value;
+        }, $this->data);
+    }
+
+    /**
      * @return null|T
      */
     public function at(int $index): mixed

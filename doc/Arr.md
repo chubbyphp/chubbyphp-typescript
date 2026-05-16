@@ -493,6 +493,20 @@ Use `iterator_to_array($arr->values())` to get a plain PHP array.
 
 ---
 
+### `toArray(): array`
+
+Returns the internal `list<null|T>` as a plain PHP array, recursively converting nested `Arr` instances.
+
+```php
+$arr = new Arr(1, 'two', null, true);
+$arr->toArray();  // [1, 'two', null, true]
+
+$nested = new Arr(new Arr('a', 'b'));
+$nested->toArray();  // [['a', 'b']]
+```
+
+---
+
 ### `__toString(): string`
 
 Magic method that delegates to `toString()`.
