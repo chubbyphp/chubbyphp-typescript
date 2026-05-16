@@ -18,7 +18,11 @@ final class Accumulator implements \JsonSerializable
     public ?string $topUser = null;
     public object $byName;
     public object $tagCounts;
+
+    /** @var Arr<string> */
     public Arr $visitLabels;
+
+    /** @var Arr<User> */
     public Arr $users;
 
     public function __construct()

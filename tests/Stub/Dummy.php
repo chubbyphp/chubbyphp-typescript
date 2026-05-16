@@ -50,11 +50,12 @@ final class Dummy
     }
 
     /**
-     * @return callable(string, int, Arr<string>): Arr
+     * @return callable(string, int, Arr<string>): Arr<string>
      */
     public function suffixCallback(): callable
     {
         return function (string $value): Arr {
+            /** @var Arr<string> $result */
             $result = new Arr();
             $result->push($value.$this->suffix);
 

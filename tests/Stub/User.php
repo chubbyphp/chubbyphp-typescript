@@ -12,13 +12,23 @@ final class User implements \JsonSerializable
     public string $name;
     public int $score;
     public bool $active;
+
+    /** @var Arr<string> */
     public Arr $tags;
+
+    /** @var Arr<Visit> */
     public Arr $visits;
     public Meta $meta;
     public bool $processed = false;
     public int $updatedAt = 0;
+
+    /** @var Arr<HistoryEntry> */
     public Arr $history;
 
+    /**
+     * @param Arr<string> $tags
+     * @param Arr<Visit>  $visits
+     */
     public function __construct(int $id, string $name, int $score, bool $active, Arr $tags, Arr $visits, Meta $meta)
     {
         $this->id = $id;

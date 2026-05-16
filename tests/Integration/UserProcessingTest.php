@@ -21,6 +21,7 @@ final class UserProcessingTest extends TestCase
 {
     public function testUserPipeline(): void
     {
+        /** @var Arr<User> $users */
         $users = new Arr(
             new User(1, 'User-1', 42, true, new Arr('new'), new Arr(
                 new Visit(5, true),

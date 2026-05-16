@@ -18,6 +18,9 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     private array $data = [];
 
+    /**
+     * @param null|T ...$arguments
+     */
     public function __construct(mixed ...$arguments)
     {
         if (1 === \count($arguments)) {
@@ -185,8 +188,6 @@ final class Arr implements \JsonSerializable, \Stringable
     }
 
     /**
-     * @param T $value
-     *
      * @return self<T>
      */
     public function fill(mixed $value, int $start = 0, ?int $end = null): self
