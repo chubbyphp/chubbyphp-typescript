@@ -35,6 +35,8 @@ final class ArrTest extends TestCase
         self::assertCount(2, iterator_to_array($array->values()));
         self::assertNull($array->at(0));
         self::assertNull($array->at(1));
+        self::assertTrue(isset($array[0]));
+        self::assertFalse(isset($array[-1]));
     }
 
     public function testArrayConstructorWithManyArgumentsSetsItemsInOrder(): void
@@ -135,6 +137,14 @@ final class ArrTest extends TestCase
         self::assertSame([1, 'two', null, true], $array->jsonSerialize());
     }
 
+    public function testJsonSerializeReturnsListForSparseArray(): void
+    {
+        $array = new Arr();
+        $array[2] = 'x';
+
+        self::assertSame([null, null, 'x'], $array->jsonSerialize());
+    }
+
     public function testJsonSerializeRecursivelySerializesNestedArr(): void
     {
         $nested = new Arr('a', 'b');
@@ -150,6 +160,14 @@ final class ArrTest extends TestCase
         $array = new Arr(1, 'two', null, true);
 
         self::assertSame([1, 'two', null, true], $array->toArray());
+    }
+
+    public function testToArrayReturnsListForSparseArray(): void
+    {
+        $array = new Arr();
+        $array[2] = 'x';
+
+        self::assertSame([null, null, 'x'], $array->toArray());
     }
 
     public function testToArrayRecursivelyConvertsNestedArr(): void
@@ -168,23 +186,6 @@ final class ArrTest extends TestCase
         self::assertSame(3, (new Arr(1, 2, 3))->length);
         self::assertSame(5, (new Arr(5))->length);
         self::assertSame(4, (new Arr('a', 'b', 'c', 'd'))->length);
-    }
-
-    public function testLengthReturnsNullForUndefinedProperty(): void
-    {
-        $array = new Arr();
-
-        error_clear_last();
-
-        self::assertNull($array->foo);
-
-        $lastError = error_get_last();
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_WARNING, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Undefined property: Chubbyphp\Typescript\Arr::$foo', $lastError['message']);
     }
 
     public function testLengthIsLive(): void
@@ -245,6 +246,57 @@ final class ArrTest extends TestCase
         self::assertNull($array->at(1));
         self::assertNull($array->at(2));
         self::assertNull($array->at(-1));
+    }
+
+    public function testArrayAccessSupportsSparseIndexedAssignmentAndDeletion(): void
+    {
+        $array = new Arr();
+
+        $array[0] = 'first';
+        $array[2] = 'x';
+
+        self::assertSame(3, $array->length);
+        self::assertSame('first', $array[0]);
+        self::assertNull($array[1]);
+        self::assertSame('x', $array[2]);
+        self::assertFalse(isset($array[1]));
+        self::assertTrue(isset($array[2]));
+        self::assertSame([0, 1, 2], iterator_to_array($array->keys()));
+        self::assertSame(['first', null, 'x'], iterator_to_array($array->values()));
+        self::assertSame([[0, 'first'], [1, null], [2, 'x']], iterator_to_array($array->entries()));
+
+        unset($array[2]);
+
+        self::assertSame(3, $array->length);
+        self::assertFalse(isset($array[2]));
+    }
+
+    public function testArrayAccessSupportsAppendAndIgnoresInvalidOffsets(): void
+    {
+        $array = new Arr();
+
+        $array[] = 'a';
+        $array[-1] = 'negative';
+        $array['key'] = 'string';
+
+        self::assertSame(1, $array->length);
+        self::assertSame('a', $array[0]);
+        self::assertNull($array['key']);
+
+        unset($array['key']);
+
+        self::assertSame(['a'], iterator_to_array($array->values()));
+    }
+
+    public function testArrayAccessAppendDoesNotAlsoSetNullOffset(): void
+    {
+        $array = new Arr();
+
+        $array[] = 'a';
+        $array[] = 'b';
+
+        self::assertSame(2, $array->length);
+        self::assertSame(['a', 'b'], iterator_to_array($array->values()));
     }
 
     // Array.prototype.concat
@@ -338,6 +390,9 @@ final class ArrTest extends TestCase
         self::assertSame([0, 1, 0, 1, 2], iterator_to_array((new Arr(0, 1, 2, 3, 4))->copyWithin(2, 0, -1)->values()));
         self::assertSame([0, 2, 2, 3, 4], iterator_to_array((new Arr(0, 1, 2, 3, 4))->copyWithin(1, 2, -2)->values()));
         self::assertSame([2, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, -2, -1)->values()));
+        self::assertSame([0, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, 1, -10)->values()));
+        self::assertSame([0, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(0, 1, 0)->values()));
+        self::assertSame([0, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->copyWithin(1, 0, -10)->values()));
     }
 
     public function testCopyWithinClampsEndBeyondLength(): void
@@ -436,6 +491,24 @@ final class ArrTest extends TestCase
         }));
     }
 
+    public function testEveryContinuesAfterIndexRemovedDuringIteration(): void
+    {
+        $visited = [];
+        $array = new Arr(1, 2, 3, 4);
+
+        self::assertTrue($array->every(static function (int $value, int $index, Arr $receivedArray) use (&$visited): bool {
+            $visited[] = $value;
+
+            if (0 === $index) {
+                unset($receivedArray[1]);
+            }
+
+            return true;
+        }));
+
+        self::assertSame([1, 3, 4], $visited);
+    }
+
     // Array.prototype.fill
 
     public function testFillWritesValueBetweenStartAndEnd(): void
@@ -448,6 +521,8 @@ final class ArrTest extends TestCase
     {
         self::assertSame([0, 1, 'x', 'x'], iterator_to_array((new Arr(0, 1, 2, 3))->fill('x', -2)->values()));
         self::assertSame([0, 'x', 'x', 3], iterator_to_array((new Arr(0, 1, 2, 3))->fill('x', -3, -1)->values()));
+        self::assertSame([0, 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->fill('x', -10, -10)->values()));
+        self::assertSame(['x', 1, 2, 3], iterator_to_array((new Arr(0, 1, 2, 3))->fill('x', -10, 1)->values()));
     }
 
     public function testFillReturnsThisObject(): void
@@ -971,6 +1046,16 @@ final class ArrTest extends TestCase
         self::assertSame([1, 2, $level2], iterator_to_array($array->flat(1)->values()));
         self::assertSame([1, 2, 3, $level3], iterator_to_array($array->flat(2)->values()));
         self::assertSame([1, 2, 3, 4], iterator_to_array($array->flat(10)->values()));
+        self::assertSame([1, $level1], iterator_to_array($array->flat(0)->values()));
+        self::assertSame([1, $level1], iterator_to_array($array->flat(-1)->values()));
+    }
+
+    public function testFlatDefaultDepthFlattensExactlyOneLevel(): void
+    {
+        $nested = new Arr(2);
+        $inner = new Arr(1, $nested);
+
+        self::assertSame([1, $nested], iterator_to_array((new Arr($inner))->flat()->values()));
     }
 
     public function testFlatDoesNotMutateOriginalArray(): void
@@ -1174,6 +1259,22 @@ final class ArrTest extends TestCase
         self::assertSame([1, 2, 3], $visited);
     }
 
+    public function testForEachContinuesAfterIndexRemovedDuringIteration(): void
+    {
+        $visited = [];
+        $array = new Arr(1, 2, 3, 4);
+
+        $array->forEach(static function (int $value, int $index, Arr $receivedArray) use (&$visited): void {
+            $visited[] = $value;
+
+            if (0 === $index) {
+                unset($receivedArray[1]);
+            }
+        });
+
+        self::assertSame([1, 3, 4], $visited);
+    }
+
     // Array.prototype.includes
 
     public function testIncludesReturnsTrueForFoundIndex(): void
@@ -1210,12 +1311,21 @@ final class ArrTest extends TestCase
         self::assertFalse($sample->includes('42'));
         self::assertFalse($sample->includes([42]));
         self::assertTrue($sample->includes(42.0));
+        self::assertTrue((new Arr())->concat(1.0)->includes(1));
         self::assertTrue($sample->includes(-0.0));
         self::assertFalse($sample->includes(true));
         self::assertFalse($sample->includes(false));
         self::assertFalse($sample->includes(null));
         self::assertFalse($sample->includes(''));
         self::assertTrue($sample->includes(NAN));
+    }
+
+    public function testIncludesDoesNotMatchNaNAgainstOtherNumbers(): void
+    {
+        self::assertFalse((new Arr(1, 2, 3))->includes(NAN));
+        self::assertFalse((new Arr())->concat(NAN)->includes(1));
+        self::assertFalse((new Arr('1'))->includes(1));
+        self::assertFalse((new Arr(1))->concat('1')->includes(1.0, 1));
     }
 
     public function testIncludesSearchesUsingFromIndex(): void
@@ -1243,6 +1353,8 @@ final class ArrTest extends TestCase
         self::assertTrue($sample->includes('c', -2));
         self::assertTrue($sample->includes('c', -3));
         self::assertTrue($sample->includes('c', -4));
+        self::assertTrue((new Arr(null))->includes(null, -2));
+        self::assertFalse((new Arr('value'))->includes(null, -2));
     }
 
     public function testIncludesReturnsFalseWhenFromIndexIsAtOrBeyondLengthOrArrayIsEmpty(): void
@@ -1277,6 +1389,8 @@ final class ArrTest extends TestCase
     public function testIndexOfReturnsFirstMatchingIndex(): void
     {
         self::assertSame(1, (new Arr(1, 2, 2, 3))->indexOf(2));
+        self::assertSame(0, (new Arr(null, 1))->indexOf());
+        self::assertSame(0, (new Arr())->concat(1.0)->indexOf(1));
     }
 
     public function testIndexOfRespectsFromIndex(): void
@@ -1284,6 +1398,9 @@ final class ArrTest extends TestCase
         self::assertSame(2, (new Arr(1, 2, 2, 3))->indexOf(2, 2));
         self::assertSame(2, (new Arr(1, 2, 2, 3))->indexOf(2, -2));
         self::assertSame(-1, (new Arr(1, 2, 2, 3))->indexOf(2, 3));
+        self::assertSame(0, (new Arr('a', 'b', 'c'))->indexOf('a', -10));
+        self::assertSame(0, (new Arr(null))->indexOf(null, -2));
+        self::assertSame(-1, (new Arr('value'))->indexOf(null));
     }
 
     public function testIndexOfReturnsMinusOneForEmptyArray(): void
@@ -1343,6 +1460,7 @@ final class ArrTest extends TestCase
     public function testKeysReturnsNumericProperties(): void
     {
         self::assertSame([0, 1, 2], iterator_to_array((new Arr('a', 'b', 'c'))->keys()));
+        self::assertSame([], iterator_to_array((new Arr())->keys()));
     }
 
     public function testKeysIteratorSeesItemsAddedBeforeExhaustion(): void
@@ -1359,6 +1477,8 @@ final class ArrTest extends TestCase
     public function testLastIndexOfReturnsLastMatchingIndex(): void
     {
         self::assertSame(2, (new Arr(1, 2, 2, 3))->lastIndexOf(2));
+        self::assertSame(3, (new Arr(1, 2, 2, 3))->lastIndexOf(3));
+        self::assertSame(0, (new Arr())->concat(1.0)->lastIndexOf(1));
     }
 
     public function testLastIndexOfRespectsFromIndex(): void
@@ -1366,6 +1486,11 @@ final class ArrTest extends TestCase
         self::assertSame(1, (new Arr(1, 2, 2, 3))->lastIndexOf(2, 1));
         self::assertSame(2, (new Arr(1, 2, 2, 3))->lastIndexOf(2, -2));
         self::assertSame(-1, (new Arr(1, 2, 2, 3))->lastIndexOf(2, -4));
+        self::assertSame(3, (new Arr(1, 2, 2, 3))->lastIndexOf(3, 99));
+        self::assertSame(-1, (new Arr(1, 2, 2, 3))->lastIndexOf(1, -5));
+        self::assertSame(-1, (new Arr(1, 2, 2, 3))->lastIndexOf(3, 2));
+        self::assertSame(0, (new Arr(1, 2))->lastIndexOf(1, 0));
+        self::assertSame(-1, (new Arr('value'))->lastIndexOf(null));
     }
 
     public function testLastIndexOfReturnsMinusOneForEmptyArray(): void
@@ -1478,6 +1603,19 @@ final class ArrTest extends TestCase
         })->values()));
     }
 
+    public function testMapContinuesAfterIndexRemovedDuringIteration(): void
+    {
+        $array = new Arr(1, 2, 3, 4);
+
+        self::assertSame([1, 3, 4], iterator_to_array($array->map(static function (int $value, int $index, Arr $receivedArray): int {
+            if (0 === $index) {
+                unset($receivedArray[1]);
+            }
+
+            return $value;
+        })->values()));
+    }
+
     public function testMapDoesNotMutateOriginalArray(): void
     {
         $array = new Arr(1, 2, 3);
@@ -1502,6 +1640,16 @@ final class ArrTest extends TestCase
         $array = new Arr(1, 2, 3);
 
         self::assertSame(3, $array->pop());
+        self::assertSame([1, 2], iterator_to_array($array->values()));
+    }
+
+    public function testPopReturnsUndefinedForTrailingHole(): void
+    {
+        $array = new Arr(1, 2, 3);
+        unset($array[2]);
+
+        self::assertNull($array->pop());
+        self::assertSame(2, $array->length);
         self::assertSame([1, 2], iterator_to_array($array->values()));
     }
 
@@ -1797,11 +1945,14 @@ final class ArrTest extends TestCase
 
         self::assertSame([0, 1, 2], iterator_to_array($result->values()));
         self::assertNull($result->at(3));
+        self::assertSame([0, 1, 2, 3, 4], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice()->values()));
     }
 
     public function testSliceSupportsNegativeIndexes(): void
     {
         self::assertSame([2, 3], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice(-3, -1)->values()));
+        self::assertSame([], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice(-10, -10)->values()));
+        self::assertSame([0], iterator_to_array((new Arr(0, 1, 2, 3, 4))->slice(-10, 1)->values()));
     }
 
     public function testSliceDoesNotMutateOriginalArray(): void
@@ -1919,6 +2070,24 @@ final class ArrTest extends TestCase
         }));
     }
 
+    public function testSomeContinuesAfterIndexRemovedDuringIteration(): void
+    {
+        $visited = [];
+        $array = new Arr(1, 2, 3, 4);
+
+        self::assertTrue($array->some(static function (int $value, int $index, Arr $receivedArray) use (&$visited): bool {
+            $visited[] = $value;
+
+            if (0 === $index) {
+                unset($receivedArray[1]);
+            }
+
+            return 4 === $value;
+        }));
+
+        self::assertSame([1, 3, 4], $visited);
+    }
+
     // Array.prototype.sort
 
     public function testSortWithoutCompareFnUsesStringComparison(): void
@@ -1990,6 +2159,15 @@ final class ArrTest extends TestCase
 
         self::assertSame([2, 3], iterator_to_array($removed->values()));
         self::assertSame([0, 1], iterator_to_array($array->values()));
+    }
+
+    public function testSpliceWithNegativeStartBeyondLengthStartsAtZero(): void
+    {
+        $array = new Arr(0, 1, 2, 3);
+        $removed = $array->splice(-10);
+
+        self::assertSame([0, 1, 2, 3], iterator_to_array($removed->values()));
+        self::assertSame([], iterator_to_array($array->values()));
     }
 
     public function testSpliceTreatsNegativeDeleteCountAsZero(): void
@@ -2099,6 +2277,19 @@ final class ArrTest extends TestCase
     public function testToLocaleStringFormatsCurrencyStyle(): void
     {
         self::assertSame('$1,234.50,$56.00', (new Arr(1234.5, 56))->toLocaleString('en-US', ['style' => 'currency', 'currency' => 'USD']));
+    }
+
+    public function testToLocaleStringCurrencyResultIsReturned(): void
+    {
+        self::assertSame('$1.00', (new Arr(1, 2))->slice(0, 1)->toLocaleString('en-US', ['style' => 'currency', 'currency' => 'USD']));
+    }
+
+    public function testToLocaleStringUsesDecimalWhenCurrencyOptionHasDecimalStyle(): void
+    {
+        $array = new Arr();
+        $array->push(1);
+
+        self::assertSame('1', $array->toLocaleString('en-US', ['style' => 'decimal']));
     }
 
     public function testToLocaleStringSupportsFractionDigitOptions(): void
@@ -2270,6 +2461,7 @@ final class ArrTest extends TestCase
     public function testToSplicedDeletesAfterStartWhenDeleteCountIsMissing(): void
     {
         self::assertSame(['first'], iterator_to_array((new Arr('first', 'second', 'third'))->toSpliced(1)->values()));
+        self::assertSame([], iterator_to_array((new Arr('first', 'second', 'third'))->toSpliced(-10)->values()));
     }
 
     public function testToSplicedTreatsNegativeStartAsRelativeToEnd(): void
@@ -2306,8 +2498,38 @@ final class ArrTest extends TestCase
 
     public function testToStringUsesJoinSemantics(): void
     {
+        $negativeInfinity = new Arr();
+        $negativeInfinity->push(-INF);
+
         self::assertSame('1,2,3', (new Arr(1, 2, 3))->toString());
         self::assertSame(',,', (new Arr(3))->toString());
+        self::assertSame('-Infinity', $negativeInfinity->toString());
+        self::assertSame('1,2,3,4', (new Arr(new \ArrayIterator([new Arr(1, 2), new Arr(3, 4)])))->toString());
+    }
+
+    public function testClosureThisArgDoesNotBindStaticClosures(): void
+    {
+        $context = new class {
+            public int $value = 3;
+        };
+
+        self::assertSame([1, 2], iterator_to_array((new Arr(1, 2))->map(static fn (int $value): int => $value, $context)->values()));
+    }
+
+    public function testNonClosureCallbackIgnoresThisArg(): void
+    {
+        $context = new class {
+            public int $value = 99;
+        };
+
+        $callback = new class {
+            public function __invoke(int $value): int
+            {
+                return $value;
+            }
+        };
+
+        self::assertSame([1, 2], iterator_to_array((new Arr(1, 2))->map($callback, $context)->values()));
     }
 
     // Array.prototype.unshift

@@ -7,14 +7,16 @@ namespace Chubbyphp\Typescript;
 /**
  * @template T
  *
- * @property int $length
+ * @implements \ArrayAccess<array-key, null|T>
  */
-final class Arr implements \JsonSerializable, \Stringable
+final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
 {
     private const RANGE_ERROR_INVALID_LENGTH = 'Invalid array length';
 
+    public int $length = 0;
+
     /**
-     * @var list<null|T>
+     * @var array<int, null|T>
      */
     private array $data = [];
 
@@ -38,6 +40,7 @@ final class Arr implements \JsonSerializable, \Stringable
                 /** @var list<null|T> $fill */
                 $fill = array_fill(0, $argument, null);
                 $this->data = $fill;
+                $this->length = $argument;
 
                 return;
             }
@@ -49,22 +52,12 @@ final class Arr implements \JsonSerializable, \Stringable
 
         /** @var list<null|T> $arguments */
         $this->data = $arguments;
+        $this->length = \count($arguments);
     }
 
     public function __toString(): string
     {
         return $this->toString();
-    }
-
-    public function __get(string $name): mixed
-    {
-        if ('length' === $name) {
-            return \count($this->data);
-        }
-
-        @trigger_error('Undefined property: '.__CLASS__."::\${$name}", E_USER_WARNING);
-
-        return null;
     }
 
     /**
@@ -78,7 +71,7 @@ final class Arr implements \JsonSerializable, \Stringable
             }
 
             return $value;
-        }, $this->data);
+        }, iterator_to_array($this->values(), false));
     }
 
     /**
@@ -92,7 +85,7 @@ final class Arr implements \JsonSerializable, \Stringable
             }
 
             return $value;
-        }, $this->data);
+        }, iterator_to_array($this->values(), false));
     }
 
     /**
@@ -101,10 +94,50 @@ final class Arr implements \JsonSerializable, \Stringable
     public function at(int $index): mixed
     {
         if (0 > $index) {
-            $index = \count($this->data) + $index;
+            $index = $this->length + $index;
         }
 
         return $this->data[$index] ?? null;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return \is_int($offset) && \array_key_exists($offset, $this->data);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        if (!\is_int($offset)) {
+            return null;
+        }
+
+        return $this->data[$offset] ?? null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        if (null === $offset) {
+            $this->data[$this->length] = $value;
+            ++$this->length;
+
+            return;
+        }
+
+        if (!\is_int($offset) || 0 > $offset) {
+            return;
+        }
+
+        $this->data[$offset] = $value;
+        $this->length = max($this->length, $offset + 1);
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        if (!\is_int($offset)) {
+            return;
+        }
+
+        unset($this->data[$offset]);
     }
 
     /**
@@ -132,7 +165,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function copyWithin(int $target, int $start, ?int $end = null): self
     {
-        $len = \count($this->data);
+        $len = $this->length;
 
         $to = $target < 0 ? max($len + $target, 0) : min($target, $len);
         $from = $start < 0 ? max($len + $start, 0) : min($start, $len);
@@ -148,6 +181,7 @@ final class Arr implements \JsonSerializable, \Stringable
                 $count,
                 \array_slice($this->data, $from, $count),
             );
+            $this->length = \count($this->data);
         }
 
         return $this;
@@ -158,8 +192,8 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function entries(): \Generator
     {
-        foreach ($this->data as $key => $value) {
-            yield [$key, $value];
+        for ($key = 0; $key < $this->length; ++$key) {
+            yield [$key, $this->data[$key] ?? null];
         }
     }
 
@@ -170,7 +204,7 @@ final class Arr implements \JsonSerializable, \Stringable
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        $len = \count($this->data);
+        $len = $this->length;
 
         for ($key = 0; $key < $len; ++$key) {
             if (!\array_key_exists($key, $this->data)) {
@@ -192,7 +226,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function fill(mixed $value, int $start = 0, ?int $end = null): self
     {
-        $len = \count($this->data);
+        $len = $this->length;
 
         $k = $start < 0 ? max($len + $start, 0) : min($start, $len);
         $relativeEnd = $end ?? $len;
@@ -201,6 +235,7 @@ final class Arr implements \JsonSerializable, \Stringable
         $count = $final - $k;
         if (0 < $count) {
             array_splice($this->data, $k, $count, array_fill(0, $count, $value));
+            $this->length = max($this->length, \count($this->data));
         }
 
         return $this;
@@ -239,7 +274,7 @@ final class Arr implements \JsonSerializable, \Stringable
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        $len = \count($this->data);
+        $len = $this->length;
 
         for ($key = 0; $key < $len; ++$key) {
             $value = $this->data[$key] ?? null;
@@ -259,7 +294,7 @@ final class Arr implements \JsonSerializable, \Stringable
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        $len = \count($this->data);
+        $len = $this->length;
 
         for ($key = 0; $key < $len; ++$key) {
             $value = $this->data[$key] ?? null;
@@ -281,9 +316,11 @@ final class Arr implements \JsonSerializable, \Stringable
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        for ($k = \count($this->data) - 1; 0 <= $k; --$k) {
-            if ($callback($this->data[$k], $k, $this)) {
-                return $this->data[$k];
+        for ($k = $this->length - 1; 0 <= $k; --$k) {
+            $value = $this->data[$k] ?? null;
+
+            if ($callback($value, $k, $this)) {
+                return $value;
             }
         }
 
@@ -297,8 +334,8 @@ final class Arr implements \JsonSerializable, \Stringable
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        for ($k = \count($this->data) - 1; 0 <= $k; --$k) {
-            if ($callback($this->data[$k], $k, $this)) {
+        for ($k = $this->length - 1; 0 <= $k; --$k) {
+            if ($callback($this->data[$k] ?? null, $k, $this)) {
                 return $k;
             }
         }
@@ -344,7 +381,7 @@ final class Arr implements \JsonSerializable, \Stringable
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        $len = \count($this->data);
+        $len = $this->length;
 
         for ($key = 0; $key < $len; ++$key) {
             if (!\array_key_exists($key, $this->data)) {
@@ -359,33 +396,14 @@ final class Arr implements \JsonSerializable, \Stringable
 
     public function includes(mixed $searchElement = null, int $fromIndex = 0): bool
     {
-        $len = \count($this->data);
+        $len = $this->length;
 
         $k = $fromIndex < 0 ? max($len + $fromIndex, 0) : $fromIndex;
 
         for (; $k < $len; ++$k) {
-            $value = $this->data[$k];
+            $value = $this->data[$k] ?? null;
 
-            if ($value === $searchElement) {
-                return true;
-            }
-
-            if (
-                (\is_int($searchElement) || \is_float($searchElement))
-                && (\is_int($value) || \is_float($value))
-                && !(\is_float($searchElement) && is_nan($searchElement))
-                && !(\is_float($value) && is_nan($value))
-                && (float) $value === (float) $searchElement
-            ) {
-                return true;
-            }
-
-            if (
-                \is_float($searchElement)
-                && is_nan($searchElement)
-                && \is_float($value)
-                && is_nan($value)
-            ) {
+            if (self::sameValueZero($value, $searchElement)) {
                 return true;
             }
         }
@@ -395,11 +413,15 @@ final class Arr implements \JsonSerializable, \Stringable
 
     public function indexOf(mixed $searchElement = null, int $fromIndex = 0): int
     {
-        $k = $fromIndex < 0 ? max(\count($this->data) + $fromIndex, 0) : $fromIndex;
+        $k = $fromIndex < 0 ? max($this->length + $fromIndex, 0) : $fromIndex;
 
-        $result = array_search($searchElement, \array_slice($this->data, $k), true);
+        for ($i = $k; $i < $this->length; ++$i) {
+            if (self::strictlyEqual($this->data[$i] ?? null, $searchElement)) {
+                return $i;
+            }
+        }
 
-        return false !== $result ? $k + $result : -1;
+        return -1;
     }
 
     public function join(?string $separator = null): string
@@ -412,12 +434,16 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function keys(): \Generator
     {
-        yield from array_keys($this->data);
+        if (0 === $this->length) {
+            return;
+        }
+
+        yield from range(0, $this->length - 1);
     }
 
     public function lastIndexOf(mixed $searchElement = null, ?int $fromIndex = null): int
     {
-        $len = \count($this->data);
+        $len = $this->length;
 
         if (0 === $len) {
             return -1;
@@ -427,7 +453,7 @@ final class Arr implements \JsonSerializable, \Stringable
         $k = $n >= 0 ? min($n, $len - 1) : $len + $n;
 
         for (; $k >= 0; --$k) {
-            if ($this->data[$k] === $searchElement) {
+            if (self::strictlyEqual($this->data[$k] ?? null, $searchElement)) {
                 return $k;
             }
         }
@@ -449,7 +475,7 @@ final class Arr implements \JsonSerializable, \Stringable
         /** @var self<U> $result */
         $result = new self();
 
-        $len = \count($this->data);
+        $len = $this->length;
 
         for ($key = 0; $key < $len; ++$key) {
             if (!\array_key_exists($key, $this->data)) {
@@ -466,7 +492,20 @@ final class Arr implements \JsonSerializable, \Stringable
 
     public function pop(): mixed
     {
-        return array_pop($this->data);
+        if (0 === $this->length) {
+            return null;
+        }
+
+        --$this->length;
+
+        if (!\array_key_exists($this->length, $this->data)) {
+            return null;
+        }
+
+        $value = $this->data[$this->length];
+        unset($this->data[$this->length]);
+
+        return $value;
     }
 
     /**
@@ -474,9 +513,12 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function push(mixed ...$items): int
     {
-        array_push($this->data, ...$items);
+        foreach ($items as $item) {
+            $this->data[$this->length] = $item;
+            ++$this->length;
+        }
 
-        return \count($this->data);
+        return $this->length;
     }
 
     /**
@@ -489,7 +531,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function reduce(callable $callback, mixed $initialValue = null): mixed
     {
-        $len = \count($this->data);
+        $len = $this->length;
         $numArgs = \func_num_args();
 
         if (0 === $len && 2 > $numArgs) {
@@ -500,12 +542,12 @@ final class Arr implements \JsonSerializable, \Stringable
             $accumulator = $initialValue;
             $i = 0;
         } else {
-            $accumulator = $this->data[0];
+            $accumulator = $this->data[0] ?? null;
             $i = 1;
         }
 
         for (; $i < $len; ++$i) {
-            $accumulator = $callback($accumulator, $this->data[$i], $i, $this);
+            $accumulator = $callback($accumulator, $this->data[$i] ?? null, $i, $this);
         }
 
         return $accumulator;
@@ -521,7 +563,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function reduceRight(callable $callback, mixed $initialValue = null): mixed
     {
-        $len = \count($this->data);
+        $len = $this->length;
         $numArgs = \func_num_args();
 
         if (0 === $len && 2 > $numArgs) {
@@ -532,12 +574,12 @@ final class Arr implements \JsonSerializable, \Stringable
             $accumulator = $initialValue;
             $i = $len - 1;
         } else {
-            $accumulator = $this->data[$len - 1];
+            $accumulator = $this->data[$len - 1] ?? null;
             $i = $len - 2;
         }
 
         for (; $i >= 0; --$i) {
-            $accumulator = $callback($accumulator, $this->data[$i], $i, $this);
+            $accumulator = $callback($accumulator, $this->data[$i] ?? null, $i, $this);
         }
 
         return $accumulator;
@@ -555,6 +597,12 @@ final class Arr implements \JsonSerializable, \Stringable
 
     public function shift(): mixed
     {
+        if (0 === $this->length) {
+            return null;
+        }
+
+        --$this->length;
+
         return array_shift($this->data);
     }
 
@@ -563,7 +611,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function slice(int $start = 0, ?int $end = null): self
     {
-        $len = \count($this->data);
+        $len = $this->length;
 
         if (null === $end) {
             $end = $len;
@@ -605,7 +653,7 @@ final class Arr implements \JsonSerializable, \Stringable
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        $len = \count($this->data);
+        $len = $this->length;
 
         for ($key = 0; $key < $len; ++$key) {
             if (!\array_key_exists($key, $this->data)) {
@@ -651,7 +699,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function splice(int $start, ?int $deleteCount = null, mixed ...$items): self
     {
-        $len = \count($this->data);
+        $len = $this->length;
         $numArgs = \func_num_args();
 
         if ($start < 0) {
@@ -677,6 +725,7 @@ final class Arr implements \JsonSerializable, \Stringable
         $removed = \array_slice($this->data, $start, $deleteCount);
 
         array_splice($this->data, $start, $deleteCount, $items);
+        $this->length = \count($this->data);
 
         $new->push(...$removed);
 
@@ -744,7 +793,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function toSpliced(int $start, ?int $deleteCount = null, mixed ...$items): self
     {
-        $len = \count($this->data);
+        $len = $this->length;
 
         if ($start < 0) {
             $start = max(0, $len + $start);
@@ -785,8 +834,9 @@ final class Arr implements \JsonSerializable, \Stringable
     public function unshift(mixed ...$items): int
     {
         array_splice($this->data, 0, 0, $items);
+        $this->length += \count($items);
 
-        return \count($this->data);
+        return $this->length;
     }
 
     /**
@@ -794,7 +844,9 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function values(): \Generator
     {
-        yield from $this->data;
+        for ($key = 0; $key < $this->length; ++$key) {
+            yield $this->data[$key] ?? null;
+        }
     }
 
     private static function mixedToString(mixed $value, ?string $separator = null): string
@@ -816,6 +868,35 @@ final class Arr implements \JsonSerializable, \Stringable
             ),
             default => '[object Object]',
         };
+    }
+
+    private static function sameValueZero(mixed $value, mixed $searchElement): bool
+    {
+        if (self::strictlyEqual($value, $searchElement)) {
+            return true;
+        }
+
+        return \is_float($value)
+            && is_nan($value)
+            && \is_float($searchElement)
+            && is_nan($searchElement);
+    }
+
+    private static function strictlyEqual(mixed $value, mixed $searchElement): bool
+    {
+        if ((\is_int($value) || \is_float($value)) && (\is_int($searchElement) || \is_float($searchElement))) {
+            if (\is_float($value) && is_nan($value)) {
+                return false;
+            }
+
+            if (\is_float($searchElement) && is_nan($searchElement)) {
+                return false;
+            }
+
+            return (float) $value === (float) $searchElement;
+        }
+
+        return $value === $searchElement;
     }
 
     /**
