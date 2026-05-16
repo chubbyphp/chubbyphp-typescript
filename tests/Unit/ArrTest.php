@@ -170,15 +170,21 @@ final class ArrTest extends TestCase
         self::assertSame(4, (new Arr('a', 'b', 'c', 'd'))->length);
     }
 
-    public function testLengthThrowsRuntimeExceptionForUndefinedProperty(): void
+    public function testLengthReturnsNullForUndefinedProperty(): void
     {
         $array = new Arr();
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Undefined property: foo');
+        error_clear_last();
 
-        $value = $array->foo;
-        unset($value);
+        self::assertNull($array->foo);
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_WARNING, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Undefined property: Chubbyphp\Typescript\Arr::$foo', $lastError['message']);
     }
 
     public function testLengthIsLive(): void

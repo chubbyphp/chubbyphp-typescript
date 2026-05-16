@@ -64,7 +64,9 @@ final class Arr implements \JsonSerializable, \Stringable
             return \count($this->data);
         }
 
-        throw new \RuntimeException("Undefined property: {$name}");
+        @trigger_error('Undefined property: '.__CLASS__."::\${$name}", E_USER_WARNING);
+
+        return null;
     }
 
     /**
