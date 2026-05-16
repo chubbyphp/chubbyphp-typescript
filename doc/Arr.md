@@ -23,11 +23,22 @@ Passing a single `int` argument creates an array of that length (filled with `nu
 
 ---
 
-## Static properties
+## Instance properties
 
-### `Arr::length`
+### `length`
 
-Not applicable — length is an instance property. Use `iterator_count($arr->values())` or inspect via iteration.
+Returns the number of elements in the array. Accessed via magic `__get`.
+
+```php
+$arr = new Arr(1, 2, 3);
+$arr->length;  // 3
+
+$arr->push(4);
+$arr->length;  // 4
+
+$arr->pop();
+$arr->length;  // 3
+```
 
 ---
 

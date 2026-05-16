@@ -134,6 +134,43 @@ final class ArrTest extends TestCase
         self::assertSame([1, 'two', null, true], $array->jsonSerialize());
     }
 
+    // __get (length)
+
+    public function testLengthReturnsElementCount(): void
+    {
+        self::assertSame(0, (new Arr())->length);
+        self::assertSame(3, (new Arr(1, 2, 3))->length);
+        self::assertSame(5, (new Arr(5))->length);
+        self::assertSame(4, (new Arr('a', 'b', 'c', 'd'))->length);
+    }
+
+    public function testLengthThrowsRuntimeExceptionForUndefinedProperty(): void
+    {
+        $array = new Arr();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Undefined property: foo');
+
+        $value = $array->foo;
+        unset($value);
+    }
+
+    public function testLengthIsLive(): void
+    {
+        $array = new Arr(1, 2, 3);
+
+        self::assertSame(3, $array->length);
+
+        $array->push(4);
+        self::assertSame(4, $array->length);
+
+        $array->pop();
+        self::assertSame(3, $array->length);
+
+        $array->shift();
+        self::assertSame(2, $array->length);
+    }
+
     // Array.prototype.at
 
     public function testAtReturnsItemValueAtSpecifiedIndex(): void

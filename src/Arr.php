@@ -6,6 +6,8 @@ namespace Chubbyphp\Typescript;
 
 /**
  * @template T
+ *
+ * @property int $length
  */
 final class Arr implements \JsonSerializable, \Stringable
 {
@@ -52,6 +54,15 @@ final class Arr implements \JsonSerializable, \Stringable
     public function __toString(): string
     {
         return $this->toString();
+    }
+
+    public function __get(string $name): mixed
+    {
+        if ('length' === $name) {
+            return \count($this->data);
+        }
+
+        throw new \RuntimeException("Undefined property: {$name}");
     }
 
     /**
