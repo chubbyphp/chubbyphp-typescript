@@ -927,11 +927,11 @@ final class Arr implements \JsonSerializable, \Stringable
         if (\NumberFormatter::CURRENCY === $style && isset($options['currency'])) {
             $currency = $options['currency'];
             if (!\is_string($currency)) {
-                throw new \RuntimeException('Number formatting failed');
+                throw new NumberFormatError('Number formatting failed');
             }
             $result = $formatter->formatCurrency($value, $currency);
             if (false === $result) {
-                throw new \RuntimeException('Number formatting failed');
+                throw new NumberFormatError('Number formatting failed');
             }
 
             return $result;

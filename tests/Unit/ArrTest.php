@@ -6,6 +6,7 @@ namespace Chubbyphp\Tests\Typescript\Unit;
 
 use Chubbyphp\Tests\Typescript\Stub\Dummy;
 use Chubbyphp\Typescript\Arr;
+use Chubbyphp\Typescript\NumberFormatError;
 use Chubbyphp\Typescript\RangeError;
 use PHPUnit\Framework\TestCase;
 
@@ -2121,7 +2122,7 @@ final class ArrTest extends TestCase
 
     public function testToLocaleStringThrowsOnNonStringCurrency(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(NumberFormatError::class);
         $this->expectExceptionMessage('Number formatting failed');
 
         (new Arr(1, 100))->toLocaleString('en-US', ['style' => 'currency', 'currency' => 123]);
@@ -2129,7 +2130,7 @@ final class ArrTest extends TestCase
 
     public function testToLocaleStringThrowsOnFormatCurrencyFailure(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(NumberFormatError::class);
         $this->expectExceptionMessage('Number formatting failed');
 
         (new Arr(1, 100))->toLocaleString('en-US', ['style' => 'currency', 'currency' => '@@@']);
