@@ -126,7 +126,7 @@ final class Arr implements \JsonSerializable, \Stringable
     public function entries(): \Generator
     {
         foreach ($this->data as $key => $value) {
-            yield $key => [$key, $value];
+            yield [$key, $value];
         }
     }
 
