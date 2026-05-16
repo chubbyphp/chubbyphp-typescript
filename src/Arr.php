@@ -11,6 +11,8 @@ namespace Chubbyphp\Typescript;
  */
 final class Arr implements \JsonSerializable, \Stringable
 {
+    private const RANGE_ERROR_INVALID_LENGTH = 'Invalid array length';
+
     /**
      * @var list<null|T>
      */
@@ -27,11 +29,11 @@ final class Arr implements \JsonSerializable, \Stringable
 
             if (\is_int($argument)) {
                 if (0 > $argument) {
-                    throw new RangeError('Invalid array length');
+                    throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
                 }
 
                 if ((2 ** 32) - 1 < $argument) {
-                    throw new RangeError('Invalid array length');
+                    throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
                 }
 
                 for ($i = 0; $i < $arguments[0]; ++$i) {
@@ -42,7 +44,7 @@ final class Arr implements \JsonSerializable, \Stringable
             }
 
             if (\is_float($argument)) {
-                throw new RangeError('Invalid array length');
+                throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
             }
         }
 
