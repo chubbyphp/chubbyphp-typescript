@@ -214,22 +214,17 @@ final class Arr implements \JsonSerializable, \Stringable
     {
         $callback = self::bindCallback($callback, $thisArg);
 
+        /** @var list<null|T> $filtered */
+        $filtered = array_values(array_filter(
+            $this->data,
+            fn (mixed $value, int $key): bool => (bool) $callback($value, $key, $this),
+            ARRAY_FILTER_USE_BOTH,
+        ));
+
         /** @var self<T> $result */
         $result = new self();
 
-        $len = \count($this->data);
-
-        for ($key = 0; $key < $len; ++$key) {
-            if (!\array_key_exists($key, $this->data)) {
-                continue;
-            }
-
-            $value = $this->data[$key];
-
-            if ($callback($value, $key, $this)) {
-                $result->push($value);
-            }
-        }
+        $result->push(...$filtered);
 
         return $result;
     }
@@ -399,17 +394,11 @@ final class Arr implements \JsonSerializable, \Stringable
 
     public function indexOf(mixed $searchElement = null, int $fromIndex = 0): int
     {
-        $len = \count($this->data);
+        $k = $fromIndex < 0 ? max(\count($this->data) + $fromIndex, 0) : $fromIndex;
 
-        $k = $fromIndex < 0 ? max($len + $fromIndex, 0) : $fromIndex;
+        $result = array_search($searchElement, \array_slice($this->data, $k), true);
 
-        for (; $k < $len; ++$k) {
-            if ($this->data[$k] === $searchElement) {
-                return $k;
-            }
-        }
-
-        return -1;
+        return false !== $result ? $k + $result : -1;
     }
 
     public function join(?string $separator = null): string
@@ -422,9 +411,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function keys(): \Generator
     {
-        foreach ($this->data as $key => $_) {
-            yield $key;
-        }
+        yield from array_keys($this->data);
     }
 
     public function lastIndexOf(mixed $searchElement = null, ?int $fromIndex = null): int
@@ -486,9 +473,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function push(mixed ...$items): int
     {
-        foreach ($items as $item) {
-            $this->data[] = $item;
-        }
+        array_push($this->data, ...$items);
 
         return \count($this->data);
     }
@@ -569,11 +554,7 @@ final class Arr implements \JsonSerializable, \Stringable
 
     public function shift(): mixed
     {
-        $item = $this->data[0] ?? null;
-
-        $this->data = \array_slice($this->data, 1);
-
-        return $item;
+        return array_shift($this->data);
     }
 
     /**
@@ -812,9 +793,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function values(): \Generator
     {
-        foreach ($this->data as $value) {
-            yield $value;
-        }
+        yield from $this->data;
     }
 
     private static function mixedToString(mixed $value, ?string $separator = null): string
