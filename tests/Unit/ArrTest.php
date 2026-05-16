@@ -134,6 +134,14 @@ final class ArrTest extends TestCase
         self::assertSame([1, 'two', null, true], $array->jsonSerialize());
     }
 
+    public function testJsonSerializeRecursivelySerializesNestedArr(): void
+    {
+        $nested = new Arr('a', 'b');
+        $array = new Arr(1, $nested, true);
+
+        self::assertSame([1, ['a', 'b'], true], $array->jsonSerialize());
+    }
+
     // __get (length)
 
     public function testLengthReturnsElementCount(): void

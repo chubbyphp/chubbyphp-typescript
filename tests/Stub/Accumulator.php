@@ -43,10 +43,23 @@ final class Accumulator implements \JsonSerializable
             'failures' => $this->failures,
             'maxScore' => $this->maxScore,
             'topUser' => $this->topUser,
-            'byName' => $this->byName,
-            'tagCounts' => $this->tagCounts,
-            'visitLabels' => $this->visitLabels,
-            'users' => $this->users,
+            'byName' => array_map(static function ($value) {
+                if ($value instanceof \JsonSerializable) {
+                    return $value->jsonSerialize();
+                }
+
+                return $value;
+            }, (array) $this->byName),
+            'tagCounts' => array_map(static function ($value) {
+                if ($value instanceof \JsonSerializable) {
+                    return $value->jsonSerialize();
+                }
+
+                return $value;
+            }, (array) $this->tagCounts),
+
+            'visitLabels' => $this->visitLabels->jsonSerialize(),
+            'users' => $this->users->jsonSerialize(),
         ];
     }
 }

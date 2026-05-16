@@ -114,7 +114,7 @@ final class UserProcessingTest extends TestCase
             'totalDuration' => 97,
             'successes' => 4,
             'failures' => 2,
-            'maxScore' => 90,
+            'maxScore' => 90.0,
             'topUser' => 'User-2',
             'byName' => [
                 'User-2' => [
@@ -178,7 +178,7 @@ final class UserProcessingTest extends TestCase
                             'duration' => 12,
                             'success' => false,
                             'checked' => true,
-                            'weight' => 6,
+                            'weight' => 6.0,
                             'label' => 'User-4-visit-1',
                         ],
                     ],
@@ -211,14 +211,14 @@ final class UserProcessingTest extends TestCase
                             'duration' => 10,
                             'success' => true,
                             'checked' => true,
-                            'weight' => 15,
+                            'weight' => 15.0,
                             'label' => 'User-1-visit-0',
                         ],
                         [
                             'duration' => 18,
                             'success' => false,
                             'checked' => true,
-                            'weight' => 9,
+                            'weight' => 9.0,
                             'label' => 'User-1-visit-1',
                         ],
                     ],
@@ -315,7 +315,7 @@ final class UserProcessingTest extends TestCase
                             'duration' => 12,
                             'success' => false,
                             'checked' => true,
-                            'weight' => 6,
+                            'weight' => 6.0,
                             'label' => 'User-4-visit-1',
                         ],
                     ],
@@ -348,14 +348,14 @@ final class UserProcessingTest extends TestCase
                             'duration' => 10,
                             'success' => true,
                             'checked' => true,
-                            'weight' => 15,
+                            'weight' => 15.0,
                             'label' => 'User-1-visit-0',
                         ],
                         [
                             'duration' => 18,
                             'success' => false,
                             'checked' => true,
-                            'weight' => 9,
+                            'weight' => 9.0,
                             'label' => 'User-1-visit-1',
                         ],
                     ],
@@ -375,6 +375,6 @@ final class UserProcessingTest extends TestCase
                     ],
                 ],
             ],
-        ], json_decode(json_encode($result), true));
+        ], $result->jsonSerialize());
     }
 }

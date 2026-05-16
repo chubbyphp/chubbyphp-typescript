@@ -41,12 +41,12 @@ final class User implements \JsonSerializable
             'name' => $this->name,
             'score' => $this->score,
             'active' => $this->active,
-            'tags' => $this->tags,
-            'visits' => $this->visits,
-            'meta' => $this->meta,
+            'tags' => $this->tags->jsonSerialize(),
+            'visits' => $this->visits->jsonSerialize(),
+            'meta' => $this->meta->jsonSerialize(),
             'processed' => $this->processed,
             'updatedAt' => $this->updatedAt,
-            'history' => $this->history,
+            'history' => $this->history->jsonSerialize(),
         ];
     }
 }

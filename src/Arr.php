@@ -66,11 +66,17 @@ final class Arr implements \JsonSerializable, \Stringable
     }
 
     /**
-     * @return list<null|T>
+     * @return list<mixed>
      */
     public function jsonSerialize(): array
     {
-        return $this->data;
+        return array_map(static function (mixed $value): mixed {
+            if ($value instanceof \JsonSerializable) {
+                return $value->jsonSerialize();
+            }
+
+            return $value;
+        }, $this->data);
     }
 
     /**
