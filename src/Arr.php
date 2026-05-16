@@ -135,9 +135,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function every(callable $callback, ?object $thisArg = null): bool
     {
-        if (null !== $thisArg && $callback instanceof \Closure) {
-            $callback = self::bindCallback($callback, $thisArg);
-        }
+        $callback = self::bindCallback($callback, $thisArg);
 
         $len = \count($this->data);
 
@@ -184,9 +182,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function filter(callable $callback, ?object $thisArg = null): self
     {
-        if (null !== $thisArg && $callback instanceof \Closure) {
-            $callback = self::bindCallback($callback, $thisArg);
-        }
+        $callback = self::bindCallback($callback, $thisArg);
 
         /** @var self<T> $result */
         $result = new self();
@@ -215,9 +211,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function find(callable $callback, ?object $thisArg = null): mixed
     {
-        if (null !== $thisArg && $callback instanceof \Closure) {
-            $callback = self::bindCallback($callback, $thisArg);
-        }
+        $callback = self::bindCallback($callback, $thisArg);
 
         $len = \count($this->data);
 
@@ -237,9 +231,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function findIndex(callable $callback, ?object $thisArg = null): int
     {
-        if (null !== $thisArg && $callback instanceof \Closure) {
-            $callback = self::bindCallback($callback, $thisArg);
-        }
+        $callback = self::bindCallback($callback, $thisArg);
 
         $len = \count($this->data);
 
@@ -261,9 +253,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function findLast(callable $callback, ?object $thisArg = null): mixed
     {
-        if (null !== $thisArg && $callback instanceof \Closure) {
-            $callback = self::bindCallback($callback, $thisArg);
-        }
+        $callback = self::bindCallback($callback, $thisArg);
 
         for ($k = \count($this->data) - 1; 0 <= $k; --$k) {
             if ($callback($this->data[$k], $k, $this)) {
@@ -279,9 +269,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function findLastIndex(callable $callback, ?object $thisArg = null): int
     {
-        if (null !== $thisArg && $callback instanceof \Closure) {
-            $callback = self::bindCallback($callback, $thisArg);
-        }
+        $callback = self::bindCallback($callback, $thisArg);
 
         for ($k = \count($this->data) - 1; 0 <= $k; --$k) {
             if ($callback($this->data[$k], $k, $this)) {
@@ -328,9 +316,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function forEach(callable $callback, ?object $thisArg = null): void
     {
-        if (null !== $thisArg && $callback instanceof \Closure) {
-            $callback = self::bindCallback($callback, $thisArg);
-        }
+        $callback = self::bindCallback($callback, $thisArg);
 
         $len = \count($this->data);
 
@@ -440,9 +426,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function map(callable $callback, ?object $thisArg = null): self
     {
-        if (null !== $thisArg && $callback instanceof \Closure) {
-            $callback = self::bindCallback($callback, $thisArg);
-        }
+        $callback = self::bindCallback($callback, $thisArg);
 
         /** @var self<U> $result */
         $result = new self();
@@ -607,9 +591,7 @@ final class Arr implements \JsonSerializable, \Stringable
      */
     public function some(callable $callback, ?object $thisArg = null): bool
     {
-        if (null !== $thisArg && $callback instanceof \Closure) {
-            $callback = self::bindCallback($callback, $thisArg);
-        }
+        $callback = self::bindCallback($callback, $thisArg);
 
         $len = \count($this->data);
 
@@ -928,10 +910,11 @@ final class Arr implements \JsonSerializable, \Stringable
         return $formatter->format($value);
     }
 
-    private static function bindCallback(callable $callback, object $thisArg): callable
+    private static function bindCallback(callable $callback, ?object $thisArg = null): callable
     {
         if (
-            $callback instanceof \Closure
+            null !== $thisArg
+            && $callback instanceof \Closure
             && !(new \ReflectionFunction($callback))->isStatic()
         ) {
             $bound = $callback->bindTo($thisArg);
