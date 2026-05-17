@@ -22,7 +22,7 @@
 
 ## Description
 
-PHP port of JavaScript's Array API with TypeScript-style generics.
+A PHP implementation of JavaScript's `Array` API with TypeScript-style generics and Test262-inspired coverage.
 
 ## Requirements
 
@@ -40,7 +40,7 @@ composer require chubbyphp/chubbyphp-typescript "^1.0"
 
 ### Arr (Array)
 
-A PHP port of the JavaScript `Array` class. See the [full documentation](doc/Arr.md) for API reference and examples.
+A PHP implementation of the JavaScript `Array` class, including sparse-array semantics and chainable methods. See the [full documentation](doc/Arr.md) for API reference and examples.
 
 ```php
 use Chubbyphp\Typescript\Arr;

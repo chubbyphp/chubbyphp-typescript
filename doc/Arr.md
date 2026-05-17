@@ -1,10 +1,10 @@
 # `Arr`
 
-`Arr` is a PHP port of the JavaScript `Array` class, implemented as `Chubbyphp\Typescript\Arr`. It provides a 1:1 mapping of JavaScript's `Array` API using PHP syntax and conventions.
+`Arr` is a PHP port of the JavaScript `Array` class, implemented as `Chubbyphp\Typescript\Arr`. It provides a close mapping of JavaScript's `Array` API using PHP syntax and conventions.
 
 - **Generic type**: `@template T` — every `Arr` instance carries a type parameter for its elements.
-- **Internal storage**: `list<T>` — an ordered, integer-keyed list.
-- **Errors**: Throws `Chubbyphp\Typescript\RangeError` (extends `RuntimeException`) where JavaScript throws `RangeError`.
+- **Internal storage**: `array<int, null|T>` — an ordered, integer-keyed array with sparse-array semantics.
+- **Errors**: Throws `Chubbyphp\Typescript\RangeError` for invalid array lengths and `Chubbyphp\Typescript\NumberFormatError` when locale-based number formatting fails.
 
 ---
 
@@ -495,7 +495,7 @@ Use `iterator_to_array($arr->values())` to get a plain PHP array.
 
 ### `toArray(): array`
 
-Returns the internal `list<null|T>` as a plain PHP array, recursively converting nested `Arr` instances.
+Returns a plain PHP array view of the `Arr`, preserving sparse positions as `null` values and recursively converting nested `Arr` instances.
 
 ```php
 $arr = new Arr(1, 'two', null, true);
@@ -520,7 +520,7 @@ echo $arr;  // '1,2,3'
 
 ### `jsonSerialize(): array`
 
-Returns the internal `list<T>` data, enabling `json_encode` to work directly.
+Returns a plain PHP array suitable for `json_encode`, preserving sparse positions as `null` values and recursively serializing nested values.
 
 ```php
 $arr = new Arr(1, 'two', null, true);
@@ -539,7 +539,9 @@ $context = new class {
     public int $multiplier = 10;
 };
 $arr->map(
-    static fn ($v) => $v * $this->multiplier,
+    function ($v) {
+        return $v * $this->multiplier;
+    },
     $context,
 );
 // [10, 20, 30]
