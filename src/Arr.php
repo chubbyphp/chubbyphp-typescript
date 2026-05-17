@@ -72,32 +72,6 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
     }
 
     /**
-     * @return list<mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        $result = [];
-        foreach ($this->values() as $value) {
-            $result[] = $value instanceof \JsonSerializable ? $value->jsonSerialize() : $value;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return list<mixed>
-     */
-    public function toArray(): array
-    {
-        $result = [];
-        foreach ($this->values() as $value) {
-            $result[] = $value instanceof self ? $value->toArray() : $value;
-        }
-
-        return $result;
-    }
-
-    /**
      * @return null|T
      */
     public function at(int $index): mixed
@@ -107,46 +81,6 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
         }
 
         return $this->internalArray[$index] ?? null;
-    }
-
-    public function offsetExists(mixed $offset): bool
-    {
-        return \is_int($offset) && \array_key_exists($offset, $this->internalArray);
-    }
-
-    public function offsetGet(mixed $offset): mixed
-    {
-        if (!\is_int($offset)) {
-            return null;
-        }
-
-        return $this->internalArray[$offset] ?? null;
-    }
-
-    public function offsetSet(mixed $offset, mixed $value): void
-    {
-        if (null === $offset) {
-            $this->internalArray[$this->internalLength] = $value;
-            ++$this->internalLength;
-
-            return;
-        }
-
-        if (!\is_int($offset) || 0 > $offset) {
-            return;
-        }
-
-        $this->internalArray[$offset] = $value;
-        $this->internalLength = max($this->internalLength, $offset + 1);
-    }
-
-    public function offsetUnset(mixed $offset): void
-    {
-        if (!\is_int($offset)) {
-            return;
-        }
-
-        unset($this->internalArray[$offset]);
     }
 
     /**
@@ -937,6 +871,72 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
         for ($key = 0; $key < $this->internalLength; ++$key) {
             yield $this->internalArray[$key] ?? null;
         }
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    public function toArray(): array
+    {
+        $result = [];
+        foreach ($this->values() as $value) {
+            $result[] = $value instanceof self ? $value->toArray() : $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $result = [];
+        foreach ($this->values() as $value) {
+            $result[] = $value instanceof \JsonSerializable ? $value->jsonSerialize() : $value;
+        }
+
+        return $result;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return \is_int($offset) && \array_key_exists($offset, $this->internalArray);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        if (!\is_int($offset)) {
+            return null;
+        }
+
+        return $this->internalArray[$offset] ?? null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        if (null === $offset) {
+            $this->internalArray[$this->internalLength] = $value;
+            ++$this->internalLength;
+
+            return;
+        }
+
+        if (!\is_int($offset) || 0 > $offset) {
+            return;
+        }
+
+        $this->internalArray[$offset] = $value;
+        $this->internalLength = max($this->internalLength, $offset + 1);
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        if (!\is_int($offset)) {
+            return;
+        }
+
+        unset($this->internalArray[$offset]);
     }
 
     private static function mixedToString(mixed $value): string

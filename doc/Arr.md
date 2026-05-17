@@ -42,6 +42,19 @@ $arr->length;  // 3
 
 ---
 
+## Magic methods
+
+### `__toString(): string`
+
+Magic method that delegates to `toString()`.
+
+```php
+$arr = new Arr(1, 2, 3);
+echo $arr;  // '1,2,3'
+```
+
+---
+
 ## Instance methods
 
 ### `at(int $index): mixed`
@@ -503,17 +516,6 @@ $arr->toArray();  // [1, 'two', null, true]
 
 $nested = new Arr(new Arr('a', 'b'));
 $nested->toArray();  // [['a', 'b']]
-```
-
----
-
-### `__toString(): string`
-
-Magic method that delegates to `toString()`.
-
-```php
-$arr = new Arr(1, 2, 3);
-echo $arr;  // '1,2,3'
 ```
 
 ---

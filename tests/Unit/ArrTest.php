@@ -139,114 +139,6 @@ final class ArrTest extends TestCase
         self::assertSame(10, $array->length);
     }
 
-    public function testArrayGetUnknownProperty(): void
-    {
-        $array = new Arr(10);
-
-        error_clear_last();
-
-        $unknown = @$array->unknown;
-
-        $lastError = error_get_last();
-
-        self::assertNull($unknown);
-
-        self::assertNotNull($lastError);
-        self::assertArrayHasKey('type', $lastError);
-        self::assertSame(E_USER_WARNING, $lastError['type']);
-        self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Undefined property: A::$unknown', $lastError['message']);
-    }
-
-    // __toString
-
-    public function testMagicToStringDelegatesToJoin(): void
-    {
-        $array = new Arr(1, 2, 3);
-
-        self::assertSame('1,2,3', $array->__toString());
-    }
-
-    public function testJsonSerializeReturnsInternalDataAsArray(): void
-    {
-        $array = new Arr(1, 'two', null, true);
-
-        self::assertSame([1, 'two', null, true], $array->jsonSerialize());
-    }
-
-    public function testJsonSerializeReturnsListForSparseArray(): void
-    {
-        $array = new Arr();
-        $array[2] = 'x';
-
-        self::assertSame([null, null, 'x'], $array->jsonSerialize());
-    }
-
-    public function testJsonSerializeReturnsListForSparseArrayByUnset(): void
-    {
-        $array = new Arr(1, 2, 3);
-        unset($array[1]);
-
-        self::assertSame([1, null, 3], $array->jsonSerialize());
-    }
-
-    public function testJsonSerializeReturnsListForSparseArrayByOnlyProvidingItsLength(): void
-    {
-        $array = new Arr(5);
-
-        self::assertSame([null, null, null, null, null], $array->jsonSerialize());
-    }
-
-    public function testJsonSerializeRecursivelySerializesNestedArr(): void
-    {
-        $nested = new Arr('a', 'b');
-        $array = new Arr(1, $nested, true);
-
-        self::assertSame([1, ['a', 'b'], true], $array->jsonSerialize());
-    }
-
-    // toArray
-
-    public function testToArrayReturnsInternalDataAsArray(): void
-    {
-        $array = new Arr(1, 'two', null, true);
-
-        self::assertSame([1, 'two', null, true], $array->toArray());
-    }
-
-    public function testToArrayReturnsListForSparseArray(): void
-    {
-        $array = new Arr();
-        $array[2] = 'x';
-
-        self::assertSame([null, null, 'x'], $array->toArray());
-    }
-
-    public function testToArrayReturnsListForSparseArrayByUnset(): void
-    {
-        $array = new Arr(1, 2, 3);
-        unset($array[1]);
-
-        self::assertSame([1, null, 3], $array->toArray());
-    }
-
-    public function testToArrayReturnsListForSparseArrayByOnlyProvidingItsLength(): void
-    {
-        $array = new Arr(5);
-
-        self::assertSame([null, null, null, null, null], $array->toArray());
-    }
-
-    public function testToArrayRecursivelyConvertsNestedArr(): void
-    {
-        $nested = new Arr('a', 'b');
-        $array = new Arr(1, $nested, true);
-
-        self::assertSame([1, ['a', 'b'], true], $array->toArray());
-    }
-
-    // __get (length)
-
     public function testLengthReturnsElementCount(): void
     {
         self::assertSame(0, (new Arr())->length);
@@ -281,6 +173,34 @@ final class ArrTest extends TestCase
         self::assertSame(3, $array->pop());
 
         self::assertSame(3, $array->length);
+    }
+
+    public function testArrayGetUnknownProperty(): void
+    {
+        $array = new Arr(10);
+
+        error_clear_last();
+
+        $unknown = @$array->unknown;
+
+        $lastError = error_get_last();
+
+        self::assertNull($unknown);
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_WARNING, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Undefined property: A::$unknown', $lastError['message']);
+    }
+
+    // __toString
+
+    public function testMagicToStringDelegatesToJoin(): void
+    {
+        $array = new Arr(1, 2, 3);
+
+        self::assertSame('1,2,3', $array->__toString());
     }
 
     // Array.prototype.at
@@ -325,97 +245,6 @@ final class ArrTest extends TestCase
         self::assertNull($array->at(1));
         self::assertNull($array->at(2));
         self::assertNull($array->at(-1));
-    }
-
-    public function testArrayAccessSupportsSparseIndexedAssignmentAndDeletion(): void
-    {
-        $array = new Arr();
-
-        $array[0] = 'first';
-        $array[2] = 'x';
-
-        self::assertSame(3, $array->length);
-        self::assertSame('first', $array[0]);
-        self::assertNull($array[1]);
-        self::assertSame('x', $array[2]);
-        self::assertFalse(isset($array[1]));
-        self::assertTrue(isset($array[2]));
-        self::assertSame([0, 1, 2], iterator_to_array($array->keys()));
-        self::assertSame(['first', null, 'x'], iterator_to_array($array->values()));
-        self::assertSame([[0, 'first'], [1, null], [2, 'x']], iterator_to_array($array->entries()));
-
-        unset($array[2]);
-
-        self::assertSame(3, $array->length);
-        self::assertFalse(isset($array[2]));
-    }
-
-    public function testSparseArrayMethodsPreserveOrSkipHolesLikeJavascript(): void
-    {
-        $array = new Arr(3);
-        $array[1] = 'x';
-
-        $mapped = $array->map(static fn (string $value): string => strtoupper($value));
-        self::assertSame(3, $mapped->length);
-        self::assertFalse(isset($mapped[0]));
-        self::assertSame('X', $mapped[1]);
-        self::assertFalse(isset($mapped[2]));
-
-        $slice = $array->slice(0, 2);
-        self::assertSame(2, $slice->length);
-        self::assertFalse(isset($slice[0]));
-        self::assertSame('x', $slice[1]);
-
-        self::assertSame(-1, $array->indexOf(null));
-        self::assertSame(-1, $array->lastIndexOf(null));
-        self::assertSame('x', $array->reduce(static fn (string $carry, string $value): string => $carry.$value));
-        self::assertSame('x', $array->reduceRight(static fn (string $carry, string $value): string => $carry.$value));
-
-        $reversed = $array->toReversed();
-        self::assertSame(3, $reversed->length);
-        self::assertFalse(isset($reversed[0]));
-        self::assertSame('x', $reversed[1]);
-        self::assertFalse(isset($reversed[2]));
-    }
-
-    public function testArrayAccessSupportsAppendAndIgnoresInvalidOffsets(): void
-    {
-        $array = new Arr();
-
-        $array[] = 'a';
-        $array[-1] = 'negative';
-        $array['key'] = 'string';
-
-        self::assertSame(1, $array->length);
-        self::assertSame('a', $array[0]);
-        self::assertNull($array['key']);
-
-        unset($array['key']);
-
-        self::assertSame(['a'], iterator_to_array($array->values()));
-    }
-
-    public function testArrayAccessDoesNotTreatStringOffsetsAsIntegerOffsets(): void
-    {
-        $array = new Arr('a');
-
-        self::assertNull($array['0']);
-
-        unset($array['0']);
-
-        self::assertSame(['a'], iterator_to_array($array->values()));
-        self::assertTrue(isset($array[0]));
-    }
-
-    public function testArrayAccessAppendDoesNotAlsoSetNullOffset(): void
-    {
-        $array = new Arr();
-
-        $array[] = 'a';
-        $array[] = 'b';
-
-        self::assertSame(2, $array->length);
-        self::assertSame(['a', 'b'], iterator_to_array($array->values()));
     }
 
     // Array.prototype.concat
@@ -3005,5 +2834,178 @@ final class ArrTest extends TestCase
         $array->push('a');
 
         self::assertSame(['a'], iterator_to_array($iterator));
+    }
+
+    // toArray
+
+    public function testToArrayReturnsInternalDataAsArray(): void
+    {
+        $array = new Arr(1, 'two', null, true);
+
+        self::assertSame([1, 'two', null, true], $array->toArray());
+    }
+
+    public function testToArrayReturnsListForSparseArray(): void
+    {
+        $array = new Arr();
+        $array[2] = 'x';
+
+        self::assertSame([null, null, 'x'], $array->toArray());
+    }
+
+    public function testToArrayReturnsListForSparseArrayByUnset(): void
+    {
+        $array = new Arr(1, 2, 3);
+        unset($array[1]);
+
+        self::assertSame([1, null, 3], $array->toArray());
+    }
+
+    public function testToArrayReturnsListForSparseArrayByOnlyProvidingItsLength(): void
+    {
+        $array = new Arr(5);
+
+        self::assertSame([null, null, null, null, null], $array->toArray());
+    }
+
+    public function testToArrayRecursivelyConvertsNestedArr(): void
+    {
+        $nested = new Arr('a', 'b');
+        $array = new Arr(1, $nested, true);
+
+        self::assertSame([1, ['a', 'b'], true], $array->toArray());
+    }
+
+    // jsonSerialize
+
+    public function testJsonSerializeReturnsInternalDataAsArray(): void
+    {
+        $array = new Arr(1, 'two', null, true);
+
+        self::assertSame([1, 'two', null, true], $array->jsonSerialize());
+    }
+
+    public function testJsonSerializeReturnsListForSparseArray(): void
+    {
+        $array = new Arr();
+        $array[2] = 'x';
+
+        self::assertSame([null, null, 'x'], $array->jsonSerialize());
+    }
+
+    public function testJsonSerializeReturnsListForSparseArrayByUnset(): void
+    {
+        $array = new Arr(1, 2, 3);
+        unset($array[1]);
+
+        self::assertSame([1, null, 3], $array->jsonSerialize());
+    }
+
+    public function testJsonSerializeReturnsListForSparseArrayByOnlyProvidingItsLength(): void
+    {
+        $array = new Arr(5);
+
+        self::assertSame([null, null, null, null, null], $array->jsonSerialize());
+    }
+
+    public function testJsonSerializeRecursivelySerializesNestedArr(): void
+    {
+        $nested = new Arr('a', 'b');
+        $array = new Arr(1, $nested, true);
+
+        self::assertSame([1, ['a', 'b'], true], $array->jsonSerialize());
+    }
+
+    // ArrayAccess
+
+    public function testArrayAccessSupportsSparseIndexedAssignmentAndDeletion(): void
+    {
+        $array = new Arr();
+
+        $array[0] = 'first';
+        $array[2] = 'x';
+
+        self::assertSame(3, $array->length);
+        self::assertSame('first', $array[0]);
+        self::assertNull($array[1]);
+        self::assertSame('x', $array[2]);
+        self::assertFalse(isset($array[1]));
+        self::assertTrue(isset($array[2]));
+        self::assertSame([0, 1, 2], iterator_to_array($array->keys()));
+        self::assertSame(['first', null, 'x'], iterator_to_array($array->values()));
+        self::assertSame([[0, 'first'], [1, null], [2, 'x']], iterator_to_array($array->entries()));
+
+        unset($array[2]);
+
+        self::assertSame(3, $array->length);
+        self::assertFalse(isset($array[2]));
+    }
+
+    public function testSparseArrayMethodsPreserveOrSkipHolesLikeJavascript(): void
+    {
+        $array = new Arr(3);
+        $array[1] = 'x';
+
+        $mapped = $array->map(static fn (string $value): string => strtoupper($value));
+        self::assertSame(3, $mapped->length);
+        self::assertFalse(isset($mapped[0]));
+        self::assertSame('X', $mapped[1]);
+        self::assertFalse(isset($mapped[2]));
+
+        $slice = $array->slice(0, 2);
+        self::assertSame(2, $slice->length);
+        self::assertFalse(isset($slice[0]));
+        self::assertSame('x', $slice[1]);
+
+        self::assertSame(-1, $array->indexOf(null));
+        self::assertSame(-1, $array->lastIndexOf(null));
+        self::assertSame('x', $array->reduce(static fn (string $carry, string $value): string => $carry.$value));
+        self::assertSame('x', $array->reduceRight(static fn (string $carry, string $value): string => $carry.$value));
+
+        $reversed = $array->toReversed();
+        self::assertSame(3, $reversed->length);
+        self::assertFalse(isset($reversed[0]));
+        self::assertSame('x', $reversed[1]);
+        self::assertFalse(isset($reversed[2]));
+    }
+
+    public function testArrayAccessSupportsAppendAndIgnoresInvalidOffsets(): void
+    {
+        $array = new Arr();
+
+        $array[] = 'a';
+        $array[-1] = 'negative';
+        $array['key'] = 'string';
+
+        self::assertSame(1, $array->length);
+        self::assertSame('a', $array[0]);
+        self::assertNull($array['key']);
+
+        unset($array['key']);
+
+        self::assertSame(['a'], iterator_to_array($array->values()));
+    }
+
+    public function testArrayAccessDoesNotTreatStringOffsetsAsIntegerOffsets(): void
+    {
+        $array = new Arr('a');
+
+        self::assertNull($array['0']);
+
+        unset($array['0']);
+
+        self::assertSame(['a'], iterator_to_array($array->values()));
+        self::assertTrue(isset($array[0]));
+    }
+
+    public function testArrayAccessAppendDoesNotAlsoSetNullOffset(): void
+    {
+        $array = new Arr();
+
+        $array[] = 'a';
+        $array[] = 'b';
+
+        self::assertSame(2, $array->length);
+        self::assertSame(['a', 'b'], iterator_to_array($array->values()));
     }
 }
