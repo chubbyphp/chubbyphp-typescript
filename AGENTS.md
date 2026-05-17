@@ -5,6 +5,7 @@ PHP port of JavaScript's `Array` API with TypeScript-style generics. Keep behavi
 ## Where To Work
 - `src/Arr.php` is the main implementation.
 - `tests/Unit/ArrTest.php` is the main spec and is organized by JS API section order.
+- `tests/Integration/DocumentationExamplesTest.php` verifies the PHP examples in `README.md` and `doc/Arr.md`.
 - Update `doc/Arr.md` and `README.md` when public behavior changes.
 
 ## Important Conventions
@@ -20,4 +21,5 @@ PHP port of JavaScript's `Array` API with TypeScript-style generics. Keep behavi
 ## Verification
 - Use Composer scripts as the default workflow: `composer test:unit`, `composer test:integration`, `composer test:static-analysis`, `composer test:cs`, or `composer test`.
 - PHPUnit runs in random order, so avoid hidden test coupling.
+- Keep every PHP example in `README.md` and `doc/Arr.md` executable and in sync with `tests/Integration/DocumentationExamplesTest.php`; add one integration test per documented example block.
 - If you edit `src/Arr.php` and line numbers move, update `infection.json` ignore entries in the same change so mutation-test ignores stay aligned.

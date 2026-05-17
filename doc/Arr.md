@@ -221,7 +221,7 @@ $arr->findLastIndex(static fn ($v) => $v > 10);  // 4
 Returns a new array with all sub-array elements concatenated up to the specified depth.
 
 ```php
-$arr = new Arr(new Arr(1, 2), new Arr(3, new Arr(4)));
+$arr = new Arr(new Arr(1, 2), new Arr(3, Arr::of(4)));
 $arr->flat(1);   // [1, 2, 3, [4]]
 $arr->flat(2);   // [1, 2, 3, 4]
 ```
