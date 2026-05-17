@@ -19,6 +19,76 @@ use PHPUnit\Framework\TestCase;
  */
 final class ArrTest extends TestCase
 {
+    // Array.from
+
+    public function testArrayFromCreatesArrayFromIterable(): void
+    {
+        self::assertSame(['a', 'b', 'c'], iterator_to_array(Arr::from(new \ArrayIterator(['a', 'b', 'c']))->values()));
+    }
+
+    public function testArrayFromCreatesDenseArrayFromSparseArr(): void
+    {
+        $source = new Arr(3);
+        $source[1] = 'x';
+
+        $result = Arr::from($source);
+
+        self::assertSame([null, 'x', null], iterator_to_array($result->values()));
+        self::assertTrue(isset($result[0]));
+        self::assertTrue(isset($result[2]));
+    }
+
+    public function testArrayFromCreatesArrayFromString(): void
+    {
+        self::assertSame(['a', 'b', 'c'], iterator_to_array(Arr::from('abc')->values()));
+    }
+
+    public function testArrayFromFallsBackToByteSplittingForInvalidUtf8String(): void
+    {
+        self::assertSame(["\xFF", "\xFE"], iterator_to_array(Arr::from("\xFF\xFE")->values()));
+    }
+
+    public function testArrayFromMapsValues(): void
+    {
+        self::assertSame([1, 3, 5], iterator_to_array(Arr::from([1, 2, 3], static fn (int $value, int $index): int => $value + $index)->values()));
+    }
+
+    public function testArrayFromBindsThisArgForClosures(): void
+    {
+        $dummy = new Dummy();
+        $dummy->multiplier = 3;
+
+        self::assertSame([3, 6, 9], iterator_to_array(Arr::from([1, 2, 3], $dummy->multiplierCallback(), $dummy)->values()));
+    }
+
+    public function testArrayFromMapCallbackReceivesTwoArguments(): void
+    {
+        $called = false;
+
+        Arr::from([0], static function (...$args) use (&$called): bool {
+            $called = true;
+
+            return 2 === \func_num_args();
+        });
+
+        self::assertTrue($called);
+    }
+
+    public function testArrayFromThrowsTypeErrorForUnsupportedInput(): void
+    {
+        $this->expectException(\TypeError::class);
+
+        Arr::from(new \stdClass());
+    }
+
+    // Array.of
+
+    public function testArrayOfCreatesArrayFromArguments(): void
+    {
+        self::assertSame([3], iterator_to_array(Arr::of(3)->values()));
+        self::assertSame([1, 2, 3], iterator_to_array(Arr::of(1, 2, 3)->values()));
+    }
+
     // Array constructor
 
     public function testArrayConstructorSetsLengthFromArgumentCount(): void

@@ -46,10 +46,15 @@ A PHP implementation of the JavaScript `Array` class, including sparse-array sem
 use Chubbyphp\Typescript\Arr;
 
 $arr = new Arr(1, 2, 3, 4, 5);
-$arr->push(6);
-$arr->pop();
-$arr->map(static fn (int $v): int => $v ** 2);
-// iterator_to_array($arr->values()) => [1, 4, 9, 16, 25]
+$arr
+    ->shift()
+    ->pop()
+    ->map(static fn (int $v): int => $v ** 2);
+    ->push(10);
+// iterator_to_array($arr->values()) => [4, 6, 8, 10]
+
+$arr = Arr::from([1, 2, 3, 4, 5], static fn (int $value): int => $value * 2);
+// iterator_to_array($arr->values()) => [2, 4, 6, 8, 10]
 ```
 
 ## Copyright

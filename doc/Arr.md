@@ -8,6 +8,35 @@
 
 ---
 
+## Static methods
+
+### `from(mixed $items, ?callable $mapFn = null, ?object $thisArg = null): self`
+
+Creates a new array from another `Arr`, a PHP iterable, or a string. If `$mapFn` is provided, it is applied to each value before insertion.
+
+```php
+use Chubbyphp\Typescript\Arr;
+
+Arr::from(new Arr(2));                                 // [null, null]
+Arr::from(['a', 'b'], static fn ($v, $i) => $i.':'.$v); // ['0:a', '1:b']
+Arr::from('abc');                                      // ['a', 'b', 'c']
+```
+
+Sparse `Arr` inputs are converted to dense arrays with explicit `null` values, mirroring `Array.from()` turning holes into elements.
+
+---
+
+### `of(mixed ...$items): self`
+
+Creates a new array from the provided arguments. Unlike the constructor, `Arr::of(3)` creates `[3]` rather than an array with length `3`.
+
+```php
+Arr::of(3);        // [3]
+Arr::of(1, 2, 3);  // [1, 2, 3]
+```
+
+---
+
 ## Constructor
 
 ```php

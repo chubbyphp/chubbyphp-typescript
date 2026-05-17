@@ -18,76 +18,76 @@
         "@default": true,
         "DecrementInteger": {
             "ignore": [
-                "Chubbyphp\\Typescript\\Arr::copyWithin::120",
-                "Chubbyphp\\Typescript\\Arr::copyWithin::126",
-                "Chubbyphp\\Typescript\\Arr::every::165",
-                "Chubbyphp\\Typescript\\Arr::fill::189",
-                "Chubbyphp\\Typescript\\Arr::filter::211",
-                "Chubbyphp\\Typescript\\Arr::forEach::343",
-                "Chubbyphp\\Typescript\\Arr::indexOf::373",
-                "Chubbyphp\\Typescript\\Arr::lastIndexOf::411",
-                "Chubbyphp\\Typescript\\Arr::lastIndexOf::415",
-                "Chubbyphp\\Typescript\\Arr::lastIndexOf::416",
-                "Chubbyphp\\Typescript\\Arr::map::443",
-                "Chubbyphp\\Typescript\\Arr::reduce::503",
-                "Chubbyphp\\Typescript\\Arr::reduce::506",
-                "Chubbyphp\\Typescript\\Arr::reduceRight::546",
-                "Chubbyphp\\Typescript\\Arr::reduceRight::549",
-                "Chubbyphp\\Typescript\\Arr::slice::622",
-                "Chubbyphp\\Typescript\\Arr::some::662",
-                "Chubbyphp\\Typescript\\Arr::toSpliced::830"
+                "Chubbyphp\\Typescript\\Arr::copyWithin::172",
+                "Chubbyphp\\Typescript\\Arr::copyWithin::178",
+                "Chubbyphp\\Typescript\\Arr::every::217",
+                "Chubbyphp\\Typescript\\Arr::fill::241",
+                "Chubbyphp\\Typescript\\Arr::filter::263",
+                "Chubbyphp\\Typescript\\Arr::forEach::395",
+                "Chubbyphp\\Typescript\\Arr::indexOf::425",
+                "Chubbyphp\\Typescript\\Arr::lastIndexOf::463",
+                "Chubbyphp\\Typescript\\Arr::lastIndexOf::467",
+                "Chubbyphp\\Typescript\\Arr::lastIndexOf::468",
+                "Chubbyphp\\Typescript\\Arr::map::495",
+                "Chubbyphp\\Typescript\\Arr::reduce::555",
+                "Chubbyphp\\Typescript\\Arr::reduce::558",
+                "Chubbyphp\\Typescript\\Arr::reduceRight::598",
+                "Chubbyphp\\Typescript\\Arr::reduceRight::601",
+                "Chubbyphp\\Typescript\\Arr::slice::674",
+                "Chubbyphp\\Typescript\\Arr::some::714",
+                "Chubbyphp\\Typescript\\Arr::toSpliced::882"
             ]
         },
         "GreaterThan": {
             "ignore": [
-                "Chubbyphp\\Typescript\\Arr::slice::629",
-                "Chubbyphp\\Typescript\\Arr::slice::633",
-                "Chubbyphp\\Typescript\\Arr::splice::707",
-                "Chubbyphp\\Typescript\\Arr::splice::713",
-                "Chubbyphp\\Typescript\\Arr::toSpliced::819",
-                "Chubbyphp\\Typescript\\Arr::mixedToString::948"
+                "Chubbyphp\\Typescript\\Arr::slice::681",
+                "Chubbyphp\\Typescript\\Arr::slice::685",
+                "Chubbyphp\\Typescript\\Arr::splice::759",
+                "Chubbyphp\\Typescript\\Arr::splice::765",
+                "Chubbyphp\\Typescript\\Arr::toSpliced::871",
+                "Chubbyphp\\Typescript\\Arr::mixedToString::1000"
             ]
         },
         "GreaterThanOrEqualTo": {
             "ignore": [
-                "Chubbyphp\\Typescript\\Arr::slice::637"
+                "Chubbyphp\\Typescript\\Arr::slice::689"
             ]
         },
         "LessThan": {
             "ignore": [
-                "Chubbyphp\\Typescript\\Arr::copyWithin::124",
-                "Chubbyphp\\Typescript\\Arr::copyWithin::126",
-                "Chubbyphp\\Typescript\\Arr::every::165",
-                "Chubbyphp\\Typescript\\Arr::indexOf::375",
-                "Chubbyphp\\Typescript\\Arr::map::443",
-                "Chubbyphp\\Typescript\\Arr::reduce::506",
-                "Chubbyphp\\Typescript\\Arr::reduce::521",
-                "Chubbyphp\\Typescript\\Arr::some::662"
+                "Chubbyphp\\Typescript\\Arr::copyWithin::176",
+                "Chubbyphp\\Typescript\\Arr::copyWithin::178",
+                "Chubbyphp\\Typescript\\Arr::every::217",
+                "Chubbyphp\\Typescript\\Arr::indexOf::427",
+                "Chubbyphp\\Typescript\\Arr::map::495",
+                "Chubbyphp\\Typescript\\Arr::reduce::558",
+                "Chubbyphp\\Typescript\\Arr::reduce::573",
+                "Chubbyphp\\Typescript\\Arr::some::714"
             ]
         },
         "LogicalAndSingleSubExprNegation": {
             "ignore": [
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::978",
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::982"
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1030",
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1034"
             ]
         },
         "Minus": {
             "ignore": [
-                "Chubbyphp\\Typescript\\Arr::lastIndexOf::415",
-                "Chubbyphp\\Typescript\\Arr::lastIndexOf::416",
-                "Chubbyphp\\Typescript\\Arr::reduceRight::546",
-                "Chubbyphp\\Typescript\\Arr::reduceRight::549",
-                "Chubbyphp\\Typescript\\Arr::splice::712",
-                "Chubbyphp\\Typescript\\Arr::toSpliced::824",
-                "Chubbyphp\\Typescript\\Arr::toSpliced::830"
+                "Chubbyphp\\Typescript\\Arr::lastIndexOf::467",
+                "Chubbyphp\\Typescript\\Arr::lastIndexOf::468",
+                "Chubbyphp\\Typescript\\Arr::reduceRight::598",
+                "Chubbyphp\\Typescript\\Arr::reduceRight::601",
+                "Chubbyphp\\Typescript\\Arr::splice::764",
+                "Chubbyphp\\Typescript\\Arr::toSpliced::876",
+                "Chubbyphp\\Typescript\\Arr::toSpliced::882"
             ]
         },
         "ReturnRemoval": {
             "ignore": [
-                "Chubbyphp\\Typescript\\Arr::offsetSet::922",
-                "Chubbyphp\\Typescript\\Arr::lastIndexOf::412",
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::979",
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::983"
+                "Chubbyphp\\Typescript\\Arr::offsetSet::974",
+                "Chubbyphp\\Typescript\\Arr::lastIndexOf::464",
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1031",
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1035"
             ]
         }
     }

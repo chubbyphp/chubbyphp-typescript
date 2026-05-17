@@ -72,6 +72,58 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
     }
 
     /**
+     * @template U
+     *
+     * @param iterable<mixed>|self<mixed>|string $items
+     * @param null|callable(mixed, int): U       $mapFn
+     *
+     * @return self<mixed|U>
+     */
+    public static function from(iterable|self|string $items, ?callable $mapFn = null, ?object $thisArg = null): self
+    {
+        if ($items instanceof self) {
+            $iterable = $items->values();
+        } elseif (\is_string($items)) {
+            $iterable = preg_split('//u', $items, -1, PREG_SPLIT_NO_EMPTY);
+
+            if (false === $iterable) {
+                $iterable = str_split($items);
+            }
+        } else {
+            $iterable = $items;
+        }
+
+        if (null !== $mapFn) {
+            $mapFn = self::bindCallback($mapFn, $thisArg);
+        }
+
+        /** @var self<mixed|U> $result */
+        $result = new self();
+
+        $i = 0;
+        foreach ($iterable as $value) {
+            $result->push(null !== $mapFn ? $mapFn($value, $i) : $value);
+            ++$i;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param null|T ...$arguments
+     *
+     * @return self<T>
+     */
+    public static function of(mixed ...$arguments): self
+    {
+        /** @var self<T> $result */
+        $result = new self();
+        $result->push(...$arguments);
+
+        return $result;
+    }
+
+    /**
      * @return null|T
      */
     public function at(int $index): mixed
