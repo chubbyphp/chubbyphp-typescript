@@ -62,13 +62,12 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function jsonSerialize(): array
     {
-        return array_map(static function (mixed $value): mixed {
-            if ($value instanceof \JsonSerializable) {
-                return $value->jsonSerialize();
-            }
+        $result = [];
+        foreach ($this->values() as $value) {
+            $result[] = $value instanceof \JsonSerializable ? $value->jsonSerialize() : $value;
+        }
 
-            return $value;
-        }, iterator_to_array($this->values()));
+        return $result;
     }
 
     /**
@@ -76,13 +75,12 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function toArray(): array
     {
-        return array_map(static function (mixed $value): mixed {
-            if ($value instanceof self) {
-                return $value->toArray();
-            }
+        $result = [];
+        foreach ($this->values() as $value) {
+            $result[] = $value instanceof self ? $value->toArray() : $value;
+        }
 
-            return $value;
-        }, iterator_to_array($this->values()));
+        return $result;
     }
 
     /**
