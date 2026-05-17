@@ -20,4 +20,4 @@ PHP port of JavaScript's `Array` API with TypeScript-style generics. Keep behavi
 ## Verification
 - Use Composer scripts as the default workflow: `composer test:unit`, `composer test:integration`, `composer test:static-analysis`, `composer test:cs`, or `composer test`.
 - PHPUnit runs in random order, so avoid hidden test coupling.
-- If `src/Arr.php` line numbers move, keep `infection.json` ignore entries in sync.
+- If you edit `src/Arr.php` and line numbers move, update `infection.json` ignore entries in the same change so mutation-test ignores stay aligned.
