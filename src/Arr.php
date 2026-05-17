@@ -77,9 +77,9 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
             }
 
             if ($value < $this->internalLength) {
-                foreach ($this->internalArray as $key => $v) {
-                    if ($key >= $value) {
-                        unset($this->internalArray[$key]);
+                foreach ($this->internalArray as $i => $_) {
+                    if ($i >= $value) {
+                        unset($this->internalArray[$i]);
                     }
                 }
             }
@@ -160,13 +160,13 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
     /**
      * @return null|T
      */
-    public function at(int $index): mixed
+    public function at(int $i): mixed
     {
-        if (0 > $index) {
-            $index = $this->internalLength + $index;
+        if (0 > $i) {
+            $i = $this->internalLength + $i;
         }
 
-        return $this->internalArray[$index] ?? null;
+        return $this->internalArray[$i] ?? null;
     }
 
     /**
@@ -181,8 +181,8 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         foreach ($items as $item) {
             if ($item instanceof self) {
                 $offset = $result->internalLength;
-                foreach ($item->internalArray as $key => $value) {
-                    $result->internalArray[$offset + $key] = $value;
+                foreach ($item->internalArray as $i => $value) {
+                    $result->internalArray[$offset + $i] = $value;
                 }
                 $result->internalLength += $item->internalLength;
             } else {
@@ -234,8 +234,8 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
      */
     public function entries(): \Generator
     {
-        for ($key = 0; $key < $this->internalLength; ++$key) {
-            yield [$key, $this->internalArray[$key] ?? null];
+        for ($i = 0; $i < $this->internalLength; ++$i) {
+            yield [$i, $this->internalArray[$i] ?? null];
         }
     }
 
@@ -248,14 +248,14 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
 
         $len = $this->internalLength;
 
-        for ($key = 0; $key < $len; ++$key) {
-            if (!\array_key_exists($key, $this->internalArray)) {
+        for ($i = 0; $i < $len; ++$i) {
+            if (!\array_key_exists($i, $this->internalArray)) {
                 continue;
             }
 
-            $value = $this->internalArray[$key];
+            $value = $this->internalArray[$i];
 
-            if (!$callback($value, $key, $this)) {
+            if (!$callback($value, $i, $this)) {
                 return false;
             }
         }
@@ -270,12 +270,12 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
     {
         $len = $this->internalLength;
 
-        $k = $start < 0 ? max($len + $start, 0) : min($start, $len);
+        $i = $start < 0 ? max($len + $start, 0) : min($start, $len);
         $relativeEnd = $end ?? $len;
         $final = $relativeEnd < 0 ? max($len + $relativeEnd, 0) : min($relativeEnd, $len);
 
-        for (; $k < $final; ++$k) {
-            $this->internalArray[$k] = $value;
+        for (; $i < $final; ++$i) {
+            $this->internalArray[$i] = $value;
         }
 
         return $this;
@@ -294,13 +294,13 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         $result = new self();
 
         $len = $this->internalLength;
-        for ($key = 0; $key < $len; ++$key) {
-            if (!\array_key_exists($key, $this->internalArray)) {
+        for ($i = 0; $i < $len; ++$i) {
+            if (!\array_key_exists($i, $this->internalArray)) {
                 continue;
             }
 
-            $value = $this->internalArray[$key];
-            if ($callback($value, $key, $this)) {
+            $value = $this->internalArray[$i];
+            if ($callback($value, $i, $this)) {
                 $result->push($value);
             }
         }
@@ -319,10 +319,10 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
 
         $len = $this->internalLength;
 
-        for ($key = 0; $key < $len; ++$key) {
-            $value = $this->internalArray[$key] ?? null;
+        for ($i = 0; $i < $len; ++$i) {
+            $value = $this->internalArray[$i] ?? null;
 
-            if ($callback($value, $key, $this)) {
+            if ($callback($value, $i, $this)) {
                 return $value;
             }
         }
@@ -339,11 +339,11 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
 
         $len = $this->internalLength;
 
-        for ($key = 0; $key < $len; ++$key) {
-            $value = $this->internalArray[$key] ?? null;
+        for ($i = 0; $i < $len; ++$i) {
+            $value = $this->internalArray[$i] ?? null;
 
-            if ($callback($value, $key, $this)) {
-                return $key;
+            if ($callback($value, $i, $this)) {
+                return $i;
             }
         }
 
@@ -359,10 +359,10 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        for ($k = $this->internalLength - 1; 0 <= $k; --$k) {
-            $value = $this->internalArray[$k] ?? null;
+        for ($i = $this->internalLength - 1; 0 <= $i; --$i) {
+            $value = $this->internalArray[$i] ?? null;
 
-            if ($callback($value, $k, $this)) {
+            if ($callback($value, $i, $this)) {
                 return $value;
             }
         }
@@ -377,9 +377,9 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        for ($k = $this->internalLength - 1; 0 <= $k; --$k) {
-            if ($callback($this->internalArray[$k] ?? null, $k, $this)) {
-                return $k;
+        for ($i = $this->internalLength - 1; 0 <= $i; --$i) {
+            if ($callback($this->internalArray[$i] ?? null, $i, $this)) {
+                return $i;
             }
         }
 
@@ -426,14 +426,14 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
 
         $len = $this->internalLength;
 
-        for ($key = 0; $key < $len; ++$key) {
-            if (!\array_key_exists($key, $this->internalArray)) {
+        for ($i = 0; $i < $len; ++$i) {
+            if (!\array_key_exists($i, $this->internalArray)) {
                 continue;
             }
 
-            $value = $this->internalArray[$key];
+            $value = $this->internalArray[$i];
 
-            $callback($value, $key, $this);
+            $callback($value, $i, $this);
         }
     }
 
@@ -441,10 +441,10 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
     {
         $len = $this->internalLength;
 
-        $k = $fromIndex < 0 ? max($len + $fromIndex, 0) : $fromIndex;
+        $i = $fromIndex < 0 ? max($len + $fromIndex, 0) : $fromIndex;
 
-        for (; $k < $len; ++$k) {
-            $value = $this->internalArray[$k] ?? null;
+        for (; $i < $len; ++$i) {
+            $value = $this->internalArray[$i] ?? null;
 
             if (self::sameValueZero($value, $searchElement)) {
                 return true;
@@ -456,10 +456,13 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
 
     public function indexOf(mixed $searchElement = null, int $fromIndex = 0): int
     {
-        $k = $fromIndex < 0 ? max($this->internalLength + $fromIndex, 0) : $fromIndex;
+        $i = $fromIndex < 0 ? max($this->internalLength + $fromIndex, 0) : $fromIndex;
 
-        for ($i = $k; $i < $this->internalLength; ++$i) {
-            if (\array_key_exists($i, $this->internalArray) && self::strictlyEqual($this->internalArray[$i], $searchElement)) {
+        for (; $i < $this->internalLength; ++$i) {
+            if (
+                \array_key_exists($i, $this->internalArray)
+                && self::strictlyEqual($this->internalArray[$i], $searchElement)
+            ) {
                 return $i;
             }
         }
@@ -471,8 +474,8 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
     {
         $values = [];
 
-        for ($key = 0; $key < $this->internalLength; ++$key) {
-            $values[] = self::mixedToString($this->internalArray[$key] ?? null);
+        for ($i = 0; $i < $this->internalLength; ++$i) {
+            $values[] = self::mixedToString($this->internalArray[$i] ?? null);
         }
 
         return implode($separator ?? self::DEFAULT_DELIMITER, $values);
@@ -499,11 +502,11 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         }
 
         $n = $fromIndex ?? $len - 1;
-        $k = $n >= 0 ? min($n, $len - 1) : $len + $n;
+        $i = $n >= 0 ? min($n, $len - 1) : $len + $n;
 
-        for (; $k >= 0; --$k) {
-            if (\array_key_exists($k, $this->internalArray) && self::strictlyEqual($this->internalArray[$k], $searchElement)) {
-                return $k;
+        for (; $i >= 0; --$i) {
+            if (\array_key_exists($i, $this->internalArray) && self::strictlyEqual($this->internalArray[$i], $searchElement)) {
+                return $i;
             }
         }
 
@@ -526,14 +529,14 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
 
         $len = $this->internalLength;
 
-        for ($key = 0; $key < $len; ++$key) {
-            if (!\array_key_exists($key, $this->internalArray)) {
+        for ($i = 0; $i < $len; ++$i) {
+            if (!\array_key_exists($i, $this->internalArray)) {
                 continue;
             }
 
-            $value = $this->internalArray[$key];
+            $value = $this->internalArray[$i];
 
-            $result->internalArray[$key] = $callback($value, $key, $this);
+            $result->internalArray[$i] = $callback($value, $i, $this);
         }
 
         return $result;
@@ -662,8 +665,8 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
     public function reverse(): static
     {
         $reversed = [];
-        foreach ($this->internalArray as $key => $value) {
-            $reversed[$this->internalLength - 1 - $key] = $value;
+        foreach ($this->internalArray as $i => $value) {
+            $reversed[$this->internalLength - 1 - $i] = $value;
         }
 
         ksort($reversed);
@@ -683,9 +686,9 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         $value = $this->internalArray[0] ?? null;
         $newData = [];
 
-        foreach ($this->internalArray as $key => $item) {
-            if (0 < $key) {
-                $newData[$key - 1] = $item;
+        foreach ($this->internalArray as $i => $item) {
+            if (0 < $i) {
+                $newData[$i - 1] = $item;
             }
         }
 
@@ -727,9 +730,9 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         /** @var self<T> $new */
         $new = new self($end - $start);
 
-        for ($key = $start; $key < $end; ++$key) {
-            if (\array_key_exists($key, $this->internalArray)) {
-                $new->internalArray[$key - $start] = $this->internalArray[$key];
+        for ($i = $start; $i < $end; ++$i) {
+            if (\array_key_exists($i, $this->internalArray)) {
+                $new->internalArray[$i - $start] = $this->internalArray[$i];
             }
         }
 
@@ -745,14 +748,14 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
 
         $len = $this->internalLength;
 
-        for ($key = 0; $key < $len; ++$key) {
-            if (!\array_key_exists($key, $this->internalArray)) {
+        for ($i = 0; $i < $len; ++$i) {
+            if (!\array_key_exists($i, $this->internalArray)) {
                 continue;
             }
 
-            $value = $this->internalArray[$key];
+            $value = $this->internalArray[$i];
 
-            if ($callback($value, $key, $this)) {
+            if ($callback($value, $i, $this)) {
                 return true;
             }
         }
@@ -814,11 +817,11 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         $shift = $itemCount - $deleteCount;
         $newData = [];
 
-        foreach ($this->internalArray as $key => $value) {
-            if ($key < $start) {
-                $newData[$key] = $value;
-            } elseif ($key >= $start + $deleteCount) {
-                $newData[$key + $shift] = $value;
+        foreach ($this->internalArray as $i => $value) {
+            if ($i < $start) {
+                $newData[$i] = $value;
+            } elseif ($i >= $start + $deleteCount) {
+                $newData[$i + $shift] = $value;
             }
         }
 
@@ -842,8 +845,12 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
     {
         $values = [];
 
-        for ($key = 0; $key < $this->internalLength; ++$key) {
-            $values[] = self::mixedToLocaleString($this->internalArray[$key] ?? null, $locales, $options);
+        for ($i = 0; $i < $this->internalLength; ++$i) {
+            $values[] = self::mixedToLocaleString(
+                $this->internalArray[$i] ?? null,
+                $locales,
+                $options,
+            );
         }
 
         return implode(self::DEFAULT_DELIMITER, $values);
@@ -857,8 +864,8 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         /** @var self<T> $result */
         $result = new self($this->internalLength);
 
-        foreach ($this->internalArray as $key => $value) {
-            $result->internalArray[$this->internalLength - 1 - $key] = $value;
+        foreach ($this->internalArray as $i => $value) {
+            $result->internalArray[$this->internalLength - 1 - $i] = $value;
         }
 
         return $result;
@@ -876,8 +883,8 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         /** @var self<T> $result */
         $result = new self($this->internalLength);
 
-        foreach ($sorted as $key => $value) {
-            $result->internalArray[$key] = $value;
+        foreach ($sorted as $i => $value) {
+            $result->internalArray[$i] = $value;
         }
 
         return $result;
@@ -956,12 +963,12 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         $itemCount = \count($items);
         $newData = [];
 
-        foreach ($items as $key => $item) {
-            $newData[$key] = $item;
+        foreach ($items as $i => $item) {
+            $newData[$i] = $item;
         }
 
-        foreach ($this->internalArray as $key => $value) {
-            $newData[$key + $itemCount] = $value;
+        foreach ($this->internalArray as $i => $value) {
+            $newData[$i + $itemCount] = $value;
         }
 
         $this->internalArray = $newData;
@@ -975,8 +982,8 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
      */
     public function values(): \Generator
     {
-        for ($key = 0; $key < $this->internalLength; ++$key) {
-            yield $this->internalArray[$key] ?? null;
+        for ($i = 0; $i < $this->internalLength; ++$i) {
+            yield $this->internalArray[$i] ?? null;
         }
     }
 
