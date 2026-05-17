@@ -3,7 +3,12 @@
     "description": "Typescript classes ported to PHP",
     "keywords": [
         "chubbyphp",
-        "typescript"
+        "array",
+        "sparse-array",
+        "javascript",
+        "typescript",
+        "tc39",
+        "test262"
     ],
     "license": "MIT",
     "authors": [
