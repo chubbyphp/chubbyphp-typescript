@@ -69,6 +69,29 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         return null;
     }
 
+    public function __set(string $name, mixed $value): void
+    {
+        if ('length' === $name) {
+            if (!\is_int($value) || 0 > $value || (2 ** 32) - 1 < $value) {
+                throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
+            }
+
+            if ($value < $this->internalLength) {
+                foreach ($this->internalArray as $key => $v) {
+                    if ($key >= $value) {
+                        unset($this->internalArray[$key]);
+                    }
+                }
+            }
+
+            $this->internalLength = $value;
+
+            return;
+        }
+
+        trigger_error('Undefined property: A::$'.$name, E_USER_WARNING);
+    }
+
     public function __toString(): string
     {
         return $this->toString();

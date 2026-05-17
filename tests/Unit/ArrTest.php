@@ -293,6 +293,88 @@ final class ArrTest extends TestCase
         self::assertSame('Undefined property: A::$unknown', $lastError['message']);
     }
 
+    // __set
+
+    public function testArraySetLengthTruncatesArray(): void
+    {
+        $array = new Arr(1, 2, 3, 4, 5);
+        $array->length = 2;
+
+        self::assertSame(2, $array->length);
+        self::assertSame([1, 2], $array->toArray());
+    }
+
+    public function testArraySetLengthExtendsWithHoles(): void
+    {
+        $array = new Arr(1, 2);
+        $array->length = 5;
+
+        self::assertSame(5, $array->length);
+        self::assertSame([1, 2, null, null, null], $array->toArray());
+    }
+
+    public function testArraySetLengthToZeroEmptiesArray(): void
+    {
+        $array = new Arr(1, 2, 3);
+        $array->length = 0;
+
+        self::assertSame(0, $array->length);
+        self::assertSame([], $array->toArray());
+    }
+
+    public function testArraySetLengthToSameValueIsNoop(): void
+    {
+        $array = new Arr(1, 2, 3);
+        $array->length = 3;
+
+        self::assertSame(3, $array->length);
+        self::assertSame([1, 2, 3], $array->toArray());
+    }
+
+    public function testArraySetLengthThrowsRangeErrorForNegative(): void
+    {
+        $this->expectException(RangeError::class);
+        $this->expectExceptionMessage('Invalid array length');
+
+        $array = new Arr(1, 2, 3);
+        $array->length = -1;
+    }
+
+    public function testArraySetLengthThrowsRangeErrorForFloat(): void
+    {
+        $this->expectException(RangeError::class);
+        $this->expectExceptionMessage('Invalid array length');
+
+        $array = new Arr(1, 2, 3);
+        $array->length = 1.5;
+    }
+
+    public function testArraySetLengthThrowsRangeErrorForTooLarge(): void
+    {
+        $this->expectException(RangeError::class);
+        $this->expectExceptionMessage('Invalid array length');
+
+        $array = new Arr(1, 2, 3);
+        $array->length = 2 ** 32;
+    }
+
+    public function testArraySetUnknownPropertyTriggersWarning(): void
+    {
+        $array = new Arr(1, 2, 3);
+
+        error_clear_last();
+
+        @$array->unknown = 'x';
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_WARNING, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Undefined property: A::$unknown', $lastError['message']);
+    }
+
     // __toString
 
     public function testMagicToStringDelegatesToJoin(): void
