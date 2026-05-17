@@ -2361,6 +2361,44 @@ final class ArrTest extends TestCase
         });
     }
 
+    public function testSortMovesSparseHolesToTheEndDroppingLength(): void
+    {
+        $array = new Arr(4);
+        $array[1] = 'b';
+        $array[3] = 'a';
+        $array[5] = 'c';
+
+        $array->sort();
+
+        self::assertSame(6, $array->length);
+        self::assertSame(['a', 'b', 'c', null, null, null], iterator_to_array($array->values()));
+        self::assertTrue(isset($array[0]));
+        self::assertTrue(isset($array[1]));
+        self::assertTrue(isset($array[2]));
+        self::assertFalse(isset($array[3]));
+        self::assertFalse(isset($array[4]));
+        self::assertFalse(isset($array[5]));
+    }
+
+    public function testSortWithDescCallbackMovesSparseHolesToTheEndDroppingLength(): void
+    {
+        $array = new Arr(4);
+        $array[1] = 'b';
+        $array[3] = 'a';
+        $array[5] = 'c';
+
+        $array->sort(static fn ($a, $b) => $b <=> $a);
+
+        self::assertSame(6, $array->length);
+        self::assertSame(['c', 'b', 'a', null, null, null], iterator_to_array($array->values()));
+        self::assertTrue(isset($array[0]));
+        self::assertTrue(isset($array[1]));
+        self::assertTrue(isset($array[2]));
+        self::assertFalse(isset($array[3]));
+        self::assertFalse(isset($array[4]));
+        self::assertFalse(isset($array[5]));
+    }
+
     // Array.prototype.splice
 
     public function testSpliceRemovesRequestedElementsAndMutatesReceiver(): void
@@ -2728,6 +2766,44 @@ final class ArrTest extends TestCase
         }
 
         self::assertSame(1, $called);
+    }
+
+    public function testToSortedMovesSparseHolesToTheEndDroppingLength(): void
+    {
+        $array = new Arr(4);
+        $array[1] = 'b';
+        $array[3] = 'a';
+        $array[5] = 'c';
+
+        $sortedArray = $array->toSorted();
+
+        self::assertSame(6, $sortedArray->length);
+        self::assertSame(['a', 'b', 'c', null, null, null], iterator_to_array($sortedArray->values()));
+        self::assertTrue(isset($sortedArray[0]));
+        self::assertTrue(isset($sortedArray[1]));
+        self::assertTrue(isset($sortedArray[2]));
+        self::assertFalse(isset($sortedArray[3]));
+        self::assertFalse(isset($sortedArray[4]));
+        self::assertFalse(isset($sortedArray[5]));
+    }
+
+    public function testToSortedWithDescCallbackMovesSparseHolesToTheEndDroppingLength(): void
+    {
+        $array = new Arr(4);
+        $array[1] = 'b';
+        $array[3] = 'a';
+        $array[5] = 'c';
+
+        $sortedArray = $array->toSorted(static fn ($a, $b) => $b <=> $a);
+
+        self::assertSame(6, $sortedArray->length);
+        self::assertSame(['c', 'b', 'a', null, null, null], iterator_to_array($sortedArray->values()));
+        self::assertTrue(isset($sortedArray[0]));
+        self::assertTrue(isset($sortedArray[1]));
+        self::assertTrue(isset($sortedArray[2]));
+        self::assertFalse(isset($sortedArray[3]));
+        self::assertFalse(isset($sortedArray[4]));
+        self::assertFalse(isset($sortedArray[5]));
     }
 
     // Array.prototype.toSpliced
