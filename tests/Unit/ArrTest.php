@@ -100,6 +100,14 @@ final class ArrTest extends TestCase
         new Arr(2 ** 32);
     }
 
+    public function testArrayConstructorAcceptsMaxUint32Length(): void
+    {
+        $array = new Arr((2 ** 32) - 1);
+
+        self::assertSame((2 ** 32) - 1, $array->length);
+        self::assertNull($array->at(0));
+    }
+
     public function testArrayConstructorThrowsRangeErrorForNanAndInfinityLengths(): void
     {
         foreach ([NAN, INF, -INF, PHP_FLOAT_MAX, PHP_FLOAT_MIN] as $length) {
@@ -235,6 +243,18 @@ final class ArrTest extends TestCase
         self::assertSame(2, $array->length);
     }
 
+    public function testLengthWithParse(): void
+    {
+        $array = new Arr();
+        $array[3] = 3;
+
+        self::assertSame(4, $array->length);
+
+        self::assertSame(3, $array->pop());
+
+        self::assertSame(3, $array->length);
+    }
+
     // Array.prototype.at
 
     public function testAtReturnsItemValueAtSpecifiedIndex(): void
@@ -345,6 +365,18 @@ final class ArrTest extends TestCase
         unset($array['key']);
 
         self::assertSame(['a'], iterator_to_array($array->values()));
+    }
+
+    public function testArrayAccessDoesNotTreatStringOffsetsAsIntegerOffsets(): void
+    {
+        $array = new Arr('a');
+
+        self::assertNull($array['0']);
+
+        unset($array['0']);
+
+        self::assertSame(['a'], iterator_to_array($array->values()));
+        self::assertTrue(isset($array[0]));
     }
 
     public function testArrayAccessAppendDoesNotAlsoSetNullOffset(): void
@@ -507,6 +539,17 @@ final class ArrTest extends TestCase
         $array->push('a');
 
         self::assertSame([0 => [0, 'a']], iterator_to_array($iterator));
+    }
+
+    public function testEntriesWithSparseArrayYieldsKeyValuePairsForAllIndices(): void
+    {
+        $array = new Arr(3);
+        $array->offsetSet(1, 'x');
+
+        self::assertSame(
+            [0 => [0, null], 1 => [1, 'x'], 2 => [2, null]],
+            iterator_to_array($array->entries()),
+        );
     }
 
     // Array.prototype.every
@@ -1559,6 +1602,12 @@ final class ArrTest extends TestCase
         self::assertSame('0', $array->join());
     }
 
+    public function testJoinReturnsStringElementsUnchanged(): void
+    {
+        self::assertSame('a,b,c', (new Arr('a', 'b', 'c'))->join());
+        self::assertSame('x,[object Object]', (new Arr(['x', new \stdClass()]))->join());
+    }
+
     public function testJoinUsesStringSeparatorAndStringifiesValues(): void
     {
         self::assertSame('0123', (new Arr(0, 1, 2, 3))->join(''));
@@ -1573,6 +1622,20 @@ final class ArrTest extends TestCase
     public function testJoinStringifiesPhpArraysAndNonStringableObjects(): void
     {
         self::assertSame('1,2,[object Object]', (new Arr([1, 2], new \stdClass()))->join());
+    }
+
+    public function testJoinReindexesTraversablesInsteadOfPreservingDuplicateKeys(): void
+    {
+        $iterable = new class implements \IteratorAggregate {
+            public function getIterator(): \Traversable
+            {
+                yield 0 => 'a';
+
+                yield 0 => 'b';
+            }
+        };
+
+        self::assertSame('a,b', (new Arr($iterable))->join());
     }
 
     // Array.prototype.keys
@@ -1590,6 +1653,14 @@ final class ArrTest extends TestCase
         $array->push('a');
 
         self::assertSame([0], iterator_to_array($iterator));
+    }
+
+    public function testKeysYieldsAllIndicesUpToLengthMinusOneEvenWhenSparse(): void
+    {
+        $array = new Arr(3);
+        $array->offsetSet(1, 'x');
+
+        self::assertSame([0, 1, 2], iterator_to_array($array->keys()));
     }
 
     // Array.prototype.lastIndexOf
@@ -1754,6 +1825,7 @@ final class ArrTest extends TestCase
         $array = new Arr();
 
         self::assertNull($array->pop());
+        self::assertSame(0, $array->length);
         self::assertCount(0, iterator_to_array($array->values()));
     }
 
@@ -2041,6 +2113,27 @@ final class ArrTest extends TestCase
         self::assertSame(['value'], iterator_to_array($single->values()));
     }
 
+    public function testReverseWithSparseArrayReversesAndPreservesLength(): void
+    {
+        $array = new Arr(4);
+        $array->offsetSet(0, 'a');
+        $array->offsetSet(2, 'c');
+        $array->reverse();
+
+        self::assertSame([null, 'c', null, 'a'], iterator_to_array($array->values()));
+    }
+
+    public function testReverseWithSparseArrayKeepsInternalIterationInIndexOrder(): void
+    {
+        $array = new Arr(4);
+        $array->offsetSet(0, 'a');
+        $array->offsetSet(2, 'c');
+
+        $array->reverse();
+
+        self::assertSame(['c', 'a'], iterator_to_array($array->flat()->values()));
+    }
+
     // Array.prototype.shift
 
     public function testShiftReturnsUndefinedForEmptyArray(): void
@@ -2048,6 +2141,7 @@ final class ArrTest extends TestCase
         $array = new Arr();
 
         self::assertNull($array->shift());
+        self::assertSame(0, $array->length);
         self::assertCount(0, iterator_to_array($array->values()));
     }
 
@@ -2341,6 +2435,28 @@ final class ArrTest extends TestCase
         self::assertSame([0, 4, 5], iterator_to_array($array->values()));
     }
 
+    public function testSpliceRemovedArrayDoesNotExposeIndexesOutsideDeleteCount(): void
+    {
+        $removed = (new Arr(0, 1, 2, 3))->splice(1, 1);
+
+        self::assertSame([1], iterator_to_array($removed->values()));
+        self::assertFalse(isset($removed[-1]));
+        self::assertFalse(isset($removed[1]));
+        self::assertNull($removed[-1]);
+        self::assertNull($removed[1]);
+    }
+
+    public function testSpliceWithSparseArrayKeepsInternalIterationInIndexOrder(): void
+    {
+        $array = new Arr(4);
+        $array->offsetSet(0, new Arr('a'));
+        $array->offsetSet(2, new Arr('c'));
+
+        $array->splice(1, 0, new Arr('b'));
+
+        self::assertSame(['a', 'b', 'c'], iterator_to_array($array->flat()->values()));
+    }
+
     public function testSpliceWithExplicitNullDeleteCountDeletesNothing(): void
     {
         $array = new Arr(0, 1, 2, 3);
@@ -2420,12 +2536,27 @@ final class ArrTest extends TestCase
     {
         self::assertSame('a,b,c', (new Arr('a', 'b', 'c'))->toLocaleString());
         self::assertSame('true,false', (new Arr(true, false))->toLocaleString());
+        self::assertSame('[object Object]', (new Arr(new \stdClass()))->toLocaleString());
     }
 
     public function testToLocaleStringStringifiesNestedIterables(): void
     {
         self::assertSame('1,2,3,4', (new Arr([1, 2], new \ArrayIterator([3, 4])))->toLocaleString('en-US'));
         self::assertSame('1,000,0.25', (new Arr([1000, 0.25]))->toLocaleString('en-US', ['style' => 'decimal']));
+    }
+
+    public function testToLocaleStringReindexesTraversablesInsteadOfPreservingDuplicateKeys(): void
+    {
+        $iterable = new class implements \IteratorAggregate {
+            public function getIterator(): \Traversable
+            {
+                yield 0 => 1000;
+
+                yield 0 => 2000;
+            }
+        };
+
+        self::assertSame('1,000,2,000', (new Arr($iterable))->toLocaleString('en-US', ['style' => 'decimal']));
     }
 
     public function testToLocaleStringFormatsPercentStyle(): void
@@ -2449,6 +2580,12 @@ final class ArrTest extends TestCase
         $array->push(1);
 
         self::assertSame('1', $array->toLocaleString('en-US', ['style' => 'decimal']));
+        self::assertSame('1', $array->toLocaleString('en-US', ['style' => 'decimal', 'currency' => 123]));
+    }
+
+    public function testToLocaleStringReturnsConfiguredCurrencyResult(): void
+    {
+        self::assertSame('€1.00', (new Arr())->concat(1)->toLocaleString('en-US', ['style' => 'currency', 'currency' => 'EUR']));
     }
 
     public function testToLocaleStringSupportsFractionDigitOptions(): void
@@ -2702,6 +2839,17 @@ final class ArrTest extends TestCase
         self::assertSame([1, 2], iterator_to_array((new Arr(1, 2))->map($callback, $context)->values()));
     }
 
+    public function testClosureThisArgRebindsNonStaticClosuresToProvidedObject(): void
+    {
+        $source = new Dummy();
+        $source->threshold = 10;
+
+        $context = new Dummy();
+        $context->threshold = 3;
+
+        self::assertFalse((new Arr(1, 2, 3))->every($source->thresholdCallback(), $context));
+    }
+
     // Array.prototype.unshift
 
     public function testUnshiftPrependsItemsAndReturnsNewLength(): void
@@ -2736,6 +2884,14 @@ final class ArrTest extends TestCase
     public function testValuesReturnsIteratorForArrayValues(): void
     {
         self::assertSame(['a', 'b', 'c'], iterator_to_array((new Arr('a', 'b', 'c'))->values()));
+    }
+
+    public function testValuesWithSparseArrayYieldsNullForHoles(): void
+    {
+        $array = new Arr(3);
+        $array->offsetSet(1, 'x');
+
+        self::assertSame([null, 'x', null], iterator_to_array($array->values()));
     }
 
     public function testValuesIteratorSeesItemsAddedBeforeExhaustion(): void
