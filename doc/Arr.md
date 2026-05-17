@@ -498,6 +498,22 @@ $spliced = $arr->toSpliced(1, 2, 100);
 
 ---
 
+### `with(int $index, mixed $value): self`
+
+Returns a new array with the element at `index` replaced by `value` (does not modify the original). Supports negative indices.
+
+```php
+$arr = new Arr(1, 2, 3, 4, 5);
+$result = $arr->with(2, 99);
+// $result is [1, 2, 99, 4, 5], $arr is [1, 2, 3, 4, 5]
+
+$arr2 = new Arr(1, 2, 3);
+$result2 = $arr2->with(-1, 'x');
+// $result2 is [1, 2, 'x']
+```
+
+---
+
 ### `toString(): string`
 
 Returns a string representation by joining with `','`.

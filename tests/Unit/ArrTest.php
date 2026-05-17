@@ -2799,6 +2799,54 @@ final class ArrTest extends TestCase
         self::assertSame([0, 1, 2, 3], iterator_to_array($array->values()));
     }
 
+    // Array.prototype.with
+
+    public function testWithReplacesElementAtPositiveIndex(): void
+    {
+        self::assertSame([1, 2, 99, 4, 5], iterator_to_array((new Arr(1, 2, 3, 4, 5))->with(2, 99)->values()));
+    }
+
+    public function testWithReplacesElementAtNegativeIndex(): void
+    {
+        self::assertSame([1, 2, 'x'], iterator_to_array((new Arr(1, 2, 3))->with(-1, 'x')->values()));
+    }
+
+    public function testWithDoesNotModifyOriginalArray(): void
+    {
+        $array = new Arr(1, 2, 3);
+        $result = $array->with(1, 99);
+
+        self::assertNotSame($array, $result);
+        self::assertSame([1, 2, 3], iterator_to_array($array->values()));
+        self::assertSame([1, 99, 3], iterator_to_array($result->values()));
+    }
+
+    public function testWithThrowsRangeErrorForOutOfBoundsIndex(): void
+    {
+        $this->expectException(RangeError::class);
+        $this->expectExceptionMessage('Invalid index: 10');
+
+        (new Arr(1, 2, 3))->with(10, 'x');
+    }
+
+    public function testWithThrowsRangeErrorForEmptyArray(): void
+    {
+        $this->expectException(RangeError::class);
+        $this->expectExceptionMessage('Invalid index: 0');
+
+        (new Arr())->with(0, 'x');
+    }
+
+    public function testWithReplacesHoleInSparseArray(): void
+    {
+        $array = new Arr(5);
+        $array[2] = 'present';
+
+        $result = $array->with(3, 'filled');
+
+        self::assertSame('filled', $result->at(3));
+    }
+
     // Array.prototype.toString
 
     public function testToStringReturnsEmptyStringForEmptyArray(): void

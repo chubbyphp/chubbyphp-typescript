@@ -884,6 +884,33 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
         return $result;
     }
 
+    /**
+     * @param T $value
+     *
+     * @return self<T>
+     */
+    public function with(int $index, mixed $value): self
+    {
+        $len = $this->internalLength;
+
+        if ($index < 0) {
+            $index = $len + $index;
+        }
+
+        if ($index < 0 || $index >= $len) {
+            throw new RangeError('Invalid index: '.$index);
+        }
+
+        /** @var self<T> $result */
+        $result = new self($this->internalLength);
+
+        for ($i = 0; $i < $len; ++$i) {
+            $result->internalArray[$i] = ($i === $index) ? $value : ($this->internalArray[$i] ?? null);
+        }
+
+        return $result;
+    }
+
     public function toString(): string
     {
         return $this->join();

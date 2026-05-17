@@ -35,12 +35,13 @@
                 "Chubbyphp\\Typescript\\Arr::reduceRight::601",
                 "Chubbyphp\\Typescript\\Arr::slice::674",
                 "Chubbyphp\\Typescript\\Arr::some::714",
-                "Chubbyphp\\Typescript\\Arr::toSpliced::876"
+                "Chubbyphp\\Typescript\\Arr::toSpliced::876",
+                "Chubbyphp\\Typescript\\Arr::with::907"
             ]
         },
         "GreaterThan": {
             "ignore": [
-                "Chubbyphp\\Typescript\\Arr::mixedToString::994",
+                "Chubbyphp\\Typescript\\Arr::mixedToString::1021",
                 "Chubbyphp\\Typescript\\Arr::slice::681",
                 "Chubbyphp\\Typescript\\Arr::slice::685",
                 "Chubbyphp\\Typescript\\Arr::splice::755",
@@ -64,13 +65,16 @@
                 "Chubbyphp\\Typescript\\Arr::map::495",
                 "Chubbyphp\\Typescript\\Arr::reduce::558",
                 "Chubbyphp\\Typescript\\Arr::reduce::573",
-                "Chubbyphp\\Typescript\\Arr::some::714"
+                "Chubbyphp\\Typescript\\Arr::some::714",
+                "Chubbyphp\\Typescript\\Arr::with::896",
+                "Chubbyphp\\Typescript\\Arr::with::900",
+                "Chubbyphp\\Typescript\\Arr::with::907"
             ]
         },
         "LogicalAndSingleSubExprNegation": {
             "ignore": [
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1024",
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1028"
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1051",
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1055"
             ]
         },
         "Minus": {
@@ -87,12 +91,12 @@
         "ReturnRemoval": {
             "ignore": [
                 "Chubbyphp\\Typescript\\Arr::lastIndexOf::464",
-                "Chubbyphp\\Typescript\\Arr::offsetSet::968",
-                "Chubbyphp\\Typescript\\Arr::offsetSet::972",
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1025",
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1029",
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1032",
-                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1035"
+                "Chubbyphp\\Typescript\\Arr::offsetSet::995",
+                "Chubbyphp\\Typescript\\Arr::offsetSet::999",
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1052",
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1056",
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1059",
+                "Chubbyphp\\Typescript\\Arr::strictlyEqual::1062"
             ]
         }
     }

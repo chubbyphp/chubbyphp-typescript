@@ -358,6 +358,20 @@ final class DocumentationExamplesTest extends TestCase
         self::assertSame([1, 2, 3, 4], $arr->toArray());
     }
 
+    public function testDocWithExample(): void
+    {
+        $arr = new Arr(1, 2, 3, 4, 5);
+        $result = $arr->with(2, 99);
+
+        self::assertSame([1, 2, 99, 4, 5], $result->toArray());
+        self::assertSame([1, 2, 3, 4, 5], $arr->toArray());
+
+        $arr2 = new Arr(1, 2, 3);
+        $result2 = $arr2->with(-1, 'x');
+
+        self::assertSame([1, 2, 'x'], $result2->toArray());
+    }
+
     public function testDocToStringExample(): void
     {
         $arr = new Arr(1, 2, 3);
