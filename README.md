@@ -22,7 +22,7 @@
 
 ## Description
 
-Typescript classes ported to PHP.
+PHP port of JavaScript's Array API with TypeScript-style generics.
 
 ## Requirements
 
