@@ -4,4 +4,4 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Typescript;
 
-final class NumberFormatError extends \RuntimeException {}
+final class NumberFormatError extends \LogicException {}

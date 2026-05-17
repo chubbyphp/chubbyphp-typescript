@@ -4,4 +4,4 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Typescript;
 
-final class RangeError extends \RuntimeException {}
+final class RangeError extends \LogicException {}
