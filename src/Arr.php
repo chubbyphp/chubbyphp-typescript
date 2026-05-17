@@ -733,7 +733,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function sort(?callable $callback = null): static
     {
-        $sorted = array_values($this->data);
+        $sorted = $this->data;
 
         self::sortValues($sorted, $callback);
 
@@ -841,7 +841,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function toSorted(?callable $callback = null): self
     {
-        $sorted = array_values($this->data);
+        $sorted = $this->data;
 
         self::sortValues($sorted, $callback);
 
