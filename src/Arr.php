@@ -68,7 +68,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
             }
 
             return $value;
-        }, iterator_to_array($this->values(), false));
+        }, iterator_to_array($this->values()));
     }
 
     /**
@@ -82,7 +82,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
             }
 
             return $value;
-        }, iterator_to_array($this->values(), false));
+        }, iterator_to_array($this->values()));
     }
 
     /**

@@ -154,6 +154,13 @@ final class ArrTest extends TestCase
         self::assertSame([1, null, 3], $array->jsonSerialize());
     }
 
+    public function testJsonSerializeReturnsListForSparseArrayByOnlyProvidingItsLength(): void
+    {
+        $array = new Arr(5);
+
+        self::assertSame([null, null, null, null, null], $array->jsonSerialize());
+    }
+
     public function testJsonSerializeRecursivelySerializesNestedArr(): void
     {
         $nested = new Arr('a', 'b');
@@ -185,6 +192,13 @@ final class ArrTest extends TestCase
         unset($array[1]);
 
         self::assertSame([1, null, 3], $array->toArray());
+    }
+
+    public function testToArrayReturnsListForSparseArrayByOnlyProvidingItsLength(): void
+    {
+        $array = new Arr(5);
+
+        self::assertSame([null, null, null, null, null], $array->toArray());
     }
 
     public function testToArrayRecursivelyConvertsNestedArr(): void
