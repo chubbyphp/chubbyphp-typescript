@@ -11,7 +11,7 @@ namespace Chubbyphp\Typescript;
  *
  * @property int $length
  */
-final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
+final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringable
 {
     private const RANGE_ERROR_INVALID_LENGTH = 'Invalid array length';
     private const DEFAULT_DELIMITER = ',';
@@ -21,6 +21,9 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     private array $internalArray = [];
 
+    /**
+     * @var int<0, max>
+     */
     private int $internalLength = 0;
 
     /**
@@ -69,6 +72,14 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
     public function __toString(): string
     {
         return $this->toString();
+    }
+
+    /**
+     * @return int<0, max>
+     */
+    public function count(): int
+    {
+        return $this->internalLength;
     }
 
     /**
@@ -796,7 +807,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
 
         /** @var array<int, null|T> $newData */
         $this->internalArray = $newData;
-        $this->internalLength = $len - $deleteCount + $itemCount;
+        $this->internalLength = max(0, $len - $deleteCount + $itemCount);
 
         return $new;
     }

@@ -245,6 +245,35 @@ final class ArrTest extends TestCase
         self::assertSame(3, $array->length);
     }
 
+    public function testCountReturnsZeroForEmptyArray(): void
+    {
+        self::assertCount(0, new Arr());
+    }
+
+    public function testCountReturnsLengthForPopulatedArray(): void
+    {
+        self::assertCount(3, new Arr(1, 2, 3));
+    }
+
+    public function testCountReturnsLengthForSparseArray(): void
+    {
+        self::assertCount(5, new Arr(5));
+    }
+
+    public function testCountMatchesAfterPushPopShift(): void
+    {
+        $array = new Arr(1, 2, 3);
+
+        $array->push(4);
+        self::assertSame($array->length, \count($array));
+
+        $array->pop();
+        self::assertSame($array->length, \count($array));
+
+        $array->shift();
+        self::assertSame($array->length, \count($array));
+    }
+
     public function testArrayGetUnknownProperty(): void
     {
         $array = new Arr(10);
