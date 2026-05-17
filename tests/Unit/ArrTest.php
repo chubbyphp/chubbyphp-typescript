@@ -130,6 +130,34 @@ final class ArrTest extends TestCase
         self::assertSame([$booleanObject], iterator_to_array((new Arr($booleanObject))->values()));
     }
 
+    // __get
+
+    public function testArrayGetLength(): void
+    {
+        $array = new Arr(10);
+
+        self::assertSame(10, $array->length);
+    }
+
+    public function testArrayGetUnknownProperty(): void
+    {
+        $array = new Arr(10);
+
+        error_clear_last();
+
+        $unknown = @$array->unknown;
+
+        $lastError = error_get_last();
+
+        self::assertNull($unknown);
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_WARNING, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Undefined property: A::$unknown', $lastError['message']);
+    }
+
     // __toString
 
     public function testMagicToStringDelegatesToJoin(): void
@@ -1638,17 +1666,6 @@ final class ArrTest extends TestCase
         self::assertSame('a,b', (new Arr($iterable))->join());
     }
 
-    public function testJoinPrivateHelperUsesCustomSeparatorForNestedIterables(): void
-    {
-        $mixedToString = \Closure::bind(
-            static fn (mixed $value, ?string $separator = null): string => Arr::mixedToString($value, $separator),
-            null,
-            Arr::class,
-        );
-
-        self::assertSame('1|2', $mixedToString([1, 2], '|'));
-    }
-
     // Array.prototype.keys
 
     public function testKeysReturnsNumericProperties(): void
@@ -2592,22 +2609,6 @@ final class ArrTest extends TestCase
     {
         self::assertSame('1,2,3,4', (new Arr([1, 2], new \ArrayIterator([3, 4])))->toLocaleString('en-US'));
         self::assertSame('1,000,0.25', (new Arr([1000, 0.25]))->toLocaleString('en-US', ['style' => 'decimal']));
-    }
-
-    public function testToLocaleStringPrivateHelperUsesCustomSeparatorForNestedIterables(): void
-    {
-        $mixedToLocaleString = \Closure::bind(
-            static fn (mixed $value, ?string $locales, ?array $options, ?string $separator = null): string => Arr::mixedToLocaleString(
-                $value,
-                $locales,
-                $options,
-                $separator,
-            ),
-            null,
-            Arr::class,
-        );
-
-        self::assertSame('1,000|2,000', $mixedToLocaleString([1000, 2000], 'en-US', ['style' => 'decimal'], '|'));
     }
 
     public function testToLocaleStringReindexesTraversablesInsteadOfPreservingDuplicateKeys(): void
