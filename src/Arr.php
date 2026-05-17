@@ -733,11 +733,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function sort(?callable $callback = null): static
     {
-        $sorted = $this->internalArray;
-
-        self::sortValues($sorted, $callback);
-
-        $this->internalArray = $sorted;
+        $this->internalArray = self::sortValues($this->internalArray, $callback);
 
         return $this;
     }
@@ -841,9 +837,7 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
      */
     public function toSorted(?callable $callback = null): self
     {
-        $sorted = $this->internalArray;
-
-        self::sortValues($sorted, $callback);
+        $sorted = self::sortValues($this->internalArray, $callback);
 
         /** @var self<T> $result */
         $result = new self($this->internalLength);
@@ -1070,22 +1064,24 @@ final class Arr implements \ArrayAccess, \JsonSerializable, \Stringable
     /**
      * @param array<int, mixed>                    $values
      * @param null|(callable(null|T, null|T): int) $callback
+     *
+     * @return array<int, mixed>
      */
-    private static function sortValues(array &$values, ?callable $callback = null): void
+    private static function sortValues(array $values, ?callable $callback = null): array
     {
         if (null !== $callback) {
             usort($values, $callback);
-
-            return;
+        } else {
+            usort(
+                $values,
+                static fn (mixed $a, mixed $b): int => strcmp(
+                    self::mixedToString($a),
+                    self::mixedToString($b)
+                )
+            );
         }
 
-        usort(
-            $values,
-            static fn (mixed $a, mixed $b): int => strcmp(
-                self::mixedToString($a),
-                self::mixedToString($b)
-            )
-        );
+        return $values;
     }
 
     /**
