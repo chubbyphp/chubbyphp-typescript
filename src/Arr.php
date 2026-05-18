@@ -40,6 +40,14 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         if (1 === \count($arguments)) {
             $argument = $arguments[0];
 
+            if (\is_float($argument)) {
+                if (self::isIntAsFloat($argument)) {
+                    $argument = (int) $argument;
+                } else {
+                    throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
+                }
+            }
+
             if (\is_int($argument)) {
                 if (0 > $argument) {
                     throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
@@ -52,10 +60,6 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
                 $this->internalLength = $argument;
 
                 return;
-            }
-
-            if (\is_float($argument)) {
-                throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
             }
         }
 
@@ -1031,12 +1035,12 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $offset = self::normalizeOffset($offset);
 
-        if (\is_int($offset)) {
-            return \array_key_exists($offset, $this->internalArray);
-        }
-
         if (\is_string($offset)) {
             return \array_key_exists($offset, $this->internalProperties);
+        }
+
+        if (\is_int($offset)) {
+            return \array_key_exists($offset, $this->internalArray);
         }
 
         return false;
@@ -1046,12 +1050,12 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $offset = self::normalizeOffset($offset);
 
-        if (\is_int($offset)) {
-            return $this->internalArray[$offset] ?? null;
-        }
-
         if (\is_string($offset)) {
             return $this->internalProperties[$offset] ?? null;
+        }
+
+        if (\is_int($offset)) {
+            return $this->internalArray[$offset] ?? null;
         }
 
         return null;
@@ -1068,19 +1072,15 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
         $offset = self::normalizeOffset($offset);
 
-        if (\is_int($offset)) {
-            if (0 > $offset) {
-                return;
-            }
-
-            $this->internalArray[$offset] = $value;
-            $this->internalLength = max($this->internalLength, $offset + 1);
+        if (\is_string($offset)) {
+            $this->internalProperties[$offset] = $value;
 
             return;
         }
 
-        if (\is_string($offset)) {
-            $this->internalProperties[$offset] = $value;
+        if (\is_int($offset)) {
+            $this->internalArray[$offset] = $value;
+            $this->internalLength = max($this->internalLength, $offset + 1);
         }
     }
 
@@ -1088,14 +1088,14 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $offset = self::normalizeOffset($offset);
 
-        if (\is_int($offset)) {
-            unset($this->internalArray[$offset]);
+        if (\is_string($offset)) {
+            unset($this->internalProperties[$offset]);
 
             return;
         }
 
-        if (\is_string($offset)) {
-            unset($this->internalProperties[$offset]);
+        if (\is_int($offset)) {
+            unset($this->internalArray[$offset]);
         }
     }
 
@@ -1285,13 +1285,38 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     private static function normalizeOffset(mixed $offset): mixed
     {
         if (\is_string($offset)) {
-            $int = filter_var($offset, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
-            if (false !== $int) {
-                return $int;
+            if (self::isFloatAsString($offset)) {
+                $offset = (float) $offset;
+            } elseif (self::isIntAsString($offset)) {
+                $offset = (int) $offset;
+            }
+        }
+
+        if (\is_float($offset)) {
+            if (self::isIntAsFloat($offset)) {
+                $offset = (int) $offset;
             }
         }
 
         return $offset;
+    }
+
+    private static function isFloatAsString(string $string): bool
+    {
+        return (string) (float) $string === $string;
+    }
+
+    private static function isIntAsString(string $string): bool
+    {
+        return (string) (int) $string === $string;
+    }
+
+    private static function isIntAsFloat(float $float): bool
+    {
+        return is_finite($float)
+            && $float >= PHP_INT_MIN
+            && $float <= PHP_INT_MAX
+            && (float) (int) $float === $float;
     }
 
     private static function bindCallback(callable $callback, ?object $thisArg = null): callable

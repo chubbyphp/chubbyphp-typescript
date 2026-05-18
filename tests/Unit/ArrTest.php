@@ -146,7 +146,21 @@ final class ArrTest extends TestCase
         self::assertSame(['hello'], iterator_to_array((new Arr('hello'))->values()));
     }
 
-    public function testArrayConstructorThrowsRangeErrorForFloatLength(): void
+    public function testArrayConstructorWithZeroFloatCreatesEmptyArray(): void
+    {
+        $array = new Arr(0.0);
+        self::assertSame(0, $array->length);
+        self::assertSame([], iterator_to_array($array->values()));
+    }
+
+    public function testArrayConstructorWithNegativeZeroFloatCreatesEmptyArray(): void
+    {
+        $array = new Arr(-0.0);
+        self::assertSame(0, $array->length);
+        self::assertSame([], iterator_to_array($array->values()));
+    }
+
+    public function testArrayConstructorThrowsRangeErrorForNonZeroFloatLength(): void
     {
         $this->expectException(RangeError::class);
         $this->expectExceptionMessage('Invalid array length');
@@ -3233,14 +3247,17 @@ final class ArrTest extends TestCase
 
         self::assertSame(1, $array->length);
         self::assertSame('a', $array[0]);
-        self::assertFalse(isset($array[-1]));
+        self::assertSame('negative', $array[-1]);
+        self::assertTrue(isset($array[-1]));
         self::assertSame('string', $array['key']);
         self::assertTrue(isset($array['key']));
 
-        unset($array['key']);
+        unset($array['key'], $array[-1]);
 
         self::assertNull($array['key']);
         self::assertFalse(isset($array['key']));
+        self::assertNull($array[-1]);
+        self::assertFalse(isset($array[-1]));
         self::assertSame(['a'], iterator_to_array($array->values()));
     }
 
@@ -3272,12 +3289,15 @@ final class ArrTest extends TestCase
     public function testArrayAccessNegativeNumericStringIsProperty(): void
     {
         $array = new Arr('a');
-        $array['-1'] = 'negative';
+        $array['-1'] = 'negative-1';
+        $array[-2] = 'negative-2';
 
-        self::assertSame('negative', $array['-1']);
+        self::assertSame('negative-1', $array['-1']);
+        self::assertSame('negative-2', $array[-2]);
         self::assertSame(1, $array->length);
         self::assertSame('a', $array[0]);
         self::assertTrue(isset($array['-1']));
+        self::assertTrue(isset($array[-2]));
     }
 
     public function testArrayAccessStringNumericKeyAffectsLength(): void
@@ -3311,7 +3331,23 @@ final class ArrTest extends TestCase
         self::assertSame(['a', 'b'], iterator_to_array($array->values()));
     }
 
-    public function testArrayAccessWithNonIntAndNonStringOffsetReturnsNullOrFalse(): void
+    public function testArrayAccessCoercesIntegerEquivalentFloatToInt(): void
+    {
+        $array = new Arr('a', 'b');
+
+        self::assertSame('a', $array[0.0]);
+        self::assertSame('b', $array[1.0]);
+
+        $array[1.0] = 'x';
+        self::assertSame('x', $array[1]);
+        self::assertTrue(isset($array[1.0]));
+        self::assertSame(2, $array->length);
+
+        unset($array[0.0]);
+        self::assertFalse(isset($array[0]));
+    }
+
+    public function testArrayAccessNonIntegerFloatIgnored(): void
     {
         $array = new Arr('a');
 
@@ -3335,5 +3371,18 @@ final class ArrTest extends TestCase
 
         self::assertSame(2, $array->length);
         self::assertSame(['a', 'b'], iterator_to_array($array->values()));
+    }
+
+    public function testArrayAccessCoercesLargeStringIntKeyToInt(): void
+    {
+        $array = new Arr();
+        $array['100000000000000'] = 'x';
+
+        self::assertSame('x', $array[100000000000000]);
+        self::assertTrue(isset($array[100000000000000]));
+        self::assertSame(100000000000001, $array->length);
+
+        unset($array[100000000000000]);
+        self::assertFalse(isset($array[100000000000000]));
     }
 }
