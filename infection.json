@@ -52,10 +52,8 @@
                 "Chubbyphp\\Typescript\\Arr::slice::719",
                 "Chubbyphp\\Typescript\\Arr::slice::723",
                 "Chubbyphp\\Typescript\\Arr::splice::793",
-                "Chubbyphp\\Typescript\\Arr::splice::798",
                 "Chubbyphp\\Typescript\\Arr::splice::799",
-                "Chubbyphp\\Typescript\\Arr::toSpliced::907",
-                "Chubbyphp\\Typescript\\Arr::toSpliced::912"
+                "Chubbyphp\\Typescript\\Arr::toSpliced::907"
             ]
         },
         "GreaterThanOrEqualTo": {
@@ -89,11 +87,6 @@
         "LessThanNegotiation": {
             "ignore": [
                 "Chubbyphp\\Typescript\\Arr::__set::80"
-            ]
-        },
-        "ArrayItemRemoval": {
-            "ignore": [
-                "Chubbyphp\\Typescript\\Arr::mixedToString::1074"
             ]
         },
         "LogicalAndSingleSubExprNegation": {
