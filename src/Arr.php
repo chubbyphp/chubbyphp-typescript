@@ -8,10 +8,11 @@ namespace Chubbyphp\Typescript;
  * @template T
  *
  * @implements \ArrayAccess<array-key, null|T>
+ * @implements \IteratorAggregate<int, null|T>
  *
  * @property int $length
  */
-final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringable
+final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSerializable, \Stringable
 {
     private const RANGE_ERROR_INVALID_LENGTH = 'Invalid array length';
     private const DEFAULT_DELIMITER = ',';
@@ -975,6 +976,14 @@ final class Arr implements \ArrayAccess, \Countable, \JsonSerializable, \Stringa
         $this->internalLength += $itemCount;
 
         return $this->internalLength;
+    }
+
+    /**
+     * @return \Generator<int, null|T, mixed, void>
+     */
+    public function getIterator(): \Generator
+    {
+        yield from $this->values();
     }
 
     /**

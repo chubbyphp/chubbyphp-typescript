@@ -3065,6 +3065,31 @@ final class ArrTest extends TestCase
         self::assertSame(['a'], iterator_to_array($iterator));
     }
 
+    // IteratorAggregate / foreach
+
+    public function testGetIteratorYieldsAllValuesInOrder(): void
+    {
+        $result = [];
+        foreach (new Arr(1, 2, 3) as $value) {
+            $result[] = $value;
+        }
+
+        self::assertSame([1, 2, 3], $result);
+    }
+
+    public function testIteratorToArrayReturnsAllValues(): void
+    {
+        self::assertSame([1, 2, 3], iterator_to_array(new Arr(1, 2, 3)));
+    }
+
+    public function testGetIteratorWithSparseArrayYieldsNullForHoles(): void
+    {
+        $array = new Arr(3);
+        $array[1] = 'x';
+
+        self::assertSame([null, 'x', null], iterator_to_array($array));
+    }
+
     // toArray
 
     public function testToArrayReturnsInternalDataAsArray(): void
