@@ -23,6 +23,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     private array $internalArray = [];
 
     /**
+     * @var array<string, mixed>
+     */
+    private array $internalProperties = [];
+
+    /**
      * @var int<0, max>
      */
     private int $internalLength = 0;
@@ -1024,16 +1029,32 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
     public function offsetExists(mixed $offset): bool
     {
-        return \is_int($offset) && \array_key_exists($offset, $this->internalArray);
+        $offset = self::normalizeOffset($offset);
+
+        if (\is_int($offset)) {
+            return \array_key_exists($offset, $this->internalArray);
+        }
+
+        if (\is_string($offset)) {
+            return \array_key_exists($offset, $this->internalProperties);
+        }
+
+        return false;
     }
 
     public function offsetGet(mixed $offset): mixed
     {
-        if (!\is_int($offset)) {
-            return null;
+        $offset = self::normalizeOffset($offset);
+
+        if (\is_int($offset)) {
+            return $this->internalArray[$offset] ?? null;
         }
 
-        return $this->internalArray[$offset] ?? null;
+        if (\is_string($offset)) {
+            return $this->internalProperties[$offset] ?? null;
+        }
+
+        return null;
     }
 
     public function offsetSet(mixed $offset, mixed $value): void
@@ -1045,21 +1066,37 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             return;
         }
 
-        if (!\is_int($offset) || 0 > $offset) {
+        $offset = self::normalizeOffset($offset);
+
+        if (\is_int($offset)) {
+            if (0 > $offset) {
+                return;
+            }
+
+            $this->internalArray[$offset] = $value;
+            $this->internalLength = max($this->internalLength, $offset + 1);
+
             return;
         }
 
-        $this->internalArray[$offset] = $value;
-        $this->internalLength = max($this->internalLength, $offset + 1);
+        if (\is_string($offset)) {
+            $this->internalProperties[$offset] = $value;
+        }
     }
 
     public function offsetUnset(mixed $offset): void
     {
-        if (!\is_int($offset)) {
+        $offset = self::normalizeOffset($offset);
+
+        if (\is_int($offset)) {
+            unset($this->internalArray[$offset]);
+
             return;
         }
 
-        unset($this->internalArray[$offset]);
+        if (\is_string($offset)) {
+            unset($this->internalProperties[$offset]);
+        }
     }
 
     private static function mixedToString(mixed $value): string
@@ -1243,6 +1280,18 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
                 $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $grouping);
             }
         }
+    }
+
+    private static function normalizeOffset(mixed $offset): mixed
+    {
+        if (\is_string($offset)) {
+            $int = filter_var($offset, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+            if (false !== $int) {
+                return $int;
+            }
+        }
+
+        return $offset;
     }
 
     private static function bindCallback(callable $callback, ?object $thisArg = null): callable

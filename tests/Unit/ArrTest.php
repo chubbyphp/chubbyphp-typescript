@@ -3233,23 +3233,97 @@ final class ArrTest extends TestCase
 
         self::assertSame(1, $array->length);
         self::assertSame('a', $array[0]);
-        self::assertNull($array['key']);
+        self::assertFalse(isset($array[-1]));
+        self::assertSame('string', $array['key']);
+        self::assertTrue(isset($array['key']));
 
         unset($array['key']);
 
+        self::assertNull($array['key']);
+        self::assertFalse(isset($array['key']));
         self::assertSame(['a'], iterator_to_array($array->values()));
     }
 
-    public function testArrayAccessDoesNotTreatStringOffsetsAsIntegerOffsets(): void
+    public function testArrayAccessCoercesStringNumericKeysToInteger(): void
     {
         $array = new Arr('a');
 
-        self::assertNull($array['0']);
+        self::assertSame('a', $array['0']);
 
         unset($array['0']);
 
-        self::assertSame(['a'], iterator_to_array($array->values()));
-        self::assertTrue(isset($array[0]));
+        self::assertSame([null], iterator_to_array($array->values()));
+        self::assertFalse(isset($array[0]));
+    }
+
+    public function testArrayAccessLeadingZerosAreNotCoercedToInt(): void
+    {
+        $array = new Arr('a', 'b', 'c');
+
+        $array['01'] = 'property';
+
+        self::assertSame('property', $array['01']);
+        self::assertSame('a', $array['0']);
+        self::assertSame('b', $array[1]);
+        self::assertSame('a', $array[0]);
+        self::assertSame(3, $array->length);
+    }
+
+    public function testArrayAccessNegativeNumericStringIsProperty(): void
+    {
+        $array = new Arr('a');
+        $array['-1'] = 'negative';
+
+        self::assertSame('negative', $array['-1']);
+        self::assertSame(1, $array->length);
+        self::assertSame('a', $array[0]);
+        self::assertTrue(isset($array['-1']));
+    }
+
+    public function testArrayAccessStringNumericKeyAffectsLength(): void
+    {
+        $array = new Arr('a');
+        $array['2'] = 'x';
+
+        self::assertSame(3, $array->length);
+        self::assertSame('x', $array[2]);
+        self::assertNull($array[1]);
+        self::assertTrue(isset($array[2]));
+    }
+
+    public function testArrayAccessStringPropertiesDoNotAffectLengthOrIteration(): void
+    {
+        $array = new Arr('a', 'b');
+
+        $array['foo'] = 'bar';
+        $array['baz'] = 42;
+
+        self::assertSame(2, $array->length);
+        self::assertSame('bar', $array['foo']);
+        self::assertSame(42, $array['baz']);
+        self::assertTrue(isset($array['foo']));
+        self::assertSame(['a', 'b'], iterator_to_array($array->values()));
+
+        unset($array['foo']);
+
+        self::assertNull($array['foo']);
+        self::assertFalse(isset($array['foo']));
+        self::assertSame(['a', 'b'], iterator_to_array($array->values()));
+    }
+
+    public function testArrayAccessWithNonIntAndNonStringOffsetReturnsNullOrFalse(): void
+    {
+        $array = new Arr('a');
+
+        self::assertNull($array->offsetGet(true));
+        self::assertNull($array->offsetGet(1.5));
+        self::assertFalse($array->offsetExists(true));
+        self::assertFalse($array->offsetExists(1.5));
+
+        $array->offsetSet(true, 'x');
+        $array->offsetSet(1.5, 'y');
+        self::assertSame(1, $array->length);
+        self::assertSame('a', $array[0]);
     }
 
     public function testArrayAccessAppendDoesNotAlsoSetNullOffset(): void
