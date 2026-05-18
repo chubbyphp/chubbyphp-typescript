@@ -1071,7 +1071,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             \is_float($value) && is_infinite($value) => $value > 0 ? 'Infinity' : '-Infinity',
             \is_float($value) => \sprintf('%.17g', $value),
             \is_string($value) => $value,
-            \is_object($value) && \is_callable([$value, '__toString']) => $value->__toString(),
+            \is_object($value) && $value instanceof \Stringable => (string) $value,
             is_iterable($value) => implode(
                 self::DEFAULT_DELIMITER,
                 array_map(
