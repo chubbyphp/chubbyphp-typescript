@@ -14,7 +14,7 @@ namespace Chubbyphp\Typescript;
  */
 final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSerializable, \Stringable
 {
-    private const RANGE_ERROR_INVALID_LENGTH = 'Invalid array length';
+    private const INVALID_LENGTH = 'Invalid array length';
     private const DEFAULT_DELIMITER = ',';
 
     /**
@@ -44,20 +44,14 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
                 if (self::isIntAsFloat($argument)) {
                     $argument = (int) $argument;
                 } else {
-                    throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
+                    throw new RangeError(self::INVALID_LENGTH);
                 }
             }
 
             if (\is_int($argument)) {
-                if (0 > $argument) {
-                    throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
-                }
+                $length = self::validateLength($argument);
 
-                if ((2 ** 32) - 1 < $argument) {
-                    throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
-                }
-
-                $this->internalLength = $argument;
+                $this->internalLength = $length;
 
                 return;
             }
@@ -82,19 +76,21 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     public function __set(string $name, mixed $value): void
     {
         if ('length' === $name) {
-            if (!\is_int($value) || 0 > $value || (2 ** 32) - 1 < $value) {
-                throw new RangeError(self::RANGE_ERROR_INVALID_LENGTH);
+            if (!\is_int($value)) {
+                throw new RangeError(self::INVALID_LENGTH);
             }
 
-            if ($value < $this->internalLength) {
+            $length = self::validateLength($value);
+
+            if ($length < $this->internalLength) {
                 foreach ($this->internalArray as $i => $_) {
-                    if ($i >= $value) {
+                    if ($i >= $length) {
                         unset($this->internalArray[$i]);
                     }
                 }
             }
 
-            $this->internalLength = $value;
+            $this->internalLength = $length;
 
             return;
         }
@@ -1097,6 +1093,18 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         if (\is_int($offset)) {
             unset($this->internalArray[$offset]);
         }
+    }
+
+    /**
+     * @return int<0, max>
+     */
+    private static function validateLength(int $length): int
+    {
+        if (0 > $length || ((2 ** 32) - 1 < $length)) {
+            throw new RangeError(self::INVALID_LENGTH);
+        }
+
+        return $length;
     }
 
     private static function mixedToString(mixed $value): string
