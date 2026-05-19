@@ -103,12 +103,101 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         return $this->toString();
     }
 
+    public function offsetExists(mixed $offset): bool
+    {
+        $offset = self::normalizeOffset($offset);
+
+        if (\is_string($offset)) {
+            return \array_key_exists($offset, $this->internalProperties);
+        }
+
+        if (\is_int($offset)) {
+            return \array_key_exists($offset, $this->internalArray);
+        }
+
+        return false;
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        $offset = self::normalizeOffset($offset);
+
+        if (\is_string($offset)) {
+            return $this->internalProperties[$offset] ?? null;
+        }
+
+        if (\is_int($offset)) {
+            return $this->internalArray[$offset] ?? null;
+        }
+
+        return null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        if (null === $offset) {
+            $this->internalArray[$this->internalLength] = $value;
+            ++$this->internalLength;
+
+            return;
+        }
+
+        $offset = self::normalizeOffset($offset);
+
+        if (\is_string($offset)) {
+            $this->internalProperties[$offset] = $value;
+
+            return;
+        }
+
+        if (\is_int($offset)) {
+            $this->internalArray[$offset] = $value;
+            $this->internalLength = max($this->internalLength, $offset + 1);
+        }
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        $offset = self::normalizeOffset($offset);
+
+        if (\is_string($offset)) {
+            unset($this->internalProperties[$offset]);
+
+            return;
+        }
+
+        if (\is_int($offset)) {
+            unset($this->internalArray[$offset]);
+        }
+    }
+
     /**
      * @return int<0, max>
      */
     public function count(): int
     {
         return $this->internalLength;
+    }
+
+    /**
+     * @return \Generator<int, null|T, mixed, void>
+     */
+    public function getIterator(): \Generator
+    {
+        yield from $this->values();
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $result = [];
+        foreach ($this->values() as $value) {
+            $result[] = $value instanceof \JsonSerializable ? $value->jsonSerialize() : $value;
+        }
+
+        return $result;
     }
 
     /**
@@ -931,33 +1020,6 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         return $result;
     }
 
-    /**
-     * @param T $value
-     *
-     * @return self<T>
-     */
-    public function with(int $index, mixed $value): self
-    {
-        $len = $this->internalLength;
-
-        if ($index < 0) {
-            $index = $len + $index;
-        }
-
-        if ($index < 0 || $index >= $len) {
-            throw new RangeError('Invalid index: '.$index);
-        }
-
-        /** @var self<T> $result */
-        $result = new self($this->internalLength);
-
-        for ($i = 0; $i < $len; ++$i) {
-            $result->internalArray[$i] = ($i === $index) ? $value : ($this->internalArray[$i] ?? null);
-        }
-
-        return $result;
-    }
-
     public function toString(): string
     {
         return $this->join();
@@ -986,19 +1048,38 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     /**
      * @return \Generator<int, null|T, mixed, void>
      */
-    public function getIterator(): \Generator
-    {
-        yield from $this->values();
-    }
-
-    /**
-     * @return \Generator<int, null|T, mixed, void>
-     */
     public function values(): \Generator
     {
         for ($i = 0; $i < $this->internalLength; ++$i) {
             yield $this->internalArray[$i] ?? null;
         }
+    }
+
+    /**
+     * @param T $value
+     *
+     * @return self<T>
+     */
+    public function with(int $index, mixed $value): self
+    {
+        $len = $this->internalLength;
+
+        if ($index < 0) {
+            $index = $len + $index;
+        }
+
+        if ($index < 0 || $index >= $len) {
+            throw new RangeError('Invalid index: '.$index);
+        }
+
+        /** @var self<T> $result */
+        $result = new self($this->internalLength);
+
+        for ($i = 0; $i < $len; ++$i) {
+            $result->internalArray[$i] = ($i === $index) ? $value : ($this->internalArray[$i] ?? null);
+        }
+
+        return $result;
     }
 
     /**
@@ -1012,87 +1093,6 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         }
 
         return $result;
-    }
-
-    /**
-     * @return list<mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        $result = [];
-        foreach ($this->values() as $value) {
-            $result[] = $value instanceof \JsonSerializable ? $value->jsonSerialize() : $value;
-        }
-
-        return $result;
-    }
-
-    public function offsetExists(mixed $offset): bool
-    {
-        $offset = self::normalizeOffset($offset);
-
-        if (\is_string($offset)) {
-            return \array_key_exists($offset, $this->internalProperties);
-        }
-
-        if (\is_int($offset)) {
-            return \array_key_exists($offset, $this->internalArray);
-        }
-
-        return false;
-    }
-
-    public function offsetGet(mixed $offset): mixed
-    {
-        $offset = self::normalizeOffset($offset);
-
-        if (\is_string($offset)) {
-            return $this->internalProperties[$offset] ?? null;
-        }
-
-        if (\is_int($offset)) {
-            return $this->internalArray[$offset] ?? null;
-        }
-
-        return null;
-    }
-
-    public function offsetSet(mixed $offset, mixed $value): void
-    {
-        if (null === $offset) {
-            $this->internalArray[$this->internalLength] = $value;
-            ++$this->internalLength;
-
-            return;
-        }
-
-        $offset = self::normalizeOffset($offset);
-
-        if (\is_string($offset)) {
-            $this->internalProperties[$offset] = $value;
-
-            return;
-        }
-
-        if (\is_int($offset)) {
-            $this->internalArray[$offset] = $value;
-            $this->internalLength = max($this->internalLength, $offset + 1);
-        }
-    }
-
-    public function offsetUnset(mixed $offset): void
-    {
-        $offset = self::normalizeOffset($offset);
-
-        if (\is_string($offset)) {
-            unset($this->internalProperties[$offset]);
-
-            return;
-        }
-
-        if (\is_int($offset)) {
-            unset($this->internalArray[$offset]);
-        }
     }
 
     /**
