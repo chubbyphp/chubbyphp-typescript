@@ -1300,10 +1300,8 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             }
         }
 
-        if (\is_float($offset)) {
-            if (self::isIntAsFloat($offset)) {
-                $offset = (int) $offset;
-            }
+        if (\is_float($offset) && self::isIntAsFloat($offset)) {
+            $offset = (int) $offset;
         }
 
         return $offset;
