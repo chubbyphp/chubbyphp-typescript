@@ -244,6 +244,14 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     }
 
     /**
+     * @phpstan-assert-if-true self<mixed> $value
+     */
+    public static function isArray(mixed $value): bool
+    {
+        return $value instanceof self;
+    }
+
+    /**
      * @param null|T ...$arguments
      *
      * @return self<T>

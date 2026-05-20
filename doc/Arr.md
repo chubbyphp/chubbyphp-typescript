@@ -26,6 +26,20 @@ Sparse `Arr` inputs are converted to dense arrays with explicit `null` values, m
 
 ---
 
+### `isArray(mixed $value): bool`
+
+Returns `true` if the given value is an `Arr` instance, `false` otherwise. This mirrors JavaScript's `Array.isArray()`, which distinguishes true arrays from array-like objects.
+
+```php
+use Chubbyphp\Typescript\Arr;
+
+Arr::isArray(new Arr(1, 2, 3));    // true
+Arr::isArray([1, 2, 3]);           // false
+Arr::isArray('hello');             // false
+```
+
+---
+
 ### `of(mixed ...$items): self`
 
 Creates a new array from the provided arguments. Unlike the constructor, `Arr::of(3)` creates `[3]` rather than an array with length `3`.

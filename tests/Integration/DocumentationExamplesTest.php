@@ -36,6 +36,13 @@ final class DocumentationExamplesTest extends TestCase
         self::assertSame(['a', 'b', 'c'], Arr::from('abc')->toArray());
     }
 
+    public function testDocStaticIsArrayExample(): void
+    {
+        self::assertTrue(Arr::isArray(new Arr(1, 2, 3)));
+        self::assertFalse(Arr::isArray([1, 2, 3]));
+        self::assertFalse(Arr::isArray('hello'));
+    }
+
     public function testDocStaticOfExample(): void
     {
         self::assertSame([3], Arr::of(3)->toArray());

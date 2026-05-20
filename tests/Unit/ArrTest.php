@@ -682,6 +682,26 @@ final class ArrTest extends TestCase
         self::assertSame([1, 2, 3], iterator_to_array(Arr::of(1, 2, 3)->values()));
     }
 
+    // Array.isArray
+
+    public function testArrayIsArrayReturnsTrueForArrInstances(): void
+    {
+        self::assertTrue(Arr::isArray(new Arr()));
+        self::assertTrue(Arr::isArray(new Arr(1, 2, 3)));
+        self::assertTrue(Arr::isArray(new Arr(5)));
+    }
+
+    public function testArrayIsArrayReturnsFalseForNonArrValues(): void
+    {
+        self::assertFalse(Arr::isArray([1, 2, 3]));
+        self::assertFalse(Arr::isArray('hello'));
+        self::assertFalse(Arr::isArray(42));
+        self::assertFalse(Arr::isArray(null));
+        self::assertFalse(Arr::isArray(true));
+        self::assertFalse(Arr::isArray(new \stdClass()));
+        self::assertFalse(Arr::isArray(new \ArrayObject()));
+    }
+
     // Array.prototype.at
 
     public function testAtReturnsItemValueAtSpecifiedIndex(): void
