@@ -62,6 +62,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         $this->internalLength = \count($arguments);
     }
 
+    public function __isset(string $name): bool
+    {
+        return 'length' === $name;
+    }
+
     public function __get(string $name): mixed
     {
         if ('length' === $name) {

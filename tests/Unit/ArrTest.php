@@ -144,6 +144,22 @@ final class ArrTest extends TestCase
         self::assertSame([$booleanObject], iterator_to_array((new Arr($booleanObject))->values()));
     }
 
+    // __isset
+
+    public function testArrayIssetLength(): void
+    {
+        $array = new Arr(10);
+
+        self::assertTrue(isset($array->length));
+    }
+
+    public function testArrayIssetUnknownProperty(): void
+    {
+        $array = new Arr(10);
+
+        self::assertFalse(isset($array->unknown));
+    }
+
     // __get
 
     public function testArrayGetLength(): void
