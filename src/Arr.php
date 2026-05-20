@@ -278,6 +278,8 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     }
 
     /**
+     * @param T ...$items
+     *
      * @return self<T>
      */
     public function concat(mixed ...$items): self
@@ -288,11 +290,9 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
         foreach ($items as $item) {
             if ($item instanceof self) {
-                $offset = $result->internalLength;
-                foreach ($item->internalArray as $i => $value) {
-                    $result->internalArray[$offset + $i] = $value;
+                foreach ($item->values() as $value) {
+                    $result->push($value);
                 }
-                $result->internalLength += $item->internalLength;
             } else {
                 $result->push($item);
             }
@@ -1038,6 +1038,9 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         return $this->join();
     }
 
+    /**
+     * @param T ...$items
+     */
     public function unshift(mixed ...$items): int
     {
         $items = array_values($items);
