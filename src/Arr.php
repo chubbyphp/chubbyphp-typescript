@@ -28,7 +28,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     private array $internalProperties = [];
 
     /**
-     * @var int<0, max>
+     * @var non-negative-int
      */
     private int $internalLength = 0;
 
@@ -177,7 +177,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     }
 
     /**
-     * @return int<0, max>
+     * @return non-negative-int
      */
     public function count(): int
     {
@@ -1101,7 +1101,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     }
 
     /**
-     * @return int<0, max>
+     * @return non-negative-int
      */
     private static function validateLength(int $length): int
     {
