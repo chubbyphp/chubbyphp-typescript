@@ -141,8 +141,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     public function offsetSet(mixed $offset, mixed $value): void
     {
         if (null === $offset) {
-            $this->internalArray[$this->internalLength] = $value;
-            ++$this->internalLength;
+            $this->internalArray[$this->internalLength++] = $value;
 
             return;
         }
@@ -278,7 +277,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     }
 
     /**
-     * @param T ...$items
+     * @param null|T ...$items
      *
      * @return self<T>
      */
