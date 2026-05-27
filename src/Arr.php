@@ -289,8 +289,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
         foreach ($items as $item) {
             if ($item instanceof self) {
-                foreach ($item->values() as $value) {
-                    $result->push($value);
+                for ($i = 0; $i < $item->internalLength; ++$i) {
+                    if (\array_key_exists($i, $item->internalArray)) {
+                        $result->internalArray[$result->internalLength] = $item->internalArray[$i];
+                    }
+                    ++$result->internalLength;
                 }
             } else {
                 $result->push($item);

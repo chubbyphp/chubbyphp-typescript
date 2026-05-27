@@ -780,6 +780,81 @@ final class ArrTest extends TestCase
         self::assertSame([1, 2], iterator_to_array($array->values()));
     }
 
+    public function testConcatPreservesSparseHolesFromSource(): void
+    {
+        $array = new Arr(3);
+        $array[0] = 'a';
+        $array[2] = 'c';
+
+        $result = $array->concat(new Arr('d', 'e'));
+
+        self::assertSame(5, $result->length);
+        self::assertTrue(isset($result[0]));
+        self::assertSame('a', $result[0]);
+        self::assertFalse(isset($result[1]));
+        self::assertNull($result[1]);
+        self::assertTrue(isset($result[2]));
+        self::assertSame('c', $result[2]);
+        self::assertTrue(isset($result[3]));
+        self::assertSame('d', $result[3]);
+        self::assertTrue(isset($result[4]));
+        self::assertSame('e', $result[4]);
+    }
+
+    public function testConcatPreservesSparseHolesFromArgument(): void
+    {
+        $array = new Arr('a', 'b');
+
+        $sparse = new Arr(3);
+        $sparse[0] = 'x';
+        $sparse[2] = 'z';
+
+        $result = $array->concat($sparse);
+
+        self::assertSame(5, $result->length);
+        self::assertTrue(isset($result[0]));
+        self::assertSame('a', $result[0]);
+        self::assertTrue(isset($result[1]));
+        self::assertSame('b', $result[1]);
+        self::assertTrue(isset($result[2]));
+        self::assertSame('x', $result[2]);
+        self::assertFalse(isset($result[3]));
+        self::assertNull($result[3]);
+        self::assertTrue(isset($result[4]));
+        self::assertSame('z', $result[4]);
+    }
+
+    public function testConcatPreservesSparseHolesFromMultipleArguments(): void
+    {
+        $array = new Arr(3);
+        $array[1] = 'b';
+
+        $sparse1 = new Arr(2);
+        $sparse1[0] = 'c';
+
+        $sparse2 = new Arr(3);
+        $sparse2[1] = 'e';
+
+        $result = $array->concat($sparse1, $sparse2);
+
+        self::assertSame(8, $result->length);
+        self::assertFalse(isset($result[0]));
+        self::assertNull($result[0]);
+        self::assertTrue(isset($result[1]));
+        self::assertSame('b', $result[1]);
+        self::assertFalse(isset($result[2]));
+
+        self::assertTrue(isset($result[3]));
+        self::assertSame('c', $result[3]);
+        self::assertFalse(isset($result[4]));
+
+        self::assertFalse(isset($result[5]));
+        self::assertNull($result[5]);
+        self::assertTrue(isset($result[6]));
+        self::assertSame('e', $result[6]);
+        self::assertFalse(isset($result[7]));
+    }
+
     // Array.prototype.copyWithin
 
     public function testCopyWithinWithNonNegativeTargetStartAndEnd(): void
