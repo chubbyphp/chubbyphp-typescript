@@ -430,7 +430,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         $len = $this->internalLength;
 
         for ($i = 0; $i < $len; ++$i) {
-            $value = $this->internalArray[$i] ?? null;
+            if (!\array_key_exists($i, $this->internalArray)) {
+                continue;
+            }
+
+            $value = $this->internalArray[$i];
 
             if ($callback($value, $i, $this)) {
                 return $value;
@@ -450,7 +454,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         $len = $this->internalLength;
 
         for ($i = 0; $i < $len; ++$i) {
-            $value = $this->internalArray[$i] ?? null;
+            if (!\array_key_exists($i, $this->internalArray)) {
+                continue;
+            }
+
+            $value = $this->internalArray[$i];
 
             if ($callback($value, $i, $this)) {
                 return $i;
@@ -470,7 +478,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         $callback = self::bindCallback($callback, $thisArg);
 
         for ($i = $this->internalLength - 1; 0 <= $i; --$i) {
-            $value = $this->internalArray[$i] ?? null;
+            if (!\array_key_exists($i, $this->internalArray)) {
+                continue;
+            }
+
+            $value = $this->internalArray[$i];
 
             if ($callback($value, $i, $this)) {
                 return $value;
@@ -488,7 +500,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         $callback = self::bindCallback($callback, $thisArg);
 
         for ($i = $this->internalLength - 1; 0 <= $i; --$i) {
-            if ($callback($this->internalArray[$i] ?? null, $i, $this)) {
+            if (!\array_key_exists($i, $this->internalArray)) {
+                continue;
+            }
+
+            if ($callback($this->internalArray[$i], $i, $this)) {
                 return $i;
             }
         }

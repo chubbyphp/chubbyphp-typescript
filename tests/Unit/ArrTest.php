@@ -1300,7 +1300,7 @@ final class ArrTest extends TestCase
         $array = new Arr('Shoes', 'Car', 'Bike');
         $results = [];
 
-        $array->find(static function (?string $value, int $index, Arr $receivedArray) use (&$results): bool {
+        $array->find(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
             if ([] === $results) {
                 $receivedArray->splice(1, 1);
             }
@@ -1310,7 +1310,7 @@ final class ArrTest extends TestCase
             return false;
         });
 
-        self::assertSame(['Shoes', 'Bike', null], $results);
+        self::assertSame(['Shoes', 'Bike'], $results);
 
         $array = new Arr('Skateboard', 'Barefoot');
         $results = [];
@@ -1329,14 +1329,33 @@ final class ArrTest extends TestCase
         self::assertSame(['Skateboard', 'Magic Carpet'], $results);
     }
 
-    public function testFindPropagatesPredicateExceptions(): void
+    public function testFindSkipsHolesInSparseArray(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('predicate failed');
+        $array = new Arr(3);
+        $array[0] = 'a';
+        $array[2] = 'c';
+        $visited = [];
 
-        (new Arr(1))->find(static function (): bool {
-            throw new \RuntimeException('predicate failed');
+        $result = $array->find(static function (string $value, int $index) use (&$visited): bool {
+            $visited[] = [$value, $index];
+
+            return 'c' === $value;
         });
+
+        self::assertSame('c', $result);
+        self::assertSame([['a', 0], ['c', 2]], $visited);
+    }
+
+    public function testFindDoesNotCallPredicateOnSparseArrayWhenAllHoles(): void
+    {
+        $called = false;
+
+        self::assertNull((new Arr(3))->find(static function () use (&$called): bool {
+            $called = true;
+
+            return true;
+        }));
+        self::assertFalse($called);
     }
 
     // Array.prototype.findIndex
@@ -1388,7 +1407,7 @@ final class ArrTest extends TestCase
         $array = new Arr('Shoes', 'Car', 'Bike');
         $results = [];
 
-        $array->findIndex(static function (?string $value, int $index, Arr $receivedArray) use (&$results): bool {
+        $array->findIndex(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
             if ([] === $results) {
                 $receivedArray->splice(1, 1);
             }
@@ -1398,7 +1417,7 @@ final class ArrTest extends TestCase
             return false;
         });
 
-        self::assertSame(['Shoes', 'Bike', null], $results);
+        self::assertSame(['Shoes', 'Bike'], $results);
 
         $array = new Arr('Skateboard', 'Barefoot');
         $results = [];
@@ -1417,14 +1436,33 @@ final class ArrTest extends TestCase
         self::assertSame(['Skateboard', 'Magic Carpet'], $results);
     }
 
-    public function testFindIndexPropagatesPredicateExceptions(): void
+    public function testFindIndexSkipsHolesInSparseArray(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('predicate failed');
+        $array = new Arr(3);
+        $array[0] = 'a';
+        $array[2] = 'c';
+        $visited = [];
 
-        (new Arr(1))->findIndex(static function (): bool {
-            throw new \RuntimeException('predicate failed');
+        $result = $array->findIndex(static function (string $value, int $index) use (&$visited): bool {
+            $visited[] = [$value, $index];
+
+            return false;
         });
+
+        self::assertSame(-1, $result);
+        self::assertSame([['a', 0], ['c', 2]], $visited);
+    }
+
+    public function testFindIndexDoesNotCallPredicateOnSparseArrayWhenAllHoles(): void
+    {
+        $called = false;
+
+        self::assertSame(-1, (new Arr(3))->findIndex(static function () use (&$called): bool {
+            $called = true;
+
+            return true;
+        }));
+        self::assertFalse($called);
     }
 
     // Array.prototype.findLast
@@ -1505,14 +1543,33 @@ final class ArrTest extends TestCase
         self::assertSame(['Barefoot', 'Magic Carpet'], $results);
     }
 
-    public function testFindLastPropagatesPredicateExceptions(): void
+    public function testFindLastSkipsHolesInSparseArray(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('predicate failed');
+        $array = new Arr(3);
+        $array[0] = 'a';
+        $array[2] = 'c';
+        $visited = [];
 
-        (new Arr(1))->findLast(static function (): bool {
-            throw new \RuntimeException('predicate failed');
+        $result = $array->findLast(static function (string $value, int $index) use (&$visited): bool {
+            $visited[] = [$value, $index];
+
+            return false;
         });
+
+        self::assertNull($result);
+        self::assertSame([['c', 2], ['a', 0]], $visited);
+    }
+
+    public function testFindLastDoesNotCallPredicateOnSparseArrayWhenAllHoles(): void
+    {
+        $called = false;
+
+        self::assertNull((new Arr(3))->findLast(static function () use (&$called): bool {
+            $called = true;
+
+            return true;
+        }));
+        self::assertFalse($called);
     }
 
     // Array.prototype.findLastIndex
@@ -1593,14 +1650,33 @@ final class ArrTest extends TestCase
         self::assertSame(['Barefoot', 'Magic Carpet'], $results);
     }
 
-    public function testFindLastIndexPropagatesPredicateExceptions(): void
+    public function testFindLastIndexSkipsHolesInSparseArray(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('predicate failed');
+        $array = new Arr(3);
+        $array[0] = 'a';
+        $array[2] = 'c';
+        $visited = [];
 
-        (new Arr(1))->findLastIndex(static function (): bool {
-            throw new \RuntimeException('predicate failed');
+        $result = $array->findLastIndex(static function (string $value, int $index) use (&$visited): bool {
+            $visited[] = [$value, $index];
+
+            return false;
         });
+
+        self::assertSame(-1, $result);
+        self::assertSame([['c', 2], ['a', 0]], $visited);
+    }
+
+    public function testFindLastIndexDoesNotCallPredicateOnSparseArrayWhenAllHoles(): void
+    {
+        $called = false;
+
+        self::assertSame(-1, (new Arr(3))->findLastIndex(static function () use (&$called): bool {
+            $called = true;
+
+            return true;
+        }));
+        self::assertFalse($called);
     }
 
     // Array.prototype.flat
