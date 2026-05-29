@@ -2906,6 +2906,36 @@ final class ArrTest extends TestCase
         self::assertFalse(isset($array[5]));
     }
 
+    public function testSortMovesExplicitNullValuesToEnd(): void
+    {
+        $array = new Arr(3, null, 1, null, 2);
+
+        $array->sort();
+
+        self::assertSame(5, $array->length);
+        self::assertSame([1, 2, 3, null, null], iterator_to_array($array->values()));
+        self::assertTrue(isset($array[0]));
+        self::assertTrue(isset($array[1]));
+        self::assertTrue(isset($array[2]));
+        self::assertTrue(isset($array[3]));
+        self::assertTrue(isset($array[4]));
+    }
+
+    public function testSortWithComparatorMovesExplicitNullValuesToEnd(): void
+    {
+        $array = new Arr(3, null, 1, null, 2);
+
+        $array->sort(static fn ($a, $b) => $b <=> $a);
+
+        self::assertSame(5, $array->length);
+        self::assertSame([3, 2, 1, null, null], iterator_to_array($array->values()));
+        self::assertTrue(isset($array[0]));
+        self::assertTrue(isset($array[1]));
+        self::assertTrue(isset($array[2]));
+        self::assertTrue(isset($array[3]));
+        self::assertTrue(isset($array[4]));
+    }
+
     // Array.prototype.splice
 
     public function testSpliceRemovesRequestedElementsAndMutatesReceiver(): void
@@ -3311,6 +3341,36 @@ final class ArrTest extends TestCase
         self::assertFalse(isset($sortedArray[3]));
         self::assertFalse(isset($sortedArray[4]));
         self::assertFalse(isset($sortedArray[5]));
+    }
+
+    public function testToSortedMovesExplicitNullValuesToEnd(): void
+    {
+        $array = new Arr(3, null, 1, null, 2);
+
+        $sortedArray = $array->toSorted();
+
+        self::assertSame(5, $sortedArray->length);
+        self::assertSame([1, 2, 3, null, null], iterator_to_array($sortedArray->values()));
+        self::assertTrue(isset($sortedArray[0]));
+        self::assertTrue(isset($sortedArray[1]));
+        self::assertTrue(isset($sortedArray[2]));
+        self::assertTrue(isset($sortedArray[3]));
+        self::assertTrue(isset($sortedArray[4]));
+    }
+
+    public function testToSortedWithComparatorMovesExplicitNullValuesToEnd(): void
+    {
+        $array = new Arr(3, null, 1, null, 2);
+
+        $sortedArray = $array->toSorted(static fn ($a, $b) => $b <=> $a);
+
+        self::assertSame(5, $sortedArray->length);
+        self::assertSame([3, 2, 1, null, null], iterator_to_array($sortedArray->values()));
+        self::assertTrue(isset($sortedArray[0]));
+        self::assertTrue(isset($sortedArray[1]));
+        self::assertTrue(isset($sortedArray[2]));
+        self::assertTrue(isset($sortedArray[3]));
+        self::assertTrue(isset($sortedArray[4]));
     }
 
     // Array.prototype.toSpliced

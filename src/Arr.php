@@ -1225,16 +1225,34 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
      */
     private static function sortValues(array $values, ?callable $callback = null): array
     {
+        // JavaScript moves `undefined` (here: explicit null) values to the end
+        // without passing them to the comparator. Holes are appended after that
+        // by the caller dropping the trailing indexes.
+        $nullCount = 0;
+        $defined = [];
+        foreach ($values as $value) {
+            if (null === $value) {
+                ++$nullCount;
+            } else {
+                $defined[] = $value;
+            }
+        }
+
         if (null !== $callback) {
-            usort($values, $callback);
+            usort($defined, $callback);
         } else {
             usort(
-                $values,
+                $defined,
                 static fn (mixed $a, mixed $b): int => strcmp(
                     self::mixedToString($a),
                     self::mixedToString($b)
                 )
             );
+        }
+
+        $values = $defined;
+        for ($i = 0; $i < $nullCount; ++$i) {
+            $values[] = null;
         }
 
         return $values;
