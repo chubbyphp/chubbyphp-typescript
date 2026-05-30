@@ -127,9 +127,14 @@ final class ArrTest extends TestCase
         foreach ([NAN, INF, -INF, PHP_FLOAT_MAX, PHP_FLOAT_MIN] as $length) {
             try {
                 new Arr($length);
-                self::fail('Expected RangeError for invalid length');
+
+                throw new \Exception('Should not be reached');
             } catch (RangeError $exception) {
-                self::assertSame('Invalid array length', $exception->getMessage());
+                if (\is_float($length)) {
+                    self::assertSame('Invalid array length: '.\sprintf('%.17g', $length), $exception->getMessage());
+                } else {
+                    self::assertSame('Invalid array length: '.$length, $exception->getMessage());
+                }
             }
         }
     }
@@ -274,7 +279,7 @@ final class ArrTest extends TestCase
     public function testArraySetLengthThrowsRangeErrorForFloat(): void
     {
         $this->expectException(RangeError::class);
-        $this->expectExceptionMessage('Invalid array length');
+        $this->expectExceptionMessage('Length needs to be an integer');
 
         $array = new Arr(1, 2, 3);
         $array->length = 1.5;
@@ -511,7 +516,7 @@ final class ArrTest extends TestCase
 
         self::assertSame('x', $array[100000000000000]);
         self::assertTrue(isset($array[100000000000000]));
-        self::assertSame(100000000000001, $array->length);
+        self::assertSame(0, $array->length);
 
         unset($array[100000000000000]);
         self::assertFalse(isset($array[100000000000000]));
@@ -1035,7 +1040,7 @@ final class ArrTest extends TestCase
                 throw new \RuntimeException('Exception occurred in callbackfn');
             });
 
-            self::fail('Expected predicate exception');
+            throw new \Exception('Should not be reached');
         } catch (\RuntimeException $exception) {
             self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
         }
@@ -1191,7 +1196,7 @@ final class ArrTest extends TestCase
                 throw new \RuntimeException('Exception occurred in callbackfn');
             });
 
-            self::fail('Expected predicate exception');
+            throw new \Exception('Should not be reached');
         } catch (\RuntimeException $exception) {
             self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
         }
@@ -1884,7 +1889,7 @@ final class ArrTest extends TestCase
                 }
             });
 
-            self::fail('Expected callback exception');
+            throw new \Exception('Should not be reached');
         } catch (\RuntimeException $exception) {
             self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
         }
@@ -2112,7 +2117,7 @@ final class ArrTest extends TestCase
     public function testJoinReturnsStringElementsUnchanged(): void
     {
         self::assertSame('a,b,c', (new Arr('a', 'b', 'c'))->join());
-        self::assertSame('x,[object Object]', (new Arr(['x', new \stdClass()]))->join());
+        self::assertSame('x,object', (new Arr(['x', new \stdClass()]))->join());
     }
 
     public function testJoinUsesStringSeparatorAndStringifiesValues(): void
@@ -2122,13 +2127,13 @@ final class ArrTest extends TestCase
         self::assertSame('0&1&2&3', (new Arr(0, 1, 2, 3))->join('&'));
         self::assertSame('true,true,true', (new Arr(true, true, true))->join());
         self::assertSame(',,', (new Arr(null, null, null))->join());
-        self::assertSame('Infinity,Infinity,Infinity', (new Arr(INF, INF, INF))->join());
+        self::assertSame('INF,INF,INF', (new Arr(INF, INF, INF))->join());
         self::assertSame('NaN,NaN,NaN', (new Arr(NAN, NAN, NAN))->join());
     }
 
     public function testJoinStringifiesPhpArraysAndNonStringableObjects(): void
     {
-        self::assertSame('1,2,[object Object]', (new Arr([1, 2], new \stdClass()))->join());
+        self::assertSame('1,2,object', (new Arr([1, 2], new \stdClass()))->join());
     }
 
     public function testJoinReindexesTraversablesInsteadOfPreservingDuplicateKeys(): void
@@ -2282,7 +2287,7 @@ final class ArrTest extends TestCase
                 return $value;
             });
 
-            self::fail('Expected mapper exception');
+            throw new \Exception('Should not be reached');
         } catch (\RuntimeException $exception) {
             self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
         }
@@ -2472,7 +2477,7 @@ final class ArrTest extends TestCase
                 return $previousValue + $currentValue;
             }, 1);
 
-            self::fail('Expected reducer exception');
+            throw new \Exception('Should not be reached');
         } catch (\RuntimeException $exception) {
             self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
         }
@@ -2590,7 +2595,7 @@ final class ArrTest extends TestCase
                 return $previousValue + $currentValue;
             }, 1);
 
-            self::fail('Expected reducer exception');
+            throw new \Exception('Should not be reached');
         } catch (\RuntimeException $exception) {
             self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
         }
@@ -2773,7 +2778,7 @@ final class ArrTest extends TestCase
                 return false;
             });
 
-            self::fail('Expected predicate exception');
+            throw new \Exception('Should not be reached');
         } catch (\RuntimeException $exception) {
             self::assertSame('Exception occurred in callbackfn', $exception->getMessage());
         }
@@ -3111,7 +3116,7 @@ final class ArrTest extends TestCase
     {
         self::assertSame('a,b,c', (new Arr('a', 'b', 'c'))->toLocaleString());
         self::assertSame('true,false', (new Arr(true, false))->toLocaleString());
-        self::assertSame('[object Object]', (new Arr(new \stdClass()))->toLocaleString());
+        self::assertSame('object', (new Arr(new \stdClass()))->toLocaleString());
     }
 
     public function testToLocaleStringStringifiesNestedIterables(): void
@@ -3297,7 +3302,7 @@ final class ArrTest extends TestCase
                 return 0;
             });
 
-            self::fail('Expected comparator exception');
+            throw new \Exception('Should not be reached');
         } catch (\RuntimeException $exception) {
             self::assertSame('compare failed', $exception->getMessage());
         }
@@ -3501,7 +3506,7 @@ final class ArrTest extends TestCase
 
         self::assertSame('1,2,3', (new Arr(1, 2, 3))->toString());
         self::assertSame(',,', (new Arr(3))->toString());
-        self::assertSame('-Infinity', $negativeInfinity->toString());
+        self::assertSame('-INF', $negativeInfinity->toString());
         self::assertSame('1,2,3,4', (new Arr(new \ArrayIterator([new Arr(1, 2), new Arr(3, 4)])))->toString());
     }
 

@@ -14,8 +14,10 @@ namespace Chubbyphp\Typescript;
  */
 final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSerializable, \Stringable
 {
-    private const INVALID_LENGTH = 'Invalid array length';
+    private const INVALID_LENGTH = 'Invalid array length: %s';
     private const DEFAULT_DELIMITER = ',';
+    private const MIN_LENGTH = 0;
+    private const MAX_LENGTH = (2 ** 32) - 1;
 
     /**
      * @var array<int, null|T>
@@ -44,7 +46,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
                 if (self::isIntAsFloat($argument)) {
                     $argument = (int) $argument;
                 } else {
-                    throw new RangeError(self::INVALID_LENGTH);
+                    throw new RangeError(\sprintf(self::INVALID_LENGTH, \sprintf('%.17g', $argument)));
                 }
             }
 
@@ -81,8 +83,20 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     public function __set(string $name, mixed $value): void
     {
         if ('length' === $name) {
+            if (true === $value) {
+                $value = 1;
+            }
+
+            if (false === $value || null === $value) {
+                $value = 0;
+            }
+
+            if (\is_string($value) && self::isIntAsString($value)) {
+                $value = (int) $value;
+            }
+
             if (!\is_int($value)) {
-                throw new RangeError(self::INVALID_LENGTH);
+                throw new RangeError('Length needs to be an integer');
             }
 
             $length = self::validateLength($value);
@@ -112,67 +126,53 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $offset = self::normalizeOffset($offset);
 
-        if (\is_string($offset)) {
-            return \array_key_exists($offset, $this->internalProperties);
-        }
-
         if (\is_int($offset)) {
             return \array_key_exists($offset, $this->internalArray);
         }
 
-        return false;
+        return \array_key_exists($offset, $this->internalProperties);
     }
 
     public function offsetGet(mixed $offset): mixed
     {
         $offset = self::normalizeOffset($offset);
 
-        if (\is_string($offset)) {
-            return $this->internalProperties[$offset] ?? null;
-        }
-
         if (\is_int($offset)) {
             return $this->internalArray[$offset] ?? null;
         }
 
-        return null;
+        return $this->internalProperties[$offset] ?? null;
     }
 
     public function offsetSet(mixed $offset, mixed $value): void
     {
         if (null === $offset) {
-            $this->internalArray[$this->internalLength++] = $value;
-
-            return;
+            $offset = $this->internalLength;
         }
 
         $offset = self::normalizeOffset($offset);
 
-        if (\is_string($offset)) {
-            $this->internalProperties[$offset] = $value;
+        if (\is_int($offset)) {
+            $this->internalArray[$offset] = $value;
+            $this->internalLength = max($this->internalLength, $offset + 1);
 
             return;
         }
 
-        if (\is_int($offset)) {
-            $this->internalArray[$offset] = $value;
-            $this->internalLength = max($this->internalLength, $offset + 1);
-        }
+        $this->internalProperties[$offset] = $value;
     }
 
     public function offsetUnset(mixed $offset): void
     {
         $offset = self::normalizeOffset($offset);
 
-        if (\is_string($offset)) {
-            unset($this->internalProperties[$offset]);
+        if (\is_int($offset)) {
+            unset($this->internalArray[$offset]);
 
             return;
         }
 
-        if (\is_int($offset)) {
-            unset($this->internalArray[$offset]);
-        }
+        unset($this->internalProperties[$offset]);
     }
 
     /**
@@ -1130,12 +1130,28 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     }
 
     /**
+     * @phpstan-assert-if-true positive-int $offset
+     */
+    private static function isValidIntegerOffset(int $offset): bool
+    {
+        return $offset >= self::MIN_LENGTH && $offset < self::MAX_LENGTH;
+    }
+
+    /**
+     * @phpstan-assert-if-true positive-int $length
+     */
+    private static function isValidLength(int $length): bool
+    {
+        return $length >= self::MIN_LENGTH && $length <= self::MAX_LENGTH;
+    }
+
+    /**
      * @return non-negative-int
      */
     private static function validateLength(int $length): int
     {
-        if (0 > $length || ((2 ** 32) - 1 < $length)) {
-            throw new RangeError(self::INVALID_LENGTH);
+        if (!self::isValidLength($length)) {
+            throw new RangeError(\sprintf(self::INVALID_LENGTH, $length));
         }
 
         return $length;
@@ -1147,10 +1163,10 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             null === $value => '',
             \is_bool($value) => $value ? 'true' : 'false',
             \is_int($value) => (string) $value,
-            \is_float($value) && is_infinite($value) => $value > 0 ? 'Infinity' : '-Infinity',
             \is_float($value) => \sprintf('%.17g', $value),
             \is_string($value) => $value,
-            \is_object($value) && $value instanceof \Stringable => (string) $value,
+            $value instanceof \BackedEnum => self::mixedToString($value->value),
+            $value instanceof \UnitEnum => $value->name,
             is_iterable($value) => implode(
                 self::DEFAULT_DELIMITER,
                 array_map(
@@ -1158,7 +1174,10 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
                     iterator_to_array($value, false),
                 ),
             ),
-            default => '[object Object]',
+            \is_object($value) && \is_callable([$value, '__toString']) => $value->__toString(),
+            \is_object($value) => 'object',
+            \is_resource($value) => 'resource',
+            default => 'unknown',
         };
     }
 
@@ -1201,7 +1220,8 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             \is_bool($value) => $value ? 'true' : 'false',
             \is_int($value) || \is_float($value) => self::formatNumberToLocale($value, $locales, $options),
             \is_string($value) => $value,
-            \is_object($value) && \is_callable([$value, 'toLocaleString']) => $value->toLocaleString(),
+            $value instanceof \BackedEnum => self::mixedToLocaleString($value->value, $locales, $options),
+            $value instanceof \UnitEnum => $value->name,
             is_iterable($value) => implode(
                 self::DEFAULT_DELIMITER,
                 array_map(
@@ -1213,7 +1233,10 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
                     iterator_to_array($value, false),
                 ),
             ),
-            default => '[object Object]',
+            \is_object($value) && \is_callable([$value, 'toLocaleString']) => $value->toLocaleString(),
+            \is_object($value) => 'object',
+            \is_resource($value) => 'resource',
+            default => 'unknown',
         };
     }
 
@@ -1342,7 +1365,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         }
     }
 
-    private static function normalizeOffset(mixed $offset): mixed
+    private static function normalizeOffset(mixed $offset): int|string
     {
         if (\is_string($offset)) {
             if (self::isFloatAsString($offset)) {
@@ -1352,11 +1375,37 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             }
         }
 
-        if (\is_float($offset) && self::isIntAsFloat($offset)) {
-            $offset = (int) $offset;
+        if (\is_float($offset)) {
+            if (self::isIntAsFloat($offset)) {
+                $offset = (int) $offset;
+            } elseif (is_infinite($offset)) {
+                return $offset > 0 ? 'INF' : '-INF';
+            } elseif (is_nan($offset)) {
+                return 'NAN';
+            }
         }
 
-        return $offset;
+        if (\is_int($offset) && !self::isValidIntegerOffset($offset)) {
+            return (string) $offset;
+        }
+
+        if (\is_int($offset) || \is_string($offset)) {
+            return $offset;
+        }
+
+        if (\is_bool($offset)) {
+            return $offset ? 'true' : 'false';
+        }
+
+        if (null === $offset) {
+            return 'null';
+        }
+
+        if (\is_scalar($offset) || $offset instanceof \Stringable) {
+            return (string) $offset;
+        }
+
+        throw new \Exception('Cannot convert offset to string');
     }
 
     private static function isFloatAsString(string $string): bool
