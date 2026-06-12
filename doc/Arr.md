@@ -124,7 +124,7 @@ $a->concat(new Arr(3, 4), 5); // [1, 2, 3, 4, 5]
 
 ---
 
-### `copyWithin(int $target, int $start, ?int $end = null): self`
+### `copyWithin(int $target, int $start = 0, ?int $end = null): self`
 
 Shallow copies a portion of the array to another location within the same array, modifying it in place and returning it.
 
@@ -188,7 +188,7 @@ $arr->filter(static fn ($v) => $v > 25);  // [30, 40]
 
 ### `find(callable $callback, ?object $thisArg = null): mixed`
 
-Returns the first element that passes the callback, or `null`.
+Returns the first element that passes the callback, or `null`. Unlike most iteration methods, `find()` does not skip holes in sparse arrays: the callback receives `null` for them.
 
 ```php
 $arr = new Arr(5, 12, 8, 130, 44);
@@ -199,7 +199,7 @@ $arr->find(static fn ($v) => $v > 10);    // 12
 
 ### `findIndex(callable $callback, ?object $thisArg = null): int`
 
-Returns the index of the first element that passes the callback, or `-1`.
+Returns the index of the first element that passes the callback, or `-1`. Like `find()`, it does not skip holes in sparse arrays.
 
 ```php
 $arr = new Arr(5, 12, 8, 130, 44);
@@ -210,7 +210,7 @@ $arr->findIndex(static fn ($v) => $v > 10);  // 1
 
 ### `findLast(callable $callback, ?object $thisArg = null): mixed`
 
-Returns the last element that passes the callback, or `null`.
+Returns the last element that passes the callback, or `null`. Like `find()`, it does not skip holes in sparse arrays.
 
 ```php
 $arr = new Arr(5, 12, 8, 130, 44);
@@ -221,7 +221,7 @@ $arr->findLast(static fn ($v) => $v > 10);   // 44
 
 ### `findLastIndex(callable $callback, ?object $thisArg = null): int`
 
-Returns the index of the last element that passes the callback, or `-1`.
+Returns the index of the last element that passes the callback, or `-1`. Like `find()`, it does not skip holes in sparse arrays.
 
 ```php
 $arr = new Arr(5, 12, 8, 130, 44);
@@ -294,13 +294,15 @@ $arr->indexOf('z');      // -1
 
 ### `join(?string $separator = null): string`
 
-Joins all elements into a string separated by `$separator` (default `','`).
+Joins all elements into a string separated by `$separator` (default `','`). Floats are rendered like JavaScript's `String(number)` (shortest round-trip representation, `NaN`, `Infinity`, `1e+21`, ...).
 
 ```php
 $arr = new Arr('Wind', 'Rain', 'Fire');
 $arr->join();          // 'Wind,Rain,Fire'
 $arr->join(' - ');     // 'Wind - Rain - Fire'
 $arr->join(', ');      // 'Wind, Rain, Fire'
+
+(new Arr(0.1, 1.0, INF))->join();  // '0.1,1,Infinity'
 ```
 
 ---
@@ -478,7 +480,7 @@ $arr->toLocaleString('en-US', ['style' => 'currency', 'currency' => 'EUR']);  //
 
 ### `toReversed(): self`
 
-Returns a new array with the elements reversed (does not modify the original).
+Returns a new array with the elements reversed (does not modify the original). The result is never sparse: holes become explicit `null` values.
 
 ```php
 $arr = new Arr(1, 2, 3);
@@ -490,7 +492,7 @@ $arr->toReversed();   // [3, 2, 1]
 
 ### `toSorted(?callable $callback = null): self`
 
-Returns a new array with the elements sorted (does not modify the original).
+Returns a new array with the elements sorted (does not modify the original). The result is never sparse: holes become explicit `null` values sorted to the end.
 
 ```php
 $arr = new Arr(3, 1, 2);
@@ -502,7 +504,7 @@ $sorted = $arr->toSorted();
 
 ### `toSpliced(int $start, ?int $deleteCount = null, mixed ...$items): self`
 
-Returns a new array with elements removed/replaced (does not modify the original).
+Returns a new array with elements removed/replaced (does not modify the original). The result is never sparse: holes become explicit `null` values.
 
 ```php
 $arr = new Arr(1, 2, 3, 4);

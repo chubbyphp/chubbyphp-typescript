@@ -87,10 +87,9 @@ final class Test262ArrayPrototypeToStringTest extends TestCase
         self::assertSame($x->join(), $x->toString(), '#5.1: $x = new Arr(null,null,null); $x->toString() === $x->join()');
         self::assertSame(',,', $x->toString(), '#5.2: $x = new Arr(null,null,null); $x->toString() === ",,"');
 
-        // Arr stringifies INF as "INF" instead of JS "Infinity"
         $x = new Arr(INF, INF, INF);
         self::assertSame($x->join(), $x->toString(), '#6.1: $x = new Arr(INF,INF,INF); $x->toString() === $x->join()');
-        self::assertSame('INF,INF,INF', $x->toString(), '#6.2: $x = new Arr(INF,INF,INF); $x->toString() === "INF,INF,INF"');
+        self::assertSame('Infinity,Infinity,Infinity', $x->toString(), '#6.2: $x = new Arr(INF,INF,INF); $x->toString() === "Infinity,Infinity,Infinity"');
 
         $x = new Arr(NAN, NAN, NAN);
         self::assertSame($x->join(), $x->toString(), '#7.1: $x = new Arr(NAN,NAN,NAN); $x->toString() === $x->join()');

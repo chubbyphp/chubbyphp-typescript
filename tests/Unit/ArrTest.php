@@ -124,17 +124,22 @@ final class ArrTest extends TestCase
 
     public function testArrayConstructorThrowsRangeErrorForNanAndInfinityLengths(): void
     {
-        foreach ([NAN, INF, -INF, PHP_FLOAT_MAX, PHP_FLOAT_MIN] as $length) {
+        // the rendered length matches the JS String(number) representation
+        $lengths = [
+            'NaN' => NAN,
+            'Infinity' => INF,
+            '-Infinity' => -INF,
+            '1.7976931348623157e+308' => PHP_FLOAT_MAX,
+            '2.2250738585072014e-308' => PHP_FLOAT_MIN,
+        ];
+
+        foreach ($lengths as $expectedString => $length) {
             try {
                 new Arr($length);
 
                 throw new \Exception('Should not be reached');
             } catch (RangeError $exception) {
-                if (\is_float($length)) {
-                    self::assertSame('Invalid array length: '.\sprintf('%.17g', $length), $exception->getMessage());
-                } else {
-                    self::assertSame('Invalid array length: '.$length, $exception->getMessage());
-                }
+                self::assertSame('Invalid array length: '.$expectedString, $exception->getMessage());
             }
         }
     }
@@ -226,7 +231,7 @@ final class ArrTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_WARNING, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Undefined property: A::$unknown', $lastError['message']);
+        self::assertSame('Undefined property: Arr::$unknown', $lastError['message']);
     }
 
     // __set
@@ -308,7 +313,7 @@ final class ArrTest extends TestCase
         self::assertArrayHasKey('type', $lastError);
         self::assertSame(E_USER_WARNING, $lastError['type']);
         self::assertArrayHasKey('message', $lastError);
-        self::assertSame('Undefined property: A::$unknown', $lastError['message']);
+        self::assertSame('Undefined property: Arr::$unknown', $lastError['message']);
     }
 
     // __toString
@@ -366,11 +371,14 @@ final class ArrTest extends TestCase
         self::assertSame('x', $array->reduce(static fn (string $carry, string $value): string => $carry.$value));
         self::assertSame('x', $array->reduceRight(static fn (string $carry, string $value): string => $carry.$value));
 
+        // toReversed() never returns a sparse array: holes become explicit nulls
         $reversed = $array->toReversed();
         self::assertSame(3, $reversed->length);
-        self::assertFalse(isset($reversed[0]));
+        self::assertTrue(isset($reversed[0]));
+        self::assertNull($reversed[0]);
         self::assertSame('x', $reversed[1]);
-        self::assertFalse(isset($reversed[2]));
+        self::assertTrue(isset($reversed[2]));
+        self::assertNull($reversed[2]);
     }
 
     public function testArrayAccessSupportsAppendAndIgnoresInvalidOffsets(): void
@@ -520,6 +528,35 @@ final class ArrTest extends TestCase
 
         unset($array[100000000000000]);
         self::assertFalse(isset($array[100000000000000]));
+    }
+
+    public function testArrayAccessReadsNullOffsetAsStringProperty(): void
+    {
+        // JS: arr[null] reads the property "null"; only writing appends
+        $array = new Arr('a');
+
+        self::assertNull($array[null]);
+        self::assertFalse(isset($array[null]));
+
+        $array['null'] = 'x';
+
+        self::assertSame('x', $array[null]);
+        self::assertTrue(isset($array[null]));
+
+        unset($array[null]);
+
+        self::assertNull($array['null']);
+        self::assertFalse(isset($array['null']));
+    }
+
+    public function testArrayAccessThrowsForNonStringableOffset(): void
+    {
+        $array = new Arr('a');
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot convert offset to string');
+
+        $array->offsetGet(new \stdClass());
     }
     // Countable::count
 
@@ -958,6 +995,15 @@ final class ArrTest extends TestCase
         self::assertSame(['a', 'a', 'c'], iterator_to_array($array->values()));
     }
 
+    public function testCopyWithinDefaultsStartToZero(): void
+    {
+        $array = new Arr(1, 2, 3, 4);
+
+        $array->copyWithin(2);
+
+        self::assertSame([1, 2, 1, 2], iterator_to_array($array->values()));
+    }
+
     // Array.prototype.entries
 
     public function testEntriesReturnsKeyValuePairs(): void
@@ -1305,7 +1351,7 @@ final class ArrTest extends TestCase
         $array = new Arr('Shoes', 'Car', 'Bike');
         $results = [];
 
-        $array->find(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+        $array->find(static function (?string $value, int $index, Arr $receivedArray) use (&$results): bool {
             if ([] === $results) {
                 $receivedArray->splice(1, 1);
             }
@@ -1315,7 +1361,8 @@ final class ArrTest extends TestCase
             return false;
         });
 
-        self::assertSame(['Shoes', 'Bike'], $results);
+        // the initial length is used; the now-missing index 2 reads back as null
+        self::assertSame(['Shoes', 'Bike', null], $results);
 
         $array = new Arr('Skateboard', 'Barefoot');
         $results = [];
@@ -1334,33 +1381,33 @@ final class ArrTest extends TestCase
         self::assertSame(['Skateboard', 'Magic Carpet'], $results);
     }
 
-    public function testFindSkipsHolesInSparseArray(): void
+    public function testFindDoesNotSkipHolesInSparseArray(): void
     {
         $array = new Arr(3);
         $array[0] = 'a';
         $array[2] = 'c';
         $visited = [];
 
-        $result = $array->find(static function (string $value, int $index) use (&$visited): bool {
+        $result = $array->find(static function (?string $value, int $index) use (&$visited): bool {
             $visited[] = [$value, $index];
 
             return 'c' === $value;
         });
 
         self::assertSame('c', $result);
-        self::assertSame([['a', 0], ['c', 2]], $visited);
+        self::assertSame([['a', 0], [null, 1], ['c', 2]], $visited);
     }
 
-    public function testFindDoesNotCallPredicateOnSparseArrayWhenAllHoles(): void
+    public function testFindCallsPredicateForEveryIndexOnSparseArrayWithAllHoles(): void
     {
-        $called = false;
+        $calls = 0;
 
-        self::assertNull((new Arr(3))->find(static function () use (&$called): bool {
-            $called = true;
+        self::assertNull((new Arr(3))->find(static function () use (&$calls): bool {
+            ++$calls;
 
-            return true;
+            return false;
         }));
-        self::assertFalse($called);
+        self::assertSame(3, $calls);
     }
 
     // Array.prototype.findIndex
@@ -1412,7 +1459,7 @@ final class ArrTest extends TestCase
         $array = new Arr('Shoes', 'Car', 'Bike');
         $results = [];
 
-        $array->findIndex(static function (string $value, int $index, Arr $receivedArray) use (&$results): bool {
+        $array->findIndex(static function (?string $value, int $index, Arr $receivedArray) use (&$results): bool {
             if ([] === $results) {
                 $receivedArray->splice(1, 1);
             }
@@ -1422,7 +1469,8 @@ final class ArrTest extends TestCase
             return false;
         });
 
-        self::assertSame(['Shoes', 'Bike'], $results);
+        // the initial length is used; the now-missing index 2 reads back as null
+        self::assertSame(['Shoes', 'Bike', null], $results);
 
         $array = new Arr('Skateboard', 'Barefoot');
         $results = [];
@@ -1441,33 +1489,33 @@ final class ArrTest extends TestCase
         self::assertSame(['Skateboard', 'Magic Carpet'], $results);
     }
 
-    public function testFindIndexSkipsHolesInSparseArray(): void
+    public function testFindIndexDoesNotSkipHolesInSparseArray(): void
     {
         $array = new Arr(3);
         $array[0] = 'a';
         $array[2] = 'c';
         $visited = [];
 
-        $result = $array->findIndex(static function (string $value, int $index) use (&$visited): bool {
+        $result = $array->findIndex(static function (?string $value, int $index) use (&$visited): bool {
             $visited[] = [$value, $index];
 
             return false;
         });
 
         self::assertSame(-1, $result);
-        self::assertSame([['a', 0], ['c', 2]], $visited);
+        self::assertSame([['a', 0], [null, 1], ['c', 2]], $visited);
     }
 
-    public function testFindIndexDoesNotCallPredicateOnSparseArrayWhenAllHoles(): void
+    public function testFindIndexCallsPredicateForEveryIndexOnSparseArrayWithAllHoles(): void
     {
-        $called = false;
+        $calls = 0;
 
-        self::assertSame(-1, (new Arr(3))->findIndex(static function () use (&$called): bool {
-            $called = true;
+        self::assertSame(-1, (new Arr(3))->findIndex(static function () use (&$calls): bool {
+            ++$calls;
 
-            return true;
+            return false;
         }));
-        self::assertFalse($called);
+        self::assertSame(3, $calls);
     }
 
     // Array.prototype.findLast
@@ -1548,33 +1596,33 @@ final class ArrTest extends TestCase
         self::assertSame(['Barefoot', 'Magic Carpet'], $results);
     }
 
-    public function testFindLastSkipsHolesInSparseArray(): void
+    public function testFindLastDoesNotSkipHolesInSparseArray(): void
     {
         $array = new Arr(3);
         $array[0] = 'a';
         $array[2] = 'c';
         $visited = [];
 
-        $result = $array->findLast(static function (string $value, int $index) use (&$visited): bool {
+        $result = $array->findLast(static function (?string $value, int $index) use (&$visited): bool {
             $visited[] = [$value, $index];
 
             return false;
         });
 
         self::assertNull($result);
-        self::assertSame([['c', 2], ['a', 0]], $visited);
+        self::assertSame([['c', 2], [null, 1], ['a', 0]], $visited);
     }
 
-    public function testFindLastDoesNotCallPredicateOnSparseArrayWhenAllHoles(): void
+    public function testFindLastCallsPredicateForEveryIndexOnSparseArrayWithAllHoles(): void
     {
-        $called = false;
+        $calls = 0;
 
-        self::assertNull((new Arr(3))->findLast(static function () use (&$called): bool {
-            $called = true;
+        self::assertNull((new Arr(3))->findLast(static function () use (&$calls): bool {
+            ++$calls;
 
-            return true;
+            return false;
         }));
-        self::assertFalse($called);
+        self::assertSame(3, $calls);
     }
 
     // Array.prototype.findLastIndex
@@ -1655,33 +1703,33 @@ final class ArrTest extends TestCase
         self::assertSame(['Barefoot', 'Magic Carpet'], $results);
     }
 
-    public function testFindLastIndexSkipsHolesInSparseArray(): void
+    public function testFindLastIndexDoesNotSkipHolesInSparseArray(): void
     {
         $array = new Arr(3);
         $array[0] = 'a';
         $array[2] = 'c';
         $visited = [];
 
-        $result = $array->findLastIndex(static function (string $value, int $index) use (&$visited): bool {
+        $result = $array->findLastIndex(static function (?string $value, int $index) use (&$visited): bool {
             $visited[] = [$value, $index];
 
             return false;
         });
 
         self::assertSame(-1, $result);
-        self::assertSame([['c', 2], ['a', 0]], $visited);
+        self::assertSame([['c', 2], [null, 1], ['a', 0]], $visited);
     }
 
-    public function testFindLastIndexDoesNotCallPredicateOnSparseArrayWhenAllHoles(): void
+    public function testFindLastIndexCallsPredicateForEveryIndexOnSparseArrayWithAllHoles(): void
     {
-        $called = false;
+        $calls = 0;
 
-        self::assertSame(-1, (new Arr(3))->findLastIndex(static function () use (&$called): bool {
-            $called = true;
+        self::assertSame(-1, (new Arr(3))->findLastIndex(static function () use (&$calls): bool {
+            ++$calls;
 
-            return true;
+            return false;
         }));
-        self::assertFalse($called);
+        self::assertSame(3, $calls);
     }
 
     // Array.prototype.flat
@@ -1721,6 +1769,15 @@ final class ArrTest extends TestCase
         $inner = new Arr(1, $nested);
 
         self::assertSame([1, $nested], iterator_to_array((new Arr($inner))->flat()->values()));
+    }
+
+    public function testFlatVisitsIndexesInOrderForOutOfOrderAssignments(): void
+    {
+        $array = new Arr();
+        $array[2] = 'c';
+        $array[0] = 'a';
+
+        self::assertSame(['a', 'c'], iterator_to_array($array->flat()->values()));
     }
 
     public function testFlatDoesNotMutateOriginalArray(): void
@@ -2127,13 +2184,61 @@ final class ArrTest extends TestCase
         self::assertSame('0&1&2&3', (new Arr(0, 1, 2, 3))->join('&'));
         self::assertSame('true,true,true', (new Arr(true, true, true))->join());
         self::assertSame(',,', (new Arr(null, null, null))->join());
-        self::assertSame('INF,INF,INF', (new Arr(INF, INF, INF))->join());
+        self::assertSame('Infinity,Infinity,Infinity', (new Arr(INF, INF, INF))->join());
         self::assertSame('NaN,NaN,NaN', (new Arr(NAN, NAN, NAN))->join());
+    }
+
+    public function testJoinFormatsFloatsLikeJavascriptNumberToString(): void
+    {
+        // shortest round-trip representation, ECMAScript Number::toString
+        self::assertSame('0.1', Arr::of(0.1)->join());
+        self::assertSame('0.30000000000000004', Arr::of(0.1 + 0.2)->join());
+        self::assertSame('123.456', Arr::of(123.456)->join());
+        self::assertSame('0.5', Arr::of(0.5)->join());
+
+        // integral floats render without a fractional part
+        self::assertSame('1', Arr::of(1.0)->join());
+        self::assertSame('100000000000000000000', Arr::of(1e20)->join());
+
+        // negative zero renders as "0"
+        self::assertSame('0', Arr::of(-0.0)->join());
+
+        // fixed notation down to 1e-6, exponential below
+        self::assertSame('0.000001', Arr::of(1e-6)->join());
+        self::assertSame('1e-7', Arr::of(1e-7)->join());
+        self::assertSame('2.5e-10', Arr::of(2.5e-10)->join());
+        self::assertSame('5e-324', Arr::of(5e-324)->join());
+
+        // exponential notation from 1e21 upwards
+        self::assertSame('1e+21', Arr::of(1e21)->join());
+        self::assertSame('1.2345e+21', Arr::of(1.2345e21)->join());
+        self::assertSame('1.7976931348623157e+308', Arr::of(PHP_FLOAT_MAX)->join());
+
+        // negative numbers keep their sign in every notation
+        self::assertSame('-1', Arr::of(-1.0)->join());
+        self::assertSame('-1.5', Arr::of(-1.5)->join());
+        self::assertSame('-0.5', Arr::of(-0.5)->join());
+        self::assertSame('-1e+21', Arr::of(-1e21)->join());
+        self::assertSame('-1.2345e+21', Arr::of(-1.2345e21)->join());
+        self::assertSame('-1e-7', Arr::of(-1e-7)->join());
     }
 
     public function testJoinStringifiesPhpArraysAndNonStringableObjects(): void
     {
         self::assertSame('1,2,object', (new Arr([1, 2], new \stdClass()))->join());
+    }
+
+    public function testJoinStringifiesResources(): void
+    {
+        $resource = fopen('php://memory', 'r');
+
+        try {
+            self::assertSame('resource', (new Arr($resource))->join());
+        } finally {
+            if (\is_resource($resource)) {
+                fclose($resource);
+            }
+        }
     }
 
     public function testJoinReindexesTraversablesInsteadOfPreservingDuplicateKeys(): void
@@ -3119,6 +3224,19 @@ final class ArrTest extends TestCase
         self::assertSame('object', (new Arr(new \stdClass()))->toLocaleString());
     }
 
+    public function testToLocaleStringStringifiesResources(): void
+    {
+        $resource = fopen('php://memory', 'r');
+
+        try {
+            self::assertSame('resource', (new Arr($resource))->toLocaleString());
+        } finally {
+            if (\is_resource($resource)) {
+                fclose($resource);
+            }
+        }
+    }
+
     public function testToLocaleStringStringifiesNestedIterables(): void
     {
         self::assertSame('1,2,3,4', (new Arr([1, 2], new \ArrayIterator([3, 4])))->toLocaleString('en-US'));
@@ -3310,7 +3428,7 @@ final class ArrTest extends TestCase
         self::assertSame(1, $called);
     }
 
-    public function testToSortedMovesSparseHolesToTheEndDroppingLength(): void
+    public function testToSortedMovesSparseHolesToTheEndAsExplicitNulls(): void
     {
         $array = new Arr(4);
         $array[1] = 'b';
@@ -3324,12 +3442,13 @@ final class ArrTest extends TestCase
         self::assertTrue(isset($sortedArray[0]));
         self::assertTrue(isset($sortedArray[1]));
         self::assertTrue(isset($sortedArray[2]));
-        self::assertFalse(isset($sortedArray[3]));
-        self::assertFalse(isset($sortedArray[4]));
-        self::assertFalse(isset($sortedArray[5]));
+        // toSorted() never returns a sparse array: holes become explicit nulls
+        self::assertTrue(isset($sortedArray[3]));
+        self::assertTrue(isset($sortedArray[4]));
+        self::assertTrue(isset($sortedArray[5]));
     }
 
-    public function testToSortedWithDescCallbackMovesSparseHolesToTheEndDroppingLength(): void
+    public function testToSortedWithDescCallbackMovesSparseHolesToTheEndAsExplicitNulls(): void
     {
         $array = new Arr(4);
         $array[1] = 'b';
@@ -3343,9 +3462,10 @@ final class ArrTest extends TestCase
         self::assertTrue(isset($sortedArray[0]));
         self::assertTrue(isset($sortedArray[1]));
         self::assertTrue(isset($sortedArray[2]));
-        self::assertFalse(isset($sortedArray[3]));
-        self::assertFalse(isset($sortedArray[4]));
-        self::assertFalse(isset($sortedArray[5]));
+        // toSorted() never returns a sparse array: holes become explicit nulls
+        self::assertTrue(isset($sortedArray[3]));
+        self::assertTrue(isset($sortedArray[4]));
+        self::assertTrue(isset($sortedArray[5]));
     }
 
     public function testToSortedMovesExplicitNullValuesToEnd(): void
@@ -3506,7 +3626,7 @@ final class ArrTest extends TestCase
 
         self::assertSame('1,2,3', (new Arr(1, 2, 3))->toString());
         self::assertSame(',,', (new Arr(3))->toString());
-        self::assertSame('-INF', $negativeInfinity->toString());
+        self::assertSame('-Infinity', $negativeInfinity->toString());
         self::assertSame('1,2,3,4', (new Arr(new \ArrayIterator([new Arr(1, 2), new Arr(3, 4)])))->toString());
     }
 

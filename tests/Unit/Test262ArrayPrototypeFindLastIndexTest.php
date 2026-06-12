@@ -149,9 +149,9 @@ final class Test262ArrayPrototypeFindLastIndexTest extends TestCase
             return false;
         });
 
-        // Arr deviation: JS visits holes and passes undefined (4 calls),
-        // Arr skips holes via array_key_exists, so only indexes 3 and 0 are visited.
-        self::assertSame(2, $called, 'The value of $called is expected to be 2');
+        // holes are visited too and read back as undefined (here: null), so
+        // all 4 indexes are visited
+        self::assertSame(4, $called, 'The value of $called is expected to be 4');
     }
 
     /**

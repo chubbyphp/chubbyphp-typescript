@@ -86,11 +86,10 @@ final class Test262ArrayPrototypeToSplicedTest extends TestCase
      */
     public function testHolesNotPreserved(): void
     {
-        // JS converts holes to undefined (own properties) in the result; Arr's
-        // toSpliced intentionally preserves holes instead, so offsetExists()
-        // returns false for them while reading still yields null. Also the
-        // Array.prototype[3] = 3 part of the JS test has no PHP equivalent,
-        // so the hole at index 3 reads back as null instead of 3.
+        // toSpliced converts holes to undefined (here: null) own properties in
+        // the result, so the result is always dense. The Array.prototype[3] = 3
+        // part of the JS test has no PHP equivalent, so the hole at index 3
+        // reads back as null instead of 3.
         $arr = new Arr(5);
         $arr[0] = 0;
         $arr[2] = 2;
@@ -102,8 +101,8 @@ final class Test262ArrayPrototypeToSplicedTest extends TestCase
             $spliced->toArray(),
             'toSpliced(0, 0) must return [0, null, 2, null, 4]'
         );
-        self::assertFalse(isset($spliced[1]), 'Arr deviation: hole at index 1 is preserved, not materialized');
-        self::assertFalse(isset($spliced[3]), 'Arr deviation: hole at index 3 is preserved, not materialized');
+        self::assertTrue(isset($spliced[1]), 'hole at index 1 is materialized as own null property');
+        self::assertTrue(isset($spliced[3]), 'hole at index 3 is materialized as own null property');
 
         $spliced = $arr->toSpliced(0, 0, -1);
         self::assertSame(
@@ -111,8 +110,8 @@ final class Test262ArrayPrototypeToSplicedTest extends TestCase
             $spliced->toArray(),
             'toSpliced(0, 0, -1) must return [-1, 0, null, 2, null, 4]'
         );
-        self::assertFalse(isset($spliced[2]), 'Arr deviation: hole at index 2 is preserved, not materialized');
-        self::assertFalse(isset($spliced[4]), 'Arr deviation: hole at index 4 is preserved, not materialized');
+        self::assertTrue(isset($spliced[2]), 'hole at index 2 is materialized as own null property');
+        self::assertTrue(isset($spliced[4]), 'hole at index 4 is materialized as own null property');
     }
 
     // SKIPPED: test/built-ins/Array/prototype/toSpliced/ignores-species.js

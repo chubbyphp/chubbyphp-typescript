@@ -101,10 +101,9 @@ final class Test262ArrayPrototypeToSortedTest extends TestCase
      */
     public function testHolesNotPreserved(): void
     {
-        // Adapted: the Array.prototype[3] = 2 part is not portable. In JS the
-        // holes become explicit own `undefined` properties sorted to the end;
-        // Arr deviates and keeps them as trailing holes, which still read back
-        // as null but are not isset().
+        // Adapted: the Array.prototype[3] = 2 part is not portable. The holes
+        // become explicit own `undefined` (here: null) properties sorted to
+        // the end, so the result is always dense.
         $arr = new Arr(5);
         $arr[0] = 3;
         $arr[2] = 4;
@@ -119,9 +118,8 @@ final class Test262ArrayPrototypeToSortedTest extends TestCase
         self::assertNull($sorted[3], 'The value of $sorted[3] is expected to be null');
         self::assertNull($sorted[4], 'The value of $sorted[4] is expected to be null');
 
-        // Deviation from JS: sorted.hasOwnProperty(4) is true in JS, but Arr
-        // keeps the trailing holes as holes.
-        self::assertFalse(isset($sorted[4]), 'isset($sorted[4]) is expected to be false');
+        self::assertTrue(isset($sorted[3]), 'isset($sorted[3]) is expected to be true (own null property, like JS own undefined)');
+        self::assertTrue(isset($sorted[4]), 'isset($sorted[4]) is expected to be true (own null property, like JS own undefined)');
     }
 
     // SKIPPED: test/built-ins/Array/prototype/toSorted/ignores-species.js

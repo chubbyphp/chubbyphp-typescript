@@ -46,7 +46,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
                 if (self::isIntAsFloat($argument)) {
                     $argument = (int) $argument;
                 } else {
-                    throw new RangeError(\sprintf(self::INVALID_LENGTH, \sprintf('%.17g', $argument)));
+                    throw new RangeError(\sprintf(self::INVALID_LENGTH, self::numberToString($argument)));
                 }
             }
 
@@ -75,7 +75,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             return $this->internalLength;
         }
 
-        trigger_error('Undefined property: A::$'.$name, E_USER_WARNING);
+        trigger_error('Undefined property: Arr::$'.$name, E_USER_WARNING);
 
         return null;
     }
@@ -114,7 +114,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             return;
         }
 
-        trigger_error('Undefined property: A::$'.$name, E_USER_WARNING);
+        trigger_error('Undefined property: Arr::$'.$name, E_USER_WARNING);
     }
 
     public function __toString(): string
@@ -306,7 +306,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     /**
      * @return self<T>
      */
-    public function copyWithin(int $target, int $start, ?int $end = null): self
+    public function copyWithin(int $target, int $start = 0, ?int $end = null): self
     {
         $len = $this->internalLength;
 
@@ -429,12 +429,9 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
         $len = $this->internalLength;
 
+        // unlike most iteration methods, find() does not skip holes
         for ($i = 0; $i < $len; ++$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            $value = $this->internalArray[$i];
+            $value = $this->internalArray[$i] ?? null;
 
             if ($callback($value, $i, $this)) {
                 return $value;
@@ -453,14 +450,9 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
         $len = $this->internalLength;
 
+        // unlike most iteration methods, findIndex() does not skip holes
         for ($i = 0; $i < $len; ++$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            $value = $this->internalArray[$i];
-
-            if ($callback($value, $i, $this)) {
+            if ($callback($this->internalArray[$i] ?? null, $i, $this)) {
                 return $i;
             }
         }
@@ -477,12 +469,9 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $callback = self::bindCallback($callback, $thisArg);
 
+        // unlike most iteration methods, findLast() does not skip holes
         for ($i = $this->internalLength - 1; 0 <= $i; --$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            $value = $this->internalArray[$i];
+            $value = $this->internalArray[$i] ?? null;
 
             if ($callback($value, $i, $this)) {
                 return $value;
@@ -499,12 +488,9 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $callback = self::bindCallback($callback, $thisArg);
 
+        // unlike most iteration methods, findLastIndex() does not skip holes
         for ($i = $this->internalLength - 1; 0 <= $i; --$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            if ($callback($this->internalArray[$i], $i, $this)) {
+            if ($callback($this->internalArray[$i] ?? null, $i, $this)) {
                 return $i;
             }
         }
@@ -520,7 +506,13 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         /** @var self<T> $result */
         $result = new self();
 
-        foreach ($this->internalArray as $value) {
+        for ($i = 0; $i < $this->internalLength; ++$i) {
+            if (!\array_key_exists($i, $this->internalArray)) {
+                continue;
+            }
+
+            $value = $this->internalArray[$i];
+
             if ($value instanceof self && 0 < $depth) {
                 foreach ($value->flat($depth - 1)->internalArray as $flattenedValue) {
                     $result->push($flattenedValue);
@@ -729,7 +721,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             }
 
             if (!$found) {
-                throw new \TypeError('Reduce of empty array with no initial value ');
+                throw new \TypeError('Reduce of empty array with no initial value');
             }
         }
 
@@ -772,7 +764,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             }
 
             if (!$found) {
-                throw new \TypeError('Reduce of empty array with no initial value ');
+                throw new \TypeError('Reduce of empty array with no initial value');
             }
         }
 
@@ -987,12 +979,17 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
      */
     public function toReversed(): self
     {
-        /** @var self<T> $result */
-        $result = new self($this->internalLength);
+        $len = $this->internalLength;
 
-        foreach ($this->internalArray as $i => $value) {
-            $result->internalArray[$this->internalLength - 1 - $i] = $value;
+        /** @var self<T> $result */
+        $result = new self($len);
+
+        // the result is always dense: holes become explicit nulls
+        for ($i = 0; $i < $len; ++$i) {
+            $result->internalArray[$len - 1 - $i] = $this->internalArray[$i] ?? null;
         }
+
+        ksort($result->internalArray);
 
         return $result;
     }
@@ -1004,10 +1001,19 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
      */
     public function toSorted(?callable $callback = null): self
     {
-        $sorted = self::sortValues($this->internalArray, $callback);
+        $len = $this->internalLength;
+
+        // the result is always dense: holes become explicit nulls and are
+        // sorted to the end together with the other nulls
+        $values = [];
+        for ($i = 0; $i < $len; ++$i) {
+            $values[$i] = $this->internalArray[$i] ?? null;
+        }
+
+        $sorted = self::sortValues($values, $callback);
 
         /** @var self<T> $result */
-        $result = new self($this->internalLength);
+        $result = new self($len);
 
         foreach ($sorted as $i => $value) {
             $result->internalArray[$i] = $value;
@@ -1044,8 +1050,13 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         }
 
         /** @var self<T> $result */
-        $result = new self($this->internalLength);
-        $result->internalArray = $this->internalArray;
+        $result = new self($len);
+
+        // the result is always dense: holes become explicit nulls
+        for ($i = 0; $i < $len; ++$i) {
+            $result->internalArray[$i] = $this->internalArray[$i] ?? null;
+        }
+
         $result->splice($start, $deleteCount, ...$items);
 
         return $result;
@@ -1163,7 +1174,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             null === $value => '',
             \is_bool($value) => $value ? 'true' : 'false',
             \is_int($value) => (string) $value,
-            \is_float($value) => \sprintf('%.17g', $value),
+            \is_float($value) => self::numberToString($value),
             \is_string($value) => $value,
             $value instanceof \BackedEnum => self::mixedToString($value->value),
             $value instanceof \UnitEnum => $value->name,
@@ -1181,6 +1192,69 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         };
     }
 
+    /**
+     * Converts a float to a string following the ECMAScript Number::toString
+     * algorithm (shortest round-trip representation).
+     */
+    private static function numberToString(float $value): string
+    {
+        if (is_nan($value)) {
+            return 'NaN';
+        }
+
+        if (is_infinite($value)) {
+            return INF === $value ? 'Infinity' : '-Infinity';
+        }
+
+        $sign = '';
+
+        if ($value < 0) {
+            $sign = '-';
+            $value = -$value;
+        }
+
+        // find the shortest round-trip representation in scientific notation
+        $repr = \sprintf('%.16e', $value);
+        for ($precision = 0; $precision < 16; ++$precision) {
+            $candidate = \sprintf('%.'.$precision.'e', $value);
+            if ((float) $candidate === $value) {
+                $repr = $candidate;
+
+                break;
+            }
+        }
+
+        [$mantissa, $exponent] = explode('e', $repr);
+
+        $digits = str_replace('.', '', $mantissa);
+
+        // $value === 0.{$digits} * 10 ** $pointPosition
+        $pointPosition = (int) $exponent + 1;
+        $digitCount = \strlen($digits);
+
+        // fixed notation between 1e-6 and 1e21, exponential notation beyond
+        if (-6 < $pointPosition && $pointPosition <= 21) {
+            if ($digitCount <= $pointPosition) {
+                return $sign.$digits.str_repeat('0', $pointPosition - $digitCount);
+            }
+
+            if (0 < $pointPosition) {
+                return $sign.substr($digits, 0, $pointPosition).'.'.substr($digits, $pointPosition);
+            }
+
+            return $sign.'0.'.str_repeat('0', -$pointPosition).$digits;
+        }
+
+        $e = $pointPosition - 1;
+        $exponentPart = 'e'.(0 <= $e ? '+' : '-').abs($e);
+
+        if (1 === $digitCount) {
+            return $sign.$digits.$exponentPart;
+        }
+
+        return $sign.$digits[0].'.'.substr($digits, 1).$exponentPart;
+    }
+
     private static function sameValueZero(mixed $value, mixed $searchElement): bool
     {
         if (self::strictlyEqual($value, $searchElement)) {
@@ -1196,14 +1270,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     private static function strictlyEqual(mixed $value, mixed $searchElement): bool
     {
         if ((\is_int($value) || \is_float($value)) && (\is_int($searchElement) || \is_float($searchElement))) {
-            if (\is_float($value) && is_nan($value)) {
-                return false;
-            }
-
-            if (\is_float($searchElement) && is_nan($searchElement)) {
-                return false;
-            }
-
+            // NAN === NAN is false in PHP too, no special casing needed
             return (float) $value === (float) $searchElement;
         }
 

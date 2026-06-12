@@ -217,6 +217,8 @@ final class DocumentationExamplesTest extends TestCase
         self::assertSame('Wind,Rain,Fire', $arr->join());
         self::assertSame('Wind - Rain - Fire', $arr->join(' - '));
         self::assertSame('Wind, Rain, Fire', $arr->join(', '));
+
+        self::assertSame('0.1,1,Infinity', (new Arr(0.1, 1.0, INF))->join());
     }
 
     public function testDocKeysExample(): void

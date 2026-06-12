@@ -26,9 +26,8 @@ final class Test262ArrayPrototypeToReversedTest extends TestCase
      * test/built-ins/Array/prototype/toReversed/holes-not-preserved.js.
      *
      * Adapted (the Array.prototype[3] = 3 inheritance part is JS-only):
-     * JS toReversed() does NOT preserve holes - they become own `undefined`
-     * properties. Arr::toReversed() deviates and preserves holes as holes,
-     * so they read back as null but offsetExists() reports them as missing.
+     * toReversed() does NOT preserve holes - they become own `undefined`
+     * (here: null) properties, so the result is always dense.
      */
     public function testHolesNotPreserved(): void
     {
@@ -40,10 +39,8 @@ final class Test262ArrayPrototypeToReversedTest extends TestCase
         $reversed = $arr->toReversed();
         self::assertSame(5, $reversed->length, 'The value of $reversed->length is expected to be 5');
         self::assertSame([4, null, 2, null, 0], $reversed->toArray(), '$reversed is expected to be [4, null, 2, null, 0]');
-        // Deviation from JS: reversed.hasOwnProperty(1) / hasOwnProperty(3)
-        // would be true in JS; Arr keeps the holes.
-        self::assertFalse($reversed->offsetExists(1), '$reversed->offsetExists(1) is expected to be false (JS: own undefined property)');
-        self::assertFalse($reversed->offsetExists(3), '$reversed->offsetExists(3) is expected to be false (JS: own undefined property)');
+        self::assertTrue($reversed->offsetExists(1), '$reversed->offsetExists(1) is expected to be true (own null property, like JS own undefined)');
+        self::assertTrue($reversed->offsetExists(3), '$reversed->offsetExists(3) is expected to be true (own null property, like JS own undefined)');
     }
 
     // SKIPPED: test/built-ins/Array/prototype/toReversed/ignores-species.js

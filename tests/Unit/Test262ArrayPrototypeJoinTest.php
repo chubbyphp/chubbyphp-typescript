@@ -143,10 +143,8 @@ final class Test262ArrayPrototypeJoinTest extends TestCase
         $x = new Arr(null, null, null);
         self::assertSame(',,', $x->join(), '$x = new Arr(null,null,null); $x->join() is expected to be ",,"');
 
-        // Arr deviation: floats render via sprintf('%.17g'), so INF renders as
-        // "INF" instead of "Infinity".
         $x = new Arr(INF, INF, INF);
-        self::assertSame('INF,INF,INF', $x->join(), '$x = new Arr(INF,INF,INF); $x->join() is expected to be "INF,INF,INF"');
+        self::assertSame('Infinity,Infinity,Infinity', $x->join(), '$x = new Arr(INF,INF,INF); $x->join() is expected to be "Infinity,Infinity,Infinity"');
 
         $x = new Arr(NAN, NAN, NAN);
         self::assertSame('NaN,NaN,NaN', $x->join(), '$x = new Arr(NAN,NAN,NAN); $x->join() is expected to be "NaN,NaN,NaN"');

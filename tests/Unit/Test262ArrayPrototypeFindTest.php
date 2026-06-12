@@ -33,11 +33,11 @@ final class Test262ArrayPrototypeFindTest extends TestCase
             return false;
         });
 
-        // Arr deviation: JS visits the now-missing index 2 and passes undefined,
-        // Arr skips missing indexes entirely, so the predicate is called twice.
-        self::assertSame(2, $results->length, 'predicate called twice');
+        // find() visits the now-missing index 2 and passes undefined (here: null)
+        self::assertSame(3, $results->length, 'predicate called three times');
         self::assertSame('Shoes', $results[0], 'The value of $results[0] is expected to be "Shoes"');
         self::assertSame('Bike', $results[1], 'The value of $results[1] is expected to be "Bike"');
+        self::assertNull($results[2], 'The value of $results[2] is expected to be null');
 
         $results = new Arr();
         $arr = new Arr('Skateboard', 'Barefoot');
@@ -147,9 +147,9 @@ final class Test262ArrayPrototypeFindTest extends TestCase
             return false;
         });
 
-        // Arr deviation: JS visits holes and passes undefined (4 calls),
-        // Arr skips holes via array_key_exists, so only indexes 0 and 3 are visited.
-        self::assertSame(2, $called, 'The value of $called is expected to be 2');
+        // find() visits holes and passes undefined (here: null), so all 4
+        // indexes are visited
+        self::assertSame(4, $called, 'The value of $called is expected to be 4');
     }
 
     /**
