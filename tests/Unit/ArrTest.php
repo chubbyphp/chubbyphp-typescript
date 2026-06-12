@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\Typescript\Unit;
 
+use Chubbyphp\Tests\Typescript\Stub\Color;
+use Chubbyphp\Tests\Typescript\Stub\Direction;
 use Chubbyphp\Tests\Typescript\Stub\Dummy;
 use Chubbyphp\Typescript\Arr;
 use Chubbyphp\Typescript\NumberFormatError;
@@ -141,6 +143,35 @@ final class ArrTest extends TestCase
             } catch (RangeError $exception) {
                 self::assertSame('Invalid array length: '.$expectedString, $exception->getMessage());
             }
+        }
+    }
+
+    public function testArrayConstructorHandlesPhpIntBoundaryFloatLengths(): void
+    {
+        // (float) PHP_INT_MIN is exactly -2**63 and castable to int: the
+        // RangeError message renders the int, not the float
+        try {
+            new Arr((float) PHP_INT_MIN);
+
+            throw new \Exception('Should not be reached');
+        } catch (RangeError $exception) {
+            self::assertSame('Invalid array length: -9223372036854775808', $exception->getMessage());
+        }
+
+        // (float) PHP_INT_MAX rounds up to 2**63, which must NOT be cast to
+        // int (that would trigger a PHP coercion warning)
+        set_error_handler(static function (int $severity, string $message): never {
+            throw new \ErrorException($message, 0, $severity);
+        });
+
+        try {
+            new Arr(9223372036854775808.0);
+
+            throw new \Exception('Should not be reached');
+        } catch (RangeError $exception) {
+            self::assertSame('Invalid array length: 9223372036854776000', $exception->getMessage());
+        } finally {
+            restore_error_handler();
         }
     }
 
@@ -288,6 +319,15 @@ final class ArrTest extends TestCase
 
         $array = new Arr(1, 2, 3);
         $array->length = 1.5;
+    }
+
+    public function testArraySetLengthThrowsRangeErrorForNonNumericString(): void
+    {
+        $this->expectException(RangeError::class);
+        $this->expectExceptionMessage('Length needs to be an integer');
+
+        $array = new Arr(1, 2, 3);
+        $array->length = 'abc';
     }
 
     public function testArraySetLengthThrowsRangeErrorForTooLarge(): void
@@ -1177,6 +1217,11 @@ final class ArrTest extends TestCase
 
         self::assertSame([8, 0, 0], iterator_to_array($array->values()));
         self::assertFalse(isset($array[-1]));
+
+        // a stray internal index -1 would surface as index 3 after reverse()
+        $array->reverse();
+        self::assertFalse(isset($array[3]));
+        self::assertSame(3, $array->length);
     }
 
     // Array.prototype.filter
@@ -2228,6 +2273,12 @@ final class ArrTest extends TestCase
         self::assertSame('1,2,object', (new Arr([1, 2], new \stdClass()))->join());
     }
 
+    public function testJoinStringifiesEnums(): void
+    {
+        // backed enums render their value, pure enums their case name
+        self::assertSame('red,North', (new Arr(Color::Red, Direction::North))->join());
+    }
+
     public function testJoinStringifiesResources(): void
     {
         $resource = fopen('php://memory', 'r');
@@ -2239,6 +2290,16 @@ final class ArrTest extends TestCase
                 fclose($resource);
             }
         }
+    }
+
+    public function testJoinStringifiesClosedResourcesAsUnknown(): void
+    {
+        $resource = fopen('php://memory', 'r');
+        self::assertIsResource($resource);
+        fclose($resource);
+
+        // a closed resource is neither a resource nor an object to PHP
+        self::assertSame('unknown', (new Arr($resource))->join());
     }
 
     public function testJoinReindexesTraversablesInsteadOfPreservingDuplicateKeys(): void
@@ -2777,6 +2838,11 @@ final class ArrTest extends TestCase
         self::assertSame('a', $array->shift());
         self::assertFalse(isset($array[-1]));
         self::assertSame(['b'], iterator_to_array($array->values()));
+
+        // a stray internal index -1 would surface as index 1 after reverse()
+        $array->reverse();
+        self::assertFalse(isset($array[1]));
+        self::assertSame(1, $array->length);
     }
 
     // Array.prototype.slice
@@ -2968,6 +3034,19 @@ final class ArrTest extends TestCase
         self::assertSame('BDEAC', implode('', array_map(static fn (array $item): string => $item['name'], iterator_to_array($array->values()))));
     }
 
+    public function testSortStabilityFollowsIndexOrderNotAssignmentOrder(): void
+    {
+        // JS reads elements in index order, so a stable sort keeps the
+        // index order for equal elements even if they were assigned out of order
+        $array = new Arr();
+        $array[1] = 'second';
+        $array[0] = 'first';
+
+        $array->sort(static fn (): int => 0);
+
+        self::assertSame(['first', 'second'], $array->toArray());
+    }
+
     public function testSortDoesNotSwallowExceptionsFromComparator(): void
     {
         $this->expectException(\RuntimeException::class);
@@ -3129,6 +3208,11 @@ final class ArrTest extends TestCase
         self::assertFalse(isset($removed[1]));
         self::assertNull($removed[-1]);
         self::assertNull($removed[1]);
+
+        // a stray internal index -1 would surface as index 1 after reverse()
+        $removed->reverse();
+        self::assertFalse(isset($removed[1]));
+        self::assertSame(1, $removed->length);
     }
 
     public function testSpliceWithSparseArrayKeepsInternalIterationInIndexOrder(): void
@@ -3224,6 +3308,12 @@ final class ArrTest extends TestCase
         self::assertSame('object', (new Arr(new \stdClass()))->toLocaleString());
     }
 
+    public function testToLocaleStringStringifiesEnums(): void
+    {
+        // backed enums render their value, pure enums their case name
+        self::assertSame('red,North', (new Arr(Color::Red, Direction::North))->toLocaleString());
+    }
+
     public function testToLocaleStringStringifiesResources(): void
     {
         $resource = fopen('php://memory', 'r');
@@ -3235,6 +3325,16 @@ final class ArrTest extends TestCase
                 fclose($resource);
             }
         }
+    }
+
+    public function testToLocaleStringStringifiesClosedResourcesAsUnknown(): void
+    {
+        $resource = fopen('php://memory', 'r');
+        self::assertIsResource($resource);
+        fclose($resource);
+
+        // a closed resource is neither a resource nor an object to PHP
+        self::assertSame('unknown', (new Arr($resource))->toLocaleString());
     }
 
     public function testToLocaleStringStringifiesNestedIterables(): void
@@ -3357,6 +3457,19 @@ final class ArrTest extends TestCase
         self::assertSame(['value'], iterator_to_array($oneReversed->values()));
     }
 
+    public function testToReversedDoesNotCreateIndexesOutsideLength(): void
+    {
+        $result = (new Arr('x', 'y'))->toReversed();
+
+        self::assertSame(['y', 'x'], $result->toArray());
+        self::assertSame(2, $result->length);
+        self::assertFalse(isset($result[2]));
+
+        // a stray internal index -1 would surface as index 2 after reverse()
+        $result->reverse();
+        self::assertFalse(isset($result[2]));
+    }
+
     // Array.prototype.toSorted
 
     public function testToSortedDoesNotMutateReceiver(): void
@@ -3403,6 +3516,19 @@ final class ArrTest extends TestCase
         self::assertSame([], iterator_to_array($zeroSorted->values()));
         self::assertNotSame($one, $oneSorted);
         self::assertSame(['value'], iterator_to_array($oneSorted->values()));
+    }
+
+    public function testToSortedDoesNotCreateIndexesOutsideLength(): void
+    {
+        $result = (new Arr(2, 1))->toSorted();
+
+        self::assertSame([1, 2], $result->toArray());
+        self::assertSame(2, $result->length);
+        self::assertFalse(isset($result[2]));
+
+        // a stray internal index -1 would surface as index 2 after reverse()
+        $result->reverse();
+        self::assertFalse(isset($result[2]));
     }
 
     public function testToSortedStopsAfterComparatorError(): void
@@ -3564,6 +3690,19 @@ final class ArrTest extends TestCase
         self::assertSame([0, 1, 2, 3], iterator_to_array($array->values()));
     }
 
+    public function testToSplicedDoesNotCreateIndexesOutsideLength(): void
+    {
+        $result = (new Arr('a'))->toSpliced(0, 0);
+
+        self::assertSame(['a'], $result->toArray());
+        self::assertSame(1, $result->length);
+        self::assertFalse(isset($result[1]));
+
+        // a stray internal index -1 would surface as index 1 after reverse()
+        $result->reverse();
+        self::assertFalse(isset($result[1]));
+    }
+
     // Array.prototype.with
 
     public function testWithReplacesElementAtPositiveIndex(): void
@@ -3610,6 +3749,19 @@ final class ArrTest extends TestCase
         $result = $array->with(3, 'filled');
 
         self::assertSame('filled', $result->at(3));
+    }
+
+    public function testWithDoesNotCreateIndexesOutsideLength(): void
+    {
+        $result = (new Arr('a', 'b'))->with(0, 'z');
+
+        self::assertSame(['z', 'b'], $result->toArray());
+        self::assertSame(2, $result->length);
+        self::assertFalse(isset($result[2]));
+
+        // a stray internal index -1 would surface as index 2 after reverse()
+        $result->reverse();
+        self::assertFalse(isset($result[2]));
     }
 
     // Array.prototype.toString

@@ -31,12 +31,12 @@ node -e 'console.log([1, , 3].findIndex(x => x === undefined))'  # prints 1
 | `composer test:cs` | php-cs-fixer dry-run (covers `src/` AND `tests/`) |
 | `composer test:unit` | PHPUnit Unit suite with coverage |
 | `composer test:integration` | PHPUnit Integration suite |
-| `composer test:infection` | Mutation testing, fails below 90% MSI (needs `test:unit` coverage first) |
+| `composer test:infection` | Mutation testing, fails below 95% MSI (needs `test:unit` coverage first) |
 | `composer fix:cs` | Auto-fix code style |
 
 Quality gates to preserve:
 - 100% line and method coverage of `src/Arr.php` (check the coverage summary `composer test:unit` prints).
-- Mutation score ≥ 90%. Kill mutants with **exact** assertions: assert exact strings/values,
+- Mutation score ≥ 95%. Kill mutants with **exact** assertions: assert exact strings/values,
   test boundary values (`0`, `-1`, `length`, `length - 1`, `21`, `-6`), and test negative numbers,
   empty arrays, and sparse arrays for every new branch.
 
@@ -94,6 +94,6 @@ Quality gates to preserve:
 ## Done Checklist
 
 1. JS behavior verified against `node` (not assumed).
-2. `composer test` exits 0 (includes 90% MSI and code style).
+2. `composer test` exits 0 (includes 95% MSI and code style).
 3. Coverage still 100% for `src/Arr.php`.
 4. Docs + integration examples updated if public behavior changed.

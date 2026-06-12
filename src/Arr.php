@@ -155,11 +155,9 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         if (\is_int($offset)) {
             $this->internalArray[$offset] = $value;
             $this->internalLength = max($this->internalLength, $offset + 1);
-
-            return;
+        } else {
+            $this->internalProperties[$offset] = $value;
         }
-
-        $this->internalProperties[$offset] = $value;
     }
 
     public function offsetUnset(mixed $offset): void
@@ -168,11 +166,9 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
         if (\is_int($offset)) {
             unset($this->internalArray[$offset]);
-
-            return;
+        } else {
+            unset($this->internalProperties[$offset]);
         }
-
-        unset($this->internalProperties[$offset]);
     }
 
     /**
@@ -317,22 +313,20 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
         $count = min($final - $from, $len - $to);
 
-        if (0 < $count) {
-            $copied = [];
-            for ($i = 0; $i < $count; ++$i) {
-                $fromKey = $from + $i;
-                if (\array_key_exists($fromKey, $this->internalArray)) {
-                    $copied[$i] = $this->internalArray[$fromKey];
-                }
+        $copied = [];
+        for ($i = 0; $i < $count; ++$i) {
+            $fromKey = $from + $i;
+            if (\array_key_exists($fromKey, $this->internalArray)) {
+                $copied[$i] = $this->internalArray[$fromKey];
             }
+        }
 
-            for ($i = 0; $i < $count; ++$i) {
-                $toKey = $to + $i;
-                if (\array_key_exists($i, $copied)) {
-                    $this->internalArray[$toKey] = $copied[$i];
-                } else {
-                    unset($this->internalArray[$toKey]);
-                }
+        for ($i = 0; $i < $count; ++$i) {
+            $toKey = $to + $i;
+            if (\array_key_exists($i, $copied)) {
+                $this->internalArray[$toKey] = $copied[$i];
+            } else {
+                unset($this->internalArray[$toKey]);
             }
         }
 
@@ -615,10 +609,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $len = $this->internalLength;
 
-        if (0 === $len) {
-            return -1;
-        }
-
+        // for an empty array $i ends up at -1, so the loop is skipped
         $n = $fromIndex ?? $len - 1;
         $i = $n >= 0 ? min($n, $len - 1) : $len + $n;
 
@@ -782,12 +773,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
      */
     public function reverse(): static
     {
+        // key order of internalArray is irrelevant; all reads are index-based
         $reversed = [];
         foreach ($this->internalArray as $i => $value) {
             $reversed[$this->internalLength - 1 - $i] = $value;
         }
-
-        ksort($reversed);
 
         /** @var array<int, null|T> $reversed */
         $this->internalArray = $reversed;
@@ -833,20 +823,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             $start = max(0, $len + $start);
         }
 
-        if ($start > $len) {
-            $start = $len;
-        }
-
-        if ($end > $len) {
-            $end = $len;
-        }
-
-        if ($start >= $end) {
-            return new self();
-        }
+        $start = min($start, $len);
+        $end = min($end, $len);
 
         /** @var self<T> $new */
-        $new = new self($end - $start);
+        $new = new self(max(0, $end - $start));
 
         for ($i = $start; $i < $end; ++$i) {
             if (\array_key_exists($i, $this->internalArray)) {
@@ -888,7 +869,16 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
      */
     public function sort(?callable $callback = null): static
     {
-        $this->internalArray = self::sortValues($this->internalArray, $callback);
+        // collect values in index order (not internal key order) so the
+        // stable sort preserves index order for equal elements, like JS
+        $values = [];
+        for ($i = 0; $i < $this->internalLength; ++$i) {
+            if (\array_key_exists($i, $this->internalArray)) {
+                $values[] = $this->internalArray[$i];
+            }
+        }
+
+        $this->internalArray = self::sortValues($values, $callback);
 
         return $this;
     }
@@ -907,19 +897,12 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             $start = max(0, $len + $start);
         }
 
-        if ($start > $len) {
-            $start = $len;
-        }
+        $start = min($start, $len);
 
-        if (2 > $numArgs) {
-            $deleteCount = $len - $start;
-        } elseif (0 > $deleteCount) {
-            $deleteCount = 0;
-        } elseif (null === $deleteCount) {
-            $deleteCount = 0;
-        }
-
-        $deleteCount = min($deleteCount, $len - $start);
+        $deleteCount = match (true) {
+            2 > $numArgs => $len - $start,
+            default => min(max(0, $deleteCount ?? 0), $len - $start),
+        };
 
         /** @var self<T> $new */
         $new = new self($deleteCount);
@@ -946,8 +929,6 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         foreach ($items as $i => $item) {
             $newData[$start + $i] = $item;
         }
-
-        ksort($newData);
 
         /** @var array<int, null|T> $newData */
         $this->internalArray = $newData;
@@ -989,8 +970,6 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             $result->internalArray[$len - 1 - $i] = $this->internalArray[$i] ?? null;
         }
 
-        ksort($result->internalArray);
-
         return $result;
     }
 
@@ -1031,24 +1010,6 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $len = $this->internalLength;
 
-        if ($start < 0) {
-            $start = max(0, $len + $start);
-        }
-
-        if ($start > $len) {
-            $start = $len;
-        }
-
-        if (2 > \func_num_args()) {
-            $deleteCount = $len - $start;
-        } else {
-            if (null === $deleteCount) {
-                $deleteCount = 0;
-            }
-
-            $deleteCount = max(0, min($deleteCount, $len - $start));
-        }
-
         /** @var self<T> $result */
         $result = new self($len);
 
@@ -1057,7 +1018,12 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
             $result->internalArray[$i] = $this->internalArray[$i] ?? null;
         }
 
-        $result->splice($start, $deleteCount, ...$items);
+        // splice() applies the same start/deleteCount normalization
+        if (2 > \func_num_args()) {
+            $result->splice($start);
+        } else {
+            $result->splice($start, $deleteCount, ...$items);
+        }
 
         return $result;
     }
@@ -1434,20 +1400,17 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
     private static function normalizeOffset(mixed $offset): int|string
     {
-        if (\is_string($offset)) {
-            if (self::isFloatAsString($offset)) {
-                $offset = (float) $offset;
-            } elseif (self::isIntAsString($offset)) {
-                $offset = (int) $offset;
-            }
+        // all in-range int strings round-trip through float; non-round-trip
+        // int strings are far out of range and stay string properties either way
+        if (\is_string($offset) && self::isFloatAsString($offset)) {
+            $offset = (float) $offset;
         }
 
         if (\is_float($offset)) {
             if (self::isIntAsFloat($offset)) {
                 $offset = (int) $offset;
-            } elseif (is_infinite($offset)) {
-                return $offset > 0 ? 'INF' : '-INF';
             } elseif (is_nan($offset)) {
+                // (string) NAN would trigger a coercion warning below
                 return 'NAN';
             }
         }
@@ -1487,9 +1450,11 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
     private static function isIntAsFloat(float $float): bool
     {
-        return is_finite($float)
-            && $float >= PHP_INT_MIN
-            && $float <= PHP_INT_MAX
+        // (float) PHP_INT_MAX rounds up to 2**63, which is NOT castable to int;
+        // the strict < keeps the (int) cast below warning-free. NAN/INF fail both
+        // comparisons, -INF fails the first one.
+        return $float >= PHP_INT_MIN
+            && $float < PHP_INT_MAX
             && (float) (int) $float === $float;
     }
 
