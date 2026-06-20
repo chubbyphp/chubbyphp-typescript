@@ -517,6 +517,14 @@ final class MapTest extends TestCase
         self::assertSame('negative zero', $map->get(0));
     }
 
+    public function testMapNormalizesNegativeZeroKeyToPositiveZero(): void
+    {
+        $map = new Map();
+        $map->set(-0.0, 'zero');
+
+        self::assertSame([0.0], iterator_to_array($map->keys()));
+    }
+
     public function testMapTreatsIntAndFloatEquivalentlyForNumericKeys(): void
     {
         $map = new Map();
@@ -702,5 +710,26 @@ final class MapTest extends TestCase
         $copy[0][1] = 99;
 
         self::assertSame(1, $map->get('a'));
+    }
+
+    // defensive internal state
+
+    public function testMapEntryAtThrowsForUnexpectedlyDeletedEntry(): void
+    {
+        $map = new Map([['a', 1]]);
+
+        $entriesProperty = new \ReflectionProperty($map, 'entries');
+
+        /** @var list<null|array{0: string, 1: int}> $entries */
+        $entries = $entriesProperty->getValue($map);
+        $entries[0] = null;
+        $entriesProperty->setValue($map, $entries);
+
+        $method = new \ReflectionMethod($map, 'entryAt');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Map entry unexpectedly deleted');
+
+        $method->invoke($map, 0);
     }
 }

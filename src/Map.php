@@ -187,8 +187,7 @@ final class Map implements \Countable, \IteratorAggregate
             return null;
         }
 
-        $entry = $this->entries[$index];
-        \assert(null !== $entry);
+        $entry = $this->entryAt($index);
 
         return $entry[1];
     }
@@ -201,8 +200,7 @@ final class Map implements \Countable, \IteratorAggregate
         $index = $this->findEntryIndex($key);
 
         if (null !== $index) {
-            $entry = $this->entries[$index];
-            \assert(null !== $entry);
+            $entry = $this->entryAt($index);
 
             return $entry[1];
         }
@@ -222,8 +220,7 @@ final class Map implements \Countable, \IteratorAggregate
         $index = $this->findEntryIndex($key);
 
         if (null !== $index) {
-            $entry = $this->entries[$index];
-            \assert(null !== $entry);
+            $entry = $this->entryAt($index);
 
             return $entry[1];
         }
@@ -258,12 +255,17 @@ final class Map implements \Countable, \IteratorAggregate
      */
     public function set(mixed $key, mixed $value): self
     {
+        // ECMAScript canonicalizes -0 to +0 for Map keys.
+        if (\is_float($key) && !is_nan($key) && '-0' === (string) $key) {
+            $key = 0.0;
+        }
+
         $index = $this->findEntryIndex($key);
 
         if (null !== $index) {
-            $entry = $this->entries[$index];
-            \assert(null !== $entry);
+            $entry = $this->entryAt($index);
             $entry[1] = $value;
+            // @phpstan-ignore-next-line (preserving list shape; index was returned by findEntryIndex)
             $this->entries[$index] = $entry;
         } else {
             /** @var array{0: K, 1: V} $entry */
@@ -313,6 +315,20 @@ final class Map implements \Countable, \IteratorAggregate
         }
 
         return null;
+    }
+
+    /**
+     * @return array{0: K, 1: V}
+     */
+    private function entryAt(int $index): array
+    {
+        $entry = $this->entries[$index];
+
+        if (null === $entry) {
+            throw new \RuntimeException('Map entry unexpectedly deleted');
+        }
+
+        return $entry;
     }
 
     private static function sameValueZero(mixed $value, mixed $searchElement): bool
