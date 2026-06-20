@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chubbyphp\Tests\Typescript\Integration;
 
 use Chubbyphp\Typescript\Arr;
+use Chubbyphp\Typescript\Map;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -448,6 +449,166 @@ final class DocumentationExamplesTest extends TestCase
         ;
 
         self::assertSame([25, 64, 81], $result->toArray());
+    }
+
+    public function testDocMapConstructorExample(): void
+    {
+        self::assertSame(0, (new Map())->size);
+        self::assertSame(2, (new Map([['a', 1], ['b', 2]]))->size);
+        self::assertSame(0, (new Map(null))->size);
+    }
+
+    public function testDocMapSizeExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        self::assertSame(2, $map->size);
+
+        $map->set('c', 3);
+        self::assertSame(3, $map->size);
+
+        $map->delete('a');
+        self::assertSame(2, $map->size);
+    }
+
+    public function testDocMapClearExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+        $map->clear();
+
+        self::assertSame(0, $map->size);
+    }
+
+    public function testDocMapDeleteExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        self::assertTrue($map->delete('a'));
+        self::assertFalse($map->delete('c'));
+        self::assertSame(1, $map->size);
+    }
+
+    public function testDocMapEntriesExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        $entries = [];
+        foreach ($map->entries() as $entry) {
+            $entries[] = $entry;
+        }
+
+        self::assertSame([['a', 1], ['b', 2]], $entries);
+    }
+
+    public function testDocMapForEachExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        $seen = [];
+        $map->forEach(static function (int $value, string $key, Map $map) use (&$seen): void {
+            $seen[] = [$key, $value];
+        });
+
+        self::assertSame([['a', 1], ['b', 2]], $seen);
+    }
+
+    public function testDocMapGetExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        self::assertSame(1, $map->get('a'));
+        self::assertNull($map->get('c'));
+    }
+
+    public function testDocMapHasExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        self::assertTrue($map->has('a'));
+        self::assertFalse($map->has('c'));
+    }
+
+    public function testDocMapHasSameValueZeroExample(): void
+    {
+        $map = new Map();
+        $map->set(NAN, 'found');
+
+        self::assertTrue($map->has(NAN));
+
+        $map->set(-0.0, 'zero');
+
+        self::assertTrue($map->has(0));
+    }
+
+    public function testDocMapKeysExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        self::assertSame(['a', 'b'], iterator_to_array($map->keys()));
+    }
+
+    public function testDocMapSetExample(): void
+    {
+        $map = new Map();
+        $map->set('a', 1)->set('b', 2);
+        $map->set('a', 3);
+
+        self::assertSame(2, $map->size);
+        self::assertSame([['a', 3], ['b', 2]], $map->toArray());
+    }
+
+    public function testDocMapValuesExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        self::assertSame([1, 2], iterator_to_array($map->values()));
+    }
+
+    public function testDocMapDefaultIteratorExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        $entries = [];
+        foreach ($map as $entry) {
+            $entries[] = $entry;
+        }
+
+        self::assertSame([['a', 1], ['b', 2]], $entries);
+    }
+
+    public function testDocMapToArrayExample(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        self::assertSame([['a', 1], ['b', 2]], $map->toArray());
+    }
+
+    public function testDocMapThisArgSupportExample(): void
+    {
+        $map = new Map([['a', 1]]);
+        $context = new class {
+            public int $multiplier = 10;
+        };
+
+        $map->forEach(
+            function (int $value, string $key, Map $map): void {
+                $map->set($key, $value * $this->multiplier);
+            },
+            $context,
+        );
+
+        self::assertSame([['a', 10]], $map->toArray());
+    }
+
+    public function testDocMapChainingExample(): void
+    {
+        $map = (new Map())
+            ->set('a', 1)
+            ->set('b', 2)
+            ->set('a', 3)
+        ;
+
+        self::assertSame([['a', 3], ['b', 2]], $map->toArray());
     }
 
     /**

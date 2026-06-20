@@ -22,7 +22,7 @@
 
 ## Description
 
-A PHP implementation of JavaScript's `Array` API with TypeScript-style generics and Test262-inspired coverage.
+A PHP implementation of JavaScript's `Array` and `Map` APIs with TypeScript-style generics and Test262-inspired coverage.
 
 ## Requirements
 
@@ -54,6 +54,24 @@ $arr->push(10);
 
 $arr = Arr::from([1, 2, 3, 4, 5], static fn (int $v): int => $v * 2);
 // iterator_to_array($arr->values()) => [2, 4, 6, 8, 10]
+```
+
+### Map
+
+A PHP implementation of the JavaScript `Map` class with `SameValueZero` key equality and insertion-order iteration. See the [full documentation](doc/Map.md) for API reference and examples.
+
+```php
+use Chubbyphp\Typescript\Map;
+
+$map = new Map([
+    ['a', 1],
+    ['b', 2],
+]);
+$map->set('c', 3);
+$map->delete('b');
+// $map->toArray() => [['a', 1], ['c', 3]]
+
+$map->forEach(static fn (int $v, string $k) => print($k.':'.$v));
 ```
 
 ## Copyright

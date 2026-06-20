@@ -1,6 +1,6 @@
 {
     "name": "chubbyphp/chubbyphp-typescript",
-    "description": "Typescript classes ported to PHP",
+    "description": "PHP port of JavaScript's Array and Map APIs with TypeScript-style generics",
     "keywords": [
         "chubbyphp",
         "array",
