@@ -17,8 +17,10 @@ use PHPUnit\Framework\TestCase;
 final class Test262ArrayPrototypeIncludesTest extends TestCase
 {
     // SKIPPED: test/built-ins/Array/prototype/includes/call-with-boolean.js
+    // Reason: Infinity/-Infinity are not representable; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/coerced-searchelement-fromindex-resize.js
+    // Reason: Infinity/-Infinity are not representable; Arr::includes() $fromIndex is typed int
 
     /**
      * test/built-ins/Array/prototype/includes/fromIndex-equal-or-greater-length-returns-false.js.
@@ -46,6 +48,7 @@ final class Test262ArrayPrototypeIncludesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/includes/get-prop.js
+    // Reason: array-like length coercion via ToLength; not applicable to Arr
 
     // SKIPPED: test/built-ins/Array/prototype/includes/length-boundaries.js
     // Reason: array-like length coercion via ToLength; not applicable to Arr
@@ -63,8 +66,10 @@ final class Test262ArrayPrototypeIncludesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/includes/length.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/name.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     /**
      * test/built-ins/Array/prototype/includes/no-arg.js.
@@ -76,8 +81,10 @@ final class Test262ArrayPrototypeIncludesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/includes/not-a-constructor.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/prop-desc.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     /**
      * test/built-ins/Array/prototype/includes/resizable-buffer-special-float-values.js.
@@ -93,18 +100,25 @@ final class Test262ArrayPrototypeIncludesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/includes/resizable-buffer.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/return-abrupt-get-length.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/return-abrupt-get-prop.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/return-abrupt-tointeger-fromindex-symbol.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/return-abrupt-tointeger-fromindex.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/return-abrupt-tonumber-length-symbol.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/return-abrupt-tonumber-length.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     /**
      * test/built-ins/Array/prototype/includes/samevaluezero.js.
@@ -210,6 +224,7 @@ final class Test262ArrayPrototypeIncludesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/includes/this-is-not-object.js
+    // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/includes/tointeger-fromindex.js
     // Reason: fromIndex coercion from string/bool/NaN/null/object; Arr::includes() $fromIndex is typed int
@@ -252,4 +267,5 @@ final class Test262ArrayPrototypeIncludesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/includes/values-are-not-cached.js
+    // Reason: array-like length coercion via ToLength; not applicable to Arr
 }

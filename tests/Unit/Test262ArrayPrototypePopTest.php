@@ -97,12 +97,16 @@ final class Test262ArrayPrototypePopTest extends TestCase
     // Reason: array-like this value with length near 2^53-1
 
     // SKIPPED: test/built-ins/Array/prototype/pop/length.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/pop/name.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/pop/not-a-constructor.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/pop/prop-desc.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/pop/set-length-array-is-frozen.js
     // Reason: Object.freeze and accessor on Array.prototype

@@ -149,15 +149,19 @@ final class Test262ArrayPrototypeToSplicedTest extends TestCase
     // Reason: array-like objects with length coercion
 
     // SKIPPED: test/built-ins/Array/prototype/toSpliced/length.js
+    // Reason: accessor properties on indexes via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/toSpliced/mutate-while-iterating.js
     // Reason: accessor properties on indexes via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/toSpliced/name.js
+    // Reason: start given as -Infinity; Arr::toSpliced() start is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/toSpliced/not-a-constructor.js
+    // Reason: start given as -Infinity; Arr::toSpliced() start is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/toSpliced/property-descriptor.js
+    // Reason: start given as -Infinity; Arr::toSpliced() start is typed int
 
     /**
      * test/built-ins/Array/prototype/toSpliced/start-and-deleteCount-missing.js.

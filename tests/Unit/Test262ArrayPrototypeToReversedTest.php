@@ -74,12 +74,16 @@ final class Test262ArrayPrototypeToReversedTest extends TestCase
     // Reason: array-like this value with length coercion via valueOf
 
     // SKIPPED: test/built-ins/Array/prototype/toReversed/length.js
+    // Reason: toReversed applied to a boolean primitive this value
 
     // SKIPPED: test/built-ins/Array/prototype/toReversed/name.js
+    // Reason: toReversed applied to a boolean primitive this value
 
     // SKIPPED: test/built-ins/Array/prototype/toReversed/not-a-constructor.js
+    // Reason: toReversed applied to a boolean primitive this value
 
     // SKIPPED: test/built-ins/Array/prototype/toReversed/property-descriptor.js
+    // Reason: toReversed applied to a boolean primitive this value
 
     // SKIPPED: test/built-ins/Array/prototype/toReversed/this-value-boolean.js
     // Reason: toReversed applied to a boolean primitive this value

@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 final class Test262ArrayPrototypeWithTest extends TestCase
 {
     // SKIPPED: test/built-ins/Array/prototype/with/frozen-this-value.js
+    // Reason: index coercion of float/string/NaN; Arr::with() is typed int
 
     /**
      * test/built-ins/Array/prototype/with/holes-not-preserved.js.
@@ -40,6 +41,7 @@ final class Test262ArrayPrototypeWithTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/with/ignores-species.js
+    // Reason: index coercion of float/string/NaN; Arr::with() is typed int
 
     /**
      * test/built-ins/Array/prototype/with/immutable.js.
@@ -115,27 +117,38 @@ final class Test262ArrayPrototypeWithTest extends TestCase
     // Reason: index coercion via valueOf; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/length-decreased-while-iterating.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/length-exceeding-array-length-limit.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/length-increased-while-iterating.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/length-tolength.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/length.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/name.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/negative-fractional-index-truncated-to-zero.js
     // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/no-get-replaced-index.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/not-a-constructor.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/property-descriptor.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/this-value-boolean.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/with/this-value-nullish.js
+    // Reason: fractional index (-0.5) truncation; Arr::with() is typed int
 }

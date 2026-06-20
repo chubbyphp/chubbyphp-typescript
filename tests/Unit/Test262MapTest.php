@@ -205,6 +205,7 @@ final class Test262MapTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Map/length.js
+    // Reason: length/name/prop-desc descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/name.js
     // Reason: length/name/prop-desc descriptor tests are not portable
 
@@ -293,16 +294,21 @@ final class Test262MapTest extends TestCase
     // Reason: PHP has no equivalent of JavaScript's new.target
 
     // SKIPPED: test/built-ins/Map/properties-of-map-instances.js
+    // Reason: property descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/properties-of-the-map-prototype-object.js
     // Reason: property descriptor tests are not portable
 
     // SKIPPED: test/built-ins/Map/proto-from-ctor-realm.js
+    // Reason: realm and intrinsic prototype tests are not portable
     // SKIPPED: test/built-ins/Map/prototype-of-map.js
     // Reason: realm and intrinsic prototype tests are not portable
 
     // SKIPPED: test/built-ins/Map/Symbol.species/length.js
+    // Reason: Symbol.species is not supported in PHP
     // SKIPPED: test/built-ins/Map/Symbol.species/return-value.js
+    // Reason: Symbol.species is not supported in PHP
     // SKIPPED: test/built-ins/Map/Symbol.species/symbol-species-name.js
+    // Reason: Symbol.species is not supported in PHP
     // SKIPPED: test/built-ins/Map/Symbol.species/symbol-species.js
     // Reason: Symbol.species is not supported in PHP
 

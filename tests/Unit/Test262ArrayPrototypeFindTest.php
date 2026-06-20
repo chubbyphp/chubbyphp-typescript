@@ -58,14 +58,19 @@ final class Test262ArrayPrototypeFindTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/find/call-with-boolean.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/callbackfn-resize-arraybuffer.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/length.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/name.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/not-a-constructor.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     /**
      * test/built-ins/Array/prototype/find/predicate-call-parameters.js.
@@ -188,12 +193,16 @@ final class Test262ArrayPrototypeFindTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/find/prop-desc.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/resizable-buffer-grow-mid-iteration.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/resizable-buffer-shrink-mid-iteration.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/resizable-buffer.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     /**
      * test/built-ins/Array/prototype/find/return-abrupt-from-predicate-call.js.
@@ -216,12 +225,16 @@ final class Test262ArrayPrototypeFindTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/find/return-abrupt-from-property.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/return-abrupt-from-this-length-as-symbol.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/return-abrupt-from-this-length.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/find/return-abrupt-from-this.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     /**
      * test/built-ins/Array/prototype/find/return-found-value-predicate-result-is-true.js.

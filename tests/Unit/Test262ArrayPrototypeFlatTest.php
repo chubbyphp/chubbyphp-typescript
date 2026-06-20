@@ -17,11 +17,13 @@ use PHPUnit\Framework\TestCase;
 final class Test262ArrayPrototypeFlatTest extends TestCase
 {
     // SKIPPED: test/built-ins/Array/prototype/flat/array-like-objects.js
+    // Reason: Function.prototype.bind on Array.prototype.flat itself
 
     // SKIPPED: test/built-ins/Array/prototype/flat/bound-function-call.js
     // Reason: Function.prototype.bind on Array.prototype.flat itself
 
     // SKIPPED: test/built-ins/Array/prototype/flat/call-with-boolean.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     /**
      * test/built-ins/Array/prototype/flat/empty-array-elements.js.
@@ -51,8 +53,10 @@ final class Test262ArrayPrototypeFlatTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/flat/length.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/flat/name.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     /**
      * test/built-ins/Array/prototype/flat/non-numeric-depth-should-not-throw.js.
@@ -80,8 +84,10 @@ final class Test262ArrayPrototypeFlatTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/flat/non-object-ctor-throws.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/flat/not-a-constructor.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     /**
      * test/built-ins/Array/prototype/flat/null-undefined-elements.js.
@@ -121,6 +127,7 @@ final class Test262ArrayPrototypeFlatTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/flat/null-undefined-input-throws.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     /**
      * test/built-ins/Array/prototype/flat/positive-infinity.js.
@@ -134,15 +141,20 @@ final class Test262ArrayPrototypeFlatTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/flat/prop-desc.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/flat/proxy-access-count.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/flat/symbol-object-create-null-depth-throws.js
     // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/flat/target-array-non-extensible.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/flat/target-array-with-non-configurable-property.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/flat/target-array-with-non-writable-property.js
+    // Reason: depth given as Symbol/Object.create(null); Arr::flat() $depth is typed int
 }

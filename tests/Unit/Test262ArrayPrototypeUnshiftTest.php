@@ -85,12 +85,16 @@ final class Test262ArrayPrototypeUnshiftTest extends TestCase
     // Reason: array-like this value with getters and length near 2^53-1
 
     // SKIPPED: test/built-ins/Array/prototype/unshift/length.js
+    // Reason: accessor property on the this value
 
     // SKIPPED: test/built-ins/Array/prototype/unshift/name.js
+    // Reason: accessor property on the this value
 
     // SKIPPED: test/built-ins/Array/prototype/unshift/not-a-constructor.js
+    // Reason: accessor property on the this value
 
     // SKIPPED: test/built-ins/Array/prototype/unshift/prop-desc.js
+    // Reason: accessor property on the this value
 
     // SKIPPED: test/built-ins/Array/prototype/unshift/read-only-property.js
     // Reason: accessor property on the this value

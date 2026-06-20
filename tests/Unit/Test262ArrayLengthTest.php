@@ -60,24 +60,34 @@ final class Test262ArrayLengthTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/length/define-own-prop-length-coercion-order.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/define-own-prop-length-coercion-order-set.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/define-own-prop-length-error.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/define-own-prop-length-no-value-order.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/define-own-prop-length-overflow-order.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/define-own-prop-length-overflow-realm.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/S15.4.2.2_A1.1_T1.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/S15.4.2.2_A1.1_T2.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/S15.4.2.2_A1.1_T3.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/S15.4.2.2_A1.2_T1.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/length/S15.4.2.2_A2.1_T1.js.
@@ -223,10 +233,13 @@ final class Test262ArrayLengthTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/length/S15.4.2.2_A2.3_T4.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/S15.4.2.2_A2.3_T5.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/length/S15.4.4_A1.3_T1.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/length/S15.4.5.1_A1.1_T1.js.
@@ -309,6 +322,7 @@ final class Test262ArrayLengthTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/length/S15.4.5.1_A1.2_T3.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/length/S15.4.5.1_A1.3_T1.js.
@@ -333,6 +347,7 @@ final class Test262ArrayLengthTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/length/S15.4.5.1_A1.3_T2.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/length/S15.4.5.2_A3_T4.js.

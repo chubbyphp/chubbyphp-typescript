@@ -57,17 +57,22 @@ final class Test262ArrayPrototypeFindLastTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/call-with-boolean.js
+    // Reason: array-like with length Number.MAX_VALUE; Arr caps length at 2^32-1
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/callbackfn-resize-arraybuffer.js
+    // Reason: array-like with length Number.MAX_VALUE; Arr caps length at 2^32-1
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/length.js
+    // Reason: array-like with length Number.MAX_VALUE; Arr caps length at 2^32-1
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/maximum-index.js
     // Reason: array-like with length Number.MAX_VALUE; Arr caps length at 2^32-1
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/name.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/not-a-constructor.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     /**
      * test/built-ins/Array/prototype/findLast/predicate-call-parameters.js.
@@ -190,12 +195,16 @@ final class Test262ArrayPrototypeFindLastTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/prop-desc.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/resizable-buffer-grow-mid-iteration.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/resizable-buffer-shrink-mid-iteration.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/resizable-buffer.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     /**
      * test/built-ins/Array/prototype/findLast/return-abrupt-from-predicate-call.js.
@@ -218,12 +227,16 @@ final class Test262ArrayPrototypeFindLastTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/return-abrupt-from-property.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/return-abrupt-from-this-length-as-symbol.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/return-abrupt-from-this-length.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findLast/return-abrupt-from-this.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     /**
      * test/built-ins/Array/prototype/findLast/return-found-value-predicate-result-is-true.js.

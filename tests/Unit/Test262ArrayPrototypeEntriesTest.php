@@ -76,22 +76,31 @@ final class Test262ArrayPrototypeEntriesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/entries/length.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/entries/name.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/entries/not-a-constructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/entries/prop-desc.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/entries/resizable-buffer-grow-mid-iteration.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/entries/resizable-buffer-shrink-mid-iteration.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/entries/resizable-buffer.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/entries/return-abrupt-from-this.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/entries/returns-iterator-from-object.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/prototype/entries/returns-iterator.js.

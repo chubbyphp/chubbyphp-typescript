@@ -124,85 +124,124 @@ final class Test262ArrayPrototypeFilterTest extends TestCase
     // Reason: array-like object with own 'length' data property
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-10.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-11.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-12.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-13.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-14.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-17.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-18.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-19.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-2.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-3.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-4.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-5.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-6.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-7.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-8.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-2-9.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-1.js
     // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-10.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-11.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-12.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-13.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-14.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-15.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-16.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-17.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-18.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-19.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-2.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-20.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-21.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-22.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-23.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-24.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-25.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-3.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-4.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-5.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-6.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-7.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/filter/15.4.4.20-3-9.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     /**
      * test/built-ins/Array/prototype/filter/15.4.4.20-4-1.js.
@@ -1771,6 +1810,7 @@ final class Test262ArrayPrototypeFilterTest extends TestCase
     // Reason: function property descriptor
 
     // SKIPPED: test/built-ins/Array/prototype/filter/not-a-constructor.js
+    // Reason: property descriptor
 
     // SKIPPED: test/built-ins/Array/prototype/filter/prop-desc.js
     // Reason: property descriptor

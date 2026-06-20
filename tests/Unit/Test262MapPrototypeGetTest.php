@@ -34,8 +34,11 @@ final class Test262MapPrototypeGetTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Map/prototype/get/length.js
+    // Reason: methods are invoked on Map instances
     // SKIPPED: test/built-ins/Map/prototype/get/name.js
+    // Reason: methods are invoked on Map instances
     // SKIPPED: test/built-ins/Map/prototype/get/not-a-constructor.js
+    // Reason: methods are invoked on Map instances
 
     /**
      * test/built-ins/Map/prototype/get/returns-undefined.js.
@@ -109,4 +112,5 @@ final class Test262MapPrototypeGetTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Map/prototype/get/this-not-object-throw.js
+    // Reason: methods are invoked on Map instances
 }

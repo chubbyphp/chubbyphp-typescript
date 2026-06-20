@@ -17,8 +17,10 @@ use PHPUnit\Framework\TestCase;
 final class Test262ArrayIsArrayTest extends TestCase
 {
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-0-1.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-0-2.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/isArray/15.4.3.2-0-3.js.
@@ -41,6 +43,7 @@ final class Test262ArrayIsArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-0-5.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/isArray/15.4.3.2-0-6.js.
@@ -59,10 +62,13 @@ final class Test262ArrayIsArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-1-10.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-1-11.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-1-12.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/isArray/15.4.3.2-1-13.js.
@@ -92,6 +98,7 @@ final class Test262ArrayIsArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-1-2.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/isArray/15.4.3.2-1-3.js.
@@ -102,6 +109,7 @@ final class Test262ArrayIsArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-1-4.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/isArray/15.4.3.2-1-5.js.
@@ -112,6 +120,7 @@ final class Test262ArrayIsArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-1-6.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/isArray/15.4.3.2-1-7.js.
@@ -122,6 +131,7 @@ final class Test262ArrayIsArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-1-8.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/isArray/15.4.3.2-1-9.js.
@@ -132,8 +142,10 @@ final class Test262ArrayIsArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-2-1.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/isArray/15.4.3.2-2-2.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/isArray/15.4.3.2-2-3.js.
@@ -144,12 +156,17 @@ final class Test262ArrayIsArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/isArray/descriptor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/isArray/name.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/isArray/not-a-constructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/isArray/proxy.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/isArray/proxy-revoked.js
+    // Reason: test262 semantics are not portable to PHP
 }

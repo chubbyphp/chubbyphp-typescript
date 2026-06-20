@@ -21,116 +21,169 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     // Reason: ToObject coercion of `this`; forEach is an Arr instance method
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-10.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-11.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-12.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-13.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-14.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-15.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-2.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-3.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-4.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-5.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-6.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-7.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-8.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-1-9.js
+    // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-1.js
     // Reason: forEach applied to array-like objects with a `length` property
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-10.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-11.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-12.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-13.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-14.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-17.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-18.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-19.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-2.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-3.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-4.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-5.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-6.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-7.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-8.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-2-9.js
+    // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-1.js
     // Reason: ToUint32 coercion of `length` on array-like objects; Arr length is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-10.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-11.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-12.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-13.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-14.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-15.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-16.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-17.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-18.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-19.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-2.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-20.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-21.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-22.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-23.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-24.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-25.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-3.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-4.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-5.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-6.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-7.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-3-9.js
+    // Reason: `length` getter on an array-like object
 
     /**
      * test/built-ins/Array/prototype/forEach/15.4.4.18-4-1.js.
@@ -149,6 +202,7 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-4-11.js
+    // Reason: ReferenceError for an unresolved identifier is a JS-only concern
 
     /**
      * test/built-ins/Array/prototype/forEach/15.4.4.18-4-12.js.
@@ -167,6 +221,7 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-4-15.js
+    // Reason: ReferenceError for an unresolved identifier is a JS-only concern
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-4-2.js
     // Reason: ReferenceError for an unresolved identifier is a JS-only concern
@@ -188,15 +243,19 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     // Reason: TypeError on non-callable is a PHP language-level guarantee; representative ported as 15.4.4.18-4-3
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-4-5.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-4-6.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-4-7.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-4-8.js
     // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-4-9.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-5-1-s.js
     // Reason: strict-mode `this === undefined` semantics do not map to PHP
@@ -580,35 +639,46 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     // Reason: prototype-chain index properties / getters
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-11.js
+    // Reason: relies on an index getter to mutate length mid-iteration; covered by 15.4.4.18-7-3
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-12.js
+    // Reason: relies on an index getter to mutate length mid-iteration; covered by 15.4.4.18-7-3
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-13.js
+    // Reason: relies on an index getter to mutate length mid-iteration; covered by 15.4.4.18-7-3
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-14.js
     // Reason: relies on an index getter to mutate length mid-iteration; covered by 15.4.4.18-7-3
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-15.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-16.js
+    // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-2.js
     // Reason: `length` getter on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-3.js
+    // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-4.js
     // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-5.js
+    // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-6.js
+    // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-7.js
+    // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-8.js
+    // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-b-9.js
+    // Reason: accessor index properties via Object.defineProperty
 
     /**
      * test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-1.js.
@@ -637,22 +707,31 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-11.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-12.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-13.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-14.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-15.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-16.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-17.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-18.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-19.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     /**
      * test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-2.js.
@@ -673,22 +752,28 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-20.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-21.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-22.js
+    // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-25.js
     // Reason: the JS Arguments object has no PHP equivalent
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-26.js
+    // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-27.js
+    // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-28.js
     // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-29.js
+    // Reason: prototype-chain index properties
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-3.js
     // Reason: prototype-chain index properties
@@ -697,19 +782,25 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     // Reason: accessor index properties via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-31.js
+    // Reason: prototype-chain index properties
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-4.js
     // Reason: prototype-chain index properties
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-5.js
+    // Reason: primitive thisArg wrapped into a Boolean object; thisArg is typed ?object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-6.js
+    // Reason: primitive thisArg wrapped into a Boolean object; thisArg is typed ?object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-7.js
+    // Reason: primitive thisArg wrapped into a Boolean object; thisArg is typed ?object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-8.js
+    // Reason: primitive thisArg wrapped into a Boolean object; thisArg is typed ?object
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-i-9.js
+    // Reason: primitive thisArg wrapped into a Boolean object; thisArg is typed ?object
 
     /**
      * test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-ii-1.js.
@@ -1187,18 +1278,25 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     // Reason: subclassed array with length type conversion
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-8-3.js
+    // Reason: Object.freeze of the built-in forEach function is JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-8-4.js
+    // Reason: Object.freeze of the built-in forEach function is JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-8-5.js
+    // Reason: Object.freeze of the built-in forEach function is JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-8-6.js
+    // Reason: Object.freeze of the built-in forEach function is JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-8-7.js
+    // Reason: Object.freeze of the built-in forEach function is JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-8-8.js
+    // Reason: Object.freeze of the built-in forEach function is JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/15.4.4.18-8-9.js
+    // Reason: Object.freeze of the built-in forEach function is JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/S15.4.4.18_A1.js
     // Reason: Object.freeze of the built-in forEach function is JS-only
@@ -1210,18 +1308,26 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     // Reason: forEach applied to a boolean primitive `this`
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/callbackfn-resize-arraybuffer.js
+    // Reason: forEach applied to a boolean primitive `this`
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/length.js
+    // Reason: forEach applied to a boolean primitive `this`
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/name.js
+    // Reason: forEach applied to a boolean primitive `this`
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/not-a-constructor.js
+    // Reason: forEach applied to a boolean primitive `this`
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/prop-desc.js
+    // Reason: forEach applied to a boolean primitive `this`
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/resizable-buffer-grow-mid-iteration.js
+    // Reason: forEach applied to a boolean primitive `this`
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/resizable-buffer-shrink-mid-iteration.js
+    // Reason: forEach applied to a boolean primitive `this`
 
     // SKIPPED: test/built-ins/Array/prototype/forEach/resizable-buffer.js
+    // Reason: forEach applied to a boolean primitive `this`
 }

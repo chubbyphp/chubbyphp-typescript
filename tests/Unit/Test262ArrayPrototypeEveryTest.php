@@ -74,90 +74,130 @@ final class Test262ArrayPrototypeEveryTest extends TestCase
     // Reason: array-like object with own 'length' data property
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-10.js
+    // Reason: Array.prototype index pollution
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-11.js
+    // Reason: Array.prototype index pollution
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-12.js
+    // Reason: Array.prototype index pollution
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-13.js
+    // Reason: Array.prototype index pollution
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-14.js
+    // Reason: Array.prototype index pollution
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-17.js
+    // Reason: Array.prototype index pollution
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-18.js
+    // Reason: Array.prototype index pollution
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-19.js
+    // Reason: Array.prototype index pollution
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-2.js
     // Reason: Array.prototype index pollution
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-3.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-4.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-5.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-6.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-7.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-8.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-2-9.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-1.js
     // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-10.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-11.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-12.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-13.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-14.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-15.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-16.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-17.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-18.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-19.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-2.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-20.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-21.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-22.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-23.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-24.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-25.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-29.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-3.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-4.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-5.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-6.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-7.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-8.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/every/15.4.4.16-3-9.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     /**
      * test/built-ins/Array/prototype/every/15.4.4.16-4-1.js.
@@ -1569,6 +1609,7 @@ final class Test262ArrayPrototypeEveryTest extends TestCase
     // Reason: function property descriptor
 
     // SKIPPED: test/built-ins/Array/prototype/every/not-a-constructor.js
+    // Reason: property descriptor
 
     // SKIPPED: test/built-ins/Array/prototype/every/prop-desc.js
     // Reason: property descriptor

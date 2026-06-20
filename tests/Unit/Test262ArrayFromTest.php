@@ -17,14 +17,29 @@ use PHPUnit\Framework\TestCase;
 final class Test262ArrayFromTest extends TestCase
 {
     // SKIPPED: test/built-ins/Array/from/Array.from_arity.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/Array.from-descriptor.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/Array.from_forwards-length-for-array-likes.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/Array.from-name.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/array-like-has-length-but-no-indexes-with-values.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/calling-from-valid-1-noStrict.js.
@@ -69,6 +84,9 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/calling-from-valid-1-onlyStrict.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/calling-from-valid-2.js.
@@ -257,6 +275,9 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/items-is-arraybuffer.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/items-is-null-throws.js.
@@ -268,14 +289,29 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/iter-adv-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/iter-cstm-ctor-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/iter-cstm-ctor.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/iter-get-iter-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/iter-get-iter-val-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/iter-map-fn-args.js.
@@ -646,6 +682,9 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/iter-set-elem-prop-err.js.
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/iter-set-elem-prop.js.
@@ -705,8 +744,14 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/iter-set-elem-prop-non-writable.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/iter-set-length-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/iter-set-length.js.
@@ -801,6 +846,9 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/mapfn-is-symbol-throws.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/mapfn-throws-exception.js.
@@ -824,8 +872,14 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/not-a-constructor.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/proto-from-ctor-realm.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/source-array-boundary.js.
@@ -860,6 +914,9 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/source-object-constructor.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/source-object-iterator-1.js.
@@ -963,8 +1020,14 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/source-object-length-set-elem-prop-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/source-object-length-set-elem-prop-non-writable.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     /**
      * test/built-ins/Array/from/source-object-missing.js.
@@ -996,106 +1059,397 @@ final class Test262ArrayFromTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/from/source-object-without.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/from/this-null.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 
     // SKIPPED: test/built-ins/Array/fromAsync/*
     // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
     // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
     // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/async-iterable-async-mapped-awaits-once.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/async-iterable-input-does-not-await-input.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/async-iterable-input-iteration-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/async-iterable-input.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-array-add-to-empty.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-array-add-to-singleton.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-array-add.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-array-mutate.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-array-remove.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-arraybuffer.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-arraylike-holes.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-arraylike-length-accessor-throws.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-arraylike-promise.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-arraylike-too-long.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-asynciterator-exists.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-asynciterator-not-callable.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-asynciterator-null.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-asynciterator-sync.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-asynciterator-throws.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-bigint.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-boolean.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-function.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-iterator-exists.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-iterator-not-callable.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-iterator-null.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-iterator-promise.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-iterator-throws.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-null-undefined.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-number.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-object-not-arraylike.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-operations.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-string.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-symbol.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/asyncitems-uses-intrinsic-iterator-symbols.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/builtin.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/length.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-async-arraylike.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-async-iterable-async.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-async-iterable-sync.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-async-throws-close-async-iterator.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-async-throws-close-sync-iterator.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-async-throws.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-not-callable.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-result-awaited-once-per-iteration.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-sync-arraylike.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-sync-iterable-async.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-sync-iterable-sync.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-sync-throws-close-async-iterator.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-sync-throws-close-sync-iterator.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/mapfn-sync-throws.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/name.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-input-does-not-use-array-prototype.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-input-element-access-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-input-with-thenable-async-mapped-awaits-callback-result-once.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-input-with-thenable-async-mapped-callback-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-input-with-thenable-element-rejects.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-input-with-thenable-sync-mapped-callback-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-input-with-thenable.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-input.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-sync-mapped-callback-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-with-non-promise-thenable.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-with-thenable-async-mapped-awaits-once.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-with-thenable-awaits-once.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-with-thenable-sync-mapped-awaits-once.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/non-iterable-with-thenable-then-method-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/not-a-constructor.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/prop-desc.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/returned-promise-resolves-to-array.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/returns-promise.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-input-with-non-promise-thenable.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-input-with-thenable.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-input.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-iteration-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-with-rejecting-thenable-closes.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-with-rejecting-thenable-rejects.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-with-thenable-async-mapped-awaits-once.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-with-thenable-async-mapped-callback-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-with-thenable-awaits-once.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-with-thenable-sync-mapped-awaits-once.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-with-thenable-sync-mapped-callback-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/sync-iterable-with-thenable-then-method-err.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/this-constructor-operations.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/this-constructor-with-bad-length-setter.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/this-constructor-with-readonly-elements.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/this-constructor-with-readonly-length.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/this-constructor-with-unsettable-element-closes-async-iterator.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/this-constructor-with-unsettable-element-closes-sync-iterator.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/this-constructor-with-unsettable-element.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/this-constructor.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/this-non-constructor.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/thisarg-object.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/thisarg-omitted-sloppy.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/thisarg-omitted-strict.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/thisarg-primitive-sloppy.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
     // SKIPPED: test/built-ins/Array/fromAsync/thisarg-primitive-strict.js
+    // Reason: Array.fromAsync relies on Promises, async iteration (@@asyncIterator),
+    // and thenables, which have no equivalent in PHP's synchronous Arr. There is no
+    // Arr::fromAsync method, so none of the following tests make sense in PHP:
 }

@@ -130,16 +130,23 @@ final class Test262ArrayPrototypeToStringTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/toString/S15.4.4.2_A3_T1.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toString/call-with-boolean.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toString/length.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toString/name.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toString/non-callable-join-string-tag.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toString/not-a-constructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toString/prop-desc.js
+    // Reason: test262 semantics are not portable to PHP
 }

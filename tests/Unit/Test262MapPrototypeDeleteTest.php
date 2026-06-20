@@ -17,8 +17,11 @@ use PHPUnit\Framework\TestCase;
 final class Test262MapPrototypeDeleteTest extends TestCase
 {
     // SKIPPED: test/built-ins/Map/prototype/delete/context-is-not-map-object.js
+    // Reason: methods are invoked on Map instances, not generic this values
     // SKIPPED: test/built-ins/Map/prototype/delete/context-is-not-object.js
+    // Reason: methods are invoked on Map instances, not generic this values
     // SKIPPED: test/built-ins/Map/prototype/delete/context-is-set-object-throws.js
+    // Reason: methods are invoked on Map instances, not generic this values
     // SKIPPED: test/built-ins/Map/prototype/delete/context-is-weakmap-object-throws.js
     // Reason: methods are invoked on Map instances, not generic this values
 
@@ -51,7 +54,9 @@ final class Test262MapPrototypeDeleteTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Map/prototype/delete/length.js
+    // Reason: length/name/not-a-constructor descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/prototype/delete/name.js
+    // Reason: length/name/not-a-constructor descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/prototype/delete/not-a-constructor.js
     // Reason: length/name/not-a-constructor descriptor tests are not portable
 

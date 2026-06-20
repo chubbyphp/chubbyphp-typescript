@@ -113,12 +113,16 @@ final class Test262ArrayPrototypeReverseTest extends TestCase
     // Reason: Proxy/Reflect
 
     // SKIPPED: test/built-ins/Array/prototype/reverse/length.js
+    // Reason: TypedArrays/ArrayBuffer
 
     // SKIPPED: test/built-ins/Array/prototype/reverse/name.js
+    // Reason: TypedArrays/ArrayBuffer
 
     // SKIPPED: test/built-ins/Array/prototype/reverse/not-a-constructor.js
+    // Reason: TypedArrays/ArrayBuffer
 
     // SKIPPED: test/built-ins/Array/prototype/reverse/prop-desc.js
+    // Reason: TypedArrays/ArrayBuffer
 
     // SKIPPED: test/built-ins/Array/prototype/reverse/resizable-buffer.js
     // Reason: TypedArrays/ArrayBuffer

@@ -110,12 +110,16 @@ final class Test262ArrayPrototypePushTest extends TestCase
     // Reason: array-like this value with length near 2^53-1
 
     // SKIPPED: test/built-ins/Array/prototype/push/length.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/push/name.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/push/not-a-constructor.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/push/prop-desc.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/push/set-length-array-is-frozen.js
     // Reason: Object.freeze and accessor on Array.prototype

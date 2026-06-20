@@ -197,20 +197,29 @@ final class Test262ArrayPrototypeJoinTest extends TestCase
     // Reason: elements inherited from Array.prototype/Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/join/S15.4.4.5_A6.6.js
+    // Reason: elements inherited from Array.prototype/Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/join/call-with-boolean.js
+    // Reason: elements inherited from Array.prototype/Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/join/coerced-separator-grow.js
+    // Reason: elements inherited from Array.prototype/Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/join/coerced-separator-shrink.js
+    // Reason: elements inherited from Array.prototype/Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/join/length.js
+    // Reason: elements inherited from Array.prototype/Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/join/name.js
+    // Reason: elements inherited from Array.prototype/Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/join/not-a-constructor.js
+    // Reason: elements inherited from Array.prototype/Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/join/prop-desc.js
+    // Reason: elements inherited from Array.prototype/Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/join/resizable-buffer.js
+    // Reason: elements inherited from Array.prototype/Object.prototype
 }

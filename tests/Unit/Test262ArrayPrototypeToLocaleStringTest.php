@@ -39,6 +39,7 @@ final class Test262ArrayPrototypeToLocaleStringTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/S15.4.4.3_A3_T1.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/prototype/toLocaleString/invoke-element-tolocalestring.js.
@@ -81,20 +82,29 @@ final class Test262ArrayPrototypeToLocaleStringTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/length.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/name.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/not-a-constructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/primitive_this_value.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/primitive_this_value_getter.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/prop-desc.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/resizable-buffer.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/user-provided-tolocalestring-grow.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/toLocaleString/user-provided-tolocalestring-shrink.js
+    // Reason: test262 semantics are not portable to PHP
 }

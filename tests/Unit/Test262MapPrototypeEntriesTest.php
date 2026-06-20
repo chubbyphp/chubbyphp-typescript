@@ -17,7 +17,9 @@ use PHPUnit\Framework\TestCase;
 final class Test262MapPrototypeEntriesTest extends TestCase
 {
     // SKIPPED: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot-set.js
+    // Reason: methods are invoked on Map instances, not generic this values
     // SKIPPED: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot-weakmap.js
+    // Reason: methods are invoked on Map instances, not generic this values
     // SKIPPED: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot.js
     // Reason: methods are invoked on Map instances, not generic this values
 
@@ -25,7 +27,9 @@ final class Test262MapPrototypeEntriesTest extends TestCase
     // Reason: prop-desc descriptor tests are not portable
 
     // SKIPPED: test/built-ins/Map/prototype/entries/length.js
+    // Reason: length/name/not-a-constructor descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/prototype/entries/name.js
+    // Reason: length/name/not-a-constructor descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/prototype/entries/not-a-constructor.js
     // Reason: length/name/not-a-constructor descriptor tests are not portable
 

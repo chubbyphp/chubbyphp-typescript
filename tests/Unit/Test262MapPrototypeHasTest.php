@@ -33,8 +33,11 @@ final class Test262MapPrototypeHasTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Map/prototype/has/length.js
+    // Reason: methods are invoked on Map instances
     // SKIPPED: test/built-ins/Map/prototype/has/name.js
+    // Reason: methods are invoked on Map instances
     // SKIPPED: test/built-ins/Map/prototype/has/not-a-constructor.js
+    // Reason: methods are invoked on Map instances
 
     /**
      * test/built-ins/Map/prototype/has/normalizes-zero-key.js.
@@ -141,4 +144,5 @@ final class Test262MapPrototypeHasTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Map/prototype/has/this-not-object-throw.js
+    // Reason: methods are invoked on Map instances
 }

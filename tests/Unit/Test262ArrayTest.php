@@ -40,16 +40,22 @@ final class Test262ArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/15.4.5-1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/constructor.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/is-a-constructor.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/length.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/name.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/prop-desc.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     /**
      * test/built-ins/Array/property-cast-boolean-primitive.js.
@@ -125,36 +131,52 @@ final class Test262ArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/proto-from-ctor-realm-one.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/proto-from-ctor-realm-two.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/proto-from-ctor-realm-zero.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/proto.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.1_A1.1_T1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.1_A1.1_T2.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.1_A1.1_T3.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.1_A1.2_T1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.1_A1.3_T1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.1_A2.1_T1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.1_A2.2_T1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.1_A3.1_T1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.2.1_A1.1_T1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.2.1_A1.1_T2.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.2.1_A1.1_T3.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.2.1_A1.2_T1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     /**
      * test/built-ins/Array/S15.4.2.1_A1.3_T1.js.
@@ -196,12 +218,16 @@ final class Test262ArrayTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/S15.4.3_A1.1_T1.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.3_A1.1_T2.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.3_A1.1_T3.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4.5.1_A1.2_T2.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     /**
      * test/built-ins/Array/S15.4.5.1_A2.1_T1.js.
@@ -403,18 +429,26 @@ final class Test262ArrayTest extends TestCase
     // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4_A1.1_T6.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4_A1.1_T7.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4_A1.1_T8.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/S15.4_A1.1_T9.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/Symbol.species/length.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/Symbol.species/return-value.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/Symbol.species/symbol-species.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 
     // SKIPPED: test/built-ins/Array/Symbol.species/symbol-species-name.js
+    // Reason: $x[] = 1 and $x[null] = 1 are the same, therefore this JS feature cannot be implemented
 }

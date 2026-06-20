@@ -17,22 +17,28 @@ use PHPUnit\Framework\TestCase;
 final class Test262ArrayPrototypeAtTest extends TestCase
 {
     // SKIPPED: test/built-ins/Array/prototype/at/coerced-index-resize.js
+    // Reason: index coercion via valueOf; Arr::at() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/at/index-argument-tointeger.js
     // Reason: index coercion via valueOf; Arr::at() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/at/index-non-numeric-argument-tointeger-invalid.js
+    // Reason: index coercion of false/null/undefined/string; Arr::at() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/at/index-non-numeric-argument-tointeger.js
     // Reason: index coercion of false/null/undefined/string; Arr::at() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/at/length.js
+    // Reason: index coercion of false/null/undefined/string; Arr::at() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/at/name.js
+    // Reason: index coercion of false/null/undefined/string; Arr::at() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/at/prop-desc.js
+    // Reason: index coercion of false/null/undefined/string; Arr::at() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/at/return-abrupt-from-this.js
+    // Reason: index coercion of false/null/undefined/string; Arr::at() is typed int
 
     /**
      * test/built-ins/Array/prototype/at/returns-item-relative-index.js.
@@ -114,4 +120,5 @@ final class Test262ArrayPrototypeAtTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/at/typed-array-resizable-buffer.js
+    // Reason: index coercion of false/null/undefined/string; Arr::at() is typed int
 }

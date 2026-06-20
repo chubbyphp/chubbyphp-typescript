@@ -968,12 +968,16 @@ final class Test262ArrayPrototypeIndexOfTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/indexOf/length.js
+    // Reason: TypedArrays backed by resizable ArrayBuffers
 
     // SKIPPED: test/built-ins/Array/prototype/indexOf/name.js
+    // Reason: TypedArrays backed by resizable ArrayBuffers
 
     // SKIPPED: test/built-ins/Array/prototype/indexOf/not-a-constructor.js
+    // Reason: TypedArrays backed by resizable ArrayBuffers
 
     // SKIPPED: test/built-ins/Array/prototype/indexOf/prop-desc.js
+    // Reason: TypedArrays backed by resizable ArrayBuffers
 
     // SKIPPED: test/built-ins/Array/prototype/indexOf/resizable-buffer-special-float-values.js
     // Reason: TypedArrays backed by resizable ArrayBuffers

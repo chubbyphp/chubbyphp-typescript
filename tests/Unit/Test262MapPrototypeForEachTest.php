@@ -171,8 +171,11 @@ final class Test262MapPrototypeForEachTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Map/prototype/forEach/length.js
+    // Reason: PHP type system rejects non-callable arguments
     // SKIPPED: test/built-ins/Map/prototype/forEach/name.js
+    // Reason: PHP type system rejects non-callable arguments
     // SKIPPED: test/built-ins/Map/prototype/forEach/not-a-constructor.js
+    // Reason: PHP type system rejects non-callable arguments
 
     /**
      * test/built-ins/Map/prototype/forEach/return-undefined.js.
@@ -206,4 +209,5 @@ final class Test262MapPrototypeForEachTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Map/prototype/forEach/this-not-object-throw.js
+    // Reason: PHP type system rejects non-callable arguments
 }

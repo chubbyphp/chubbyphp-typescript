@@ -17,13 +17,18 @@ use PHPUnit\Framework\TestCase;
 final class Test262MapPrototypeKeysTest extends TestCase
 {
     // SKIPPED: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot-set.js
+    // Reason: methods are invoked on Map instances, not generic this values
     // SKIPPED: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot-weakmap.js
+    // Reason: methods are invoked on Map instances, not generic this values
     // SKIPPED: test/built-ins/Map/prototype/keys/does-not-have-mapdata-internal-slot.js
     // Reason: methods are invoked on Map instances, not generic this values
 
     // SKIPPED: test/built-ins/Map/prototype/keys/keys.js
+    // Reason: property descriptor / function identity tests are not portable to PHP
     // SKIPPED: test/built-ins/Map/prototype/keys/length.js
+    // Reason: property descriptor / function identity tests are not portable to PHP
     // SKIPPED: test/built-ins/Map/prototype/keys/name.js
+    // Reason: property descriptor / function identity tests are not portable to PHP
     // SKIPPED: test/built-ins/Map/prototype/keys/not-a-constructor.js
     // Reason: property descriptor / function identity tests are not portable to PHP
 

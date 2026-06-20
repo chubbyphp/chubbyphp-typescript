@@ -123,6 +123,7 @@ final class Test262ArrayPrototypeToSortedTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/toSorted/ignores-species.js
+    // Reason: toSorted called generically on array-like objects with invalid lengths
 
     /**
      * test/built-ins/Array/prototype/toSorted/immutable.js.
@@ -152,12 +153,16 @@ final class Test262ArrayPrototypeToSortedTest extends TestCase
     // Reason: length coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/toSorted/length.js
+    // Reason: ToObject coercion of boolean this values
 
     // SKIPPED: test/built-ins/Array/prototype/toSorted/name.js
+    // Reason: ToObject coercion of boolean this values
 
     // SKIPPED: test/built-ins/Array/prototype/toSorted/not-a-constructor.js
+    // Reason: ToObject coercion of boolean this values
 
     // SKIPPED: test/built-ins/Array/prototype/toSorted/property-descriptor.js
+    // Reason: ToObject coercion of boolean this values
 
     // SKIPPED: test/built-ins/Array/prototype/toSorted/this-value-boolean.js
     // Reason: ToObject coercion of boolean this values

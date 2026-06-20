@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 final class Test262ArrayPrototypeFillTest extends TestCase
 {
     // SKIPPED: test/built-ins/Array/prototype/fill/call-with-boolean.js
+    // Reason: array-like with length near 2^53; Arr caps length at 2^32-1
 
     /**
      * test/built-ins/Array/prototype/fill/coerced-indexes.js.
@@ -102,32 +103,43 @@ final class Test262ArrayPrototypeFillTest extends TestCase
     // Reason: array-like with length near 2^53; Arr caps length at 2^32-1
 
     // SKIPPED: test/built-ins/Array/prototype/fill/length.js
+    // Reason: end coercion via valueOf; Arr::fill() is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/name.js
+    // Reason: end coercion via valueOf; Arr::fill() is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/not-a-constructor.js
+    // Reason: end coercion via valueOf; Arr::fill() is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/prop-desc.js
+    // Reason: end coercion via valueOf; Arr::fill() is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/resizable-buffer.js
+    // Reason: end coercion via valueOf; Arr::fill() is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/return-abrupt-from-end-as-symbol.js
+    // Reason: end coercion via valueOf; Arr::fill() is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/return-abrupt-from-end.js
     // Reason: end coercion via valueOf; Arr::fill() is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/return-abrupt-from-setting-property-value.js
+    // Reason: start coercion via valueOf; Arr::fill() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/return-abrupt-from-start-as-symbol.js
+    // Reason: start coercion via valueOf; Arr::fill() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/return-abrupt-from-start.js
     // Reason: start coercion via valueOf; Arr::fill() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/return-abrupt-from-this-length-as-symbol.js
+    // Reason: start coercion via valueOf; Arr::fill() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/return-abrupt-from-this-length.js
+    // Reason: start coercion via valueOf; Arr::fill() is typed int
 
     // SKIPPED: test/built-ins/Array/prototype/fill/return-abrupt-from-this.js
+    // Reason: start coercion via valueOf; Arr::fill() is typed int
 
     /**
      * test/built-ins/Array/prototype/fill/return-this.js.
@@ -142,4 +154,5 @@ final class Test262ArrayPrototypeFillTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/fill/typed-array-resize.js
+    // Reason: start coercion via valueOf; Arr::fill() is typed int
 }

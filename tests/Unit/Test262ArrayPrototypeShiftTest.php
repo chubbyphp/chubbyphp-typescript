@@ -88,12 +88,16 @@ final class Test262ArrayPrototypeShiftTest extends TestCase
     // Reason: shift applied to a boolean primitive this value
 
     // SKIPPED: test/built-ins/Array/prototype/shift/length.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/shift/name.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/shift/not-a-constructor.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/shift/prop-desc.js
+    // Reason: Object.freeze and accessor on Array.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/shift/set-length-array-is-frozen.js
     // Reason: Object.freeze and accessor on Array.prototype

@@ -66,14 +66,19 @@ final class Test262ArrayPrototypeMapTest extends TestCase
     // Reason: array-like object with own 'length' data property
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-10.js
+    // Reason: Arguments object as this
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-11.js
+    // Reason: Arguments object as this
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-12.js
+    // Reason: Arguments object as this
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-13.js
+    // Reason: Arguments object as this
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-14.js
+    // Reason: Arguments object as this
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-17.js
     // Reason: Arguments object as this
@@ -97,74 +102,106 @@ final class Test262ArrayPrototypeMapTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-3.js
+    // Reason: Array.prototype 'length' override
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-4.js
     // Reason: Array.prototype 'length' override
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-5.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-6.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-7.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-8.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-2-9.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-1.js
     // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-10.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-11.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-12.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-13.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-14.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-15.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-16.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-17.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-18.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-19.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-2.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-20.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-21.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-22.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-23.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-24.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-25.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-28.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-29.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-3.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-4.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-5.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-6.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-7.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-8.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/map/15.4.4.19-3-9.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     /**
      * test/built-ins/Array/prototype/map/15.4.4.19-4-1.js.
@@ -1365,6 +1402,7 @@ final class Test262ArrayPrototypeMapTest extends TestCase
     // Reason: function property descriptor
 
     // SKIPPED: test/built-ins/Array/prototype/map/not-a-constructor.js
+    // Reason: property descriptor
 
     // SKIPPED: test/built-ins/Array/prototype/map/prop-desc.js
     // Reason: property descriptor

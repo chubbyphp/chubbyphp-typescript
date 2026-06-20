@@ -17,9 +17,13 @@ use PHPUnit\Framework\TestCase;
 final class Test262MapPrototypeIteratorTest extends TestCase
 {
     // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator/descriptor.js
+    // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator/length.js
+    // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator/name.js
+    // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator/not-a-constructor.js
+    // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
     // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator.js
     // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
 

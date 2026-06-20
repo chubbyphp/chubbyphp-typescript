@@ -17,12 +17,16 @@ use PHPUnit\Framework\TestCase;
 final class Test262ArrayPrototypeFlatMapTest extends TestCase
 {
     // SKIPPED: test/built-ins/Array/prototype/flatMap/array-like-objects-nested.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/array-like-objects-poisoned-length.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/array-like-objects-typedarrays.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/array-like-objects.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/prototype/flatMap/bound-function-argument.js.
@@ -40,6 +44,7 @@ final class Test262ArrayPrototypeFlatMapTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/call-with-boolean.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/prototype/flatMap/depth-always-one.js.
@@ -63,6 +68,7 @@ final class Test262ArrayPrototypeFlatMapTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/length.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/prototype/flatMap/mapperfunction-throws.js.
@@ -94,6 +100,7 @@ final class Test262ArrayPrototypeFlatMapTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/name.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/prototype/flatMap/non-callable-argument-throws.js.
@@ -113,28 +120,40 @@ final class Test262ArrayPrototypeFlatMapTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/not-a-constructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/prop-desc.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/proxy-access-count.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/target-array-non-extensible.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/target-array-with-non-configurable-property.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/target-array-with-non-writable-property.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/this-value-ctor-non-object.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/this-value-ctor-object-species-bad-throws.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/this-value-ctor-object-species-custom-ctor-poisoned-throws.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/this-value-ctor-object-species-custom-ctor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/this-value-ctor-object-species.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/flatMap/this-value-null-undefined-throws.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/prototype/flatMap/thisArg-argument.js.

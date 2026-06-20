@@ -65,20 +65,28 @@ final class Test262ArrayPrototypeValuesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/values/length.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/values/name.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/values/not-a-constructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/values/prop-desc.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/values/resizable-buffer-grow-mid-iteration.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/values/resizable-buffer-shrink-mid-iteration.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/values/resizable-buffer.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/values/returns-iterator-from-object.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/prototype/values/returns-iterator.js.
@@ -92,18 +100,24 @@ final class Test262ArrayPrototypeValuesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/values/this-val-non-obj-coercible.js
+    // Reason: test262 semantics are not portable to PHP
 
     // ===== test/built-ins/Array/prototype (root), Symbol.iterator, Symbol.unscopables =====
 
     // SKIPPED: test/built-ins/Array/prototype/Symbol.iterator/not-a-constructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/Symbol.unscopables/array-find-from-last.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/Symbol.unscopables/change-array-by-copy.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/Symbol.unscopables/prop-desc.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/Symbol.unscopables/value.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/prototype/Symbol.iterator.js.
@@ -123,14 +137,20 @@ final class Test262ArrayPrototypeValuesTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/constructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/exotic-array.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/length.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/methods-called-as-functions.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/prop-desc.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/prototype/proto.js
+    // Reason: test262 semantics are not portable to PHP
 }

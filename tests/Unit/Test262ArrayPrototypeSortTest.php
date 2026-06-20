@@ -388,10 +388,13 @@ final class Test262ArrayPrototypeSortTest extends TestCase
     // Reason: TypedArrays backed by resizable ArrayBuffers
 
     // SKIPPED: test/built-ins/Array/prototype/sort/length.js
+    // Reason: accessor property defined on Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/sort/name.js
+    // Reason: accessor property defined on Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/sort/not-a-constructor.js
+    // Reason: accessor property defined on Object.prototype
 
     // SKIPPED: test/built-ins/Array/prototype/sort/precise-comparefn-throws.js
     // Reason: accessor property defined on Object.prototype
@@ -451,6 +454,7 @@ final class Test262ArrayPrototypeSortTest extends TestCase
     // Reason: accessor properties on indexes via Object.defineProperty
 
     // SKIPPED: test/built-ins/Array/prototype/sort/prop-desc.js
+    // Reason: TypedArrays backed by resizable ArrayBuffers
 
     // SKIPPED: test/built-ins/Array/prototype/sort/resizable-buffer-default-comparator.js
     // Reason: TypedArrays backed by resizable ArrayBuffers

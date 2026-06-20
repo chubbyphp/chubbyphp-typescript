@@ -143,12 +143,16 @@ final class Test262ArrayPrototypeReduceRightTest extends TestCase
     // Reason: 'length' accessor property on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-2-11.js
+    // Reason: Arguments object as this
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-2-12.js
+    // Reason: Arguments object as this
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-2-13.js
+    // Reason: Arguments object as this
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-2-14.js
+    // Reason: Arguments object as this
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-2-17.js
     // Reason: Arguments object as this
@@ -186,61 +190,88 @@ final class Test262ArrayPrototypeReduceRightTest extends TestCase
     // Reason: 'length' accessor property on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-2-6.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-2-7.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-2-8.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-2-9.js
+    // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-1.js
     // Reason: 'length' coercion on array-like objects
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-10.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-11.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-12.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-13.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-14.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-15.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-16.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-17.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-18.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-19.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-2.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-20.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-21.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-22.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-23.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-24.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-25.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-3.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-4.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-5.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-6.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-7.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/15.4.4.22-3-9.js
+    // Reason: 'length' accessor property throwing on an array-like object
 
     /**
      * test/built-ins/Array/prototype/reduceRight/15.4.4.22-4-1.js.
@@ -1757,6 +1788,7 @@ final class Test262ArrayPrototypeReduceRightTest extends TestCase
     // Reason: function property descriptor
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/not-a-constructor.js
+    // Reason: property descriptor
 
     // SKIPPED: test/built-ins/Array/prototype/reduceRight/prop-desc.js
     // Reason: property descriptor

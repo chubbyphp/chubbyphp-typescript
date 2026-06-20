@@ -608,12 +608,16 @@ final class Test262ArrayPrototypeSpliceTest extends TestCase
     // Reason: array-like objects with length near 2^53-1
 
     // SKIPPED: test/built-ins/Array/prototype/splice/length.js
+    // Reason: Proxy / @@species
 
     // SKIPPED: test/built-ins/Array/prototype/splice/name.js
+    // Reason: Proxy / @@species
 
     // SKIPPED: test/built-ins/Array/prototype/splice/not-a-constructor.js
+    // Reason: Proxy / @@species
 
     // SKIPPED: test/built-ins/Array/prototype/splice/prop-desc.js
+    // Reason: Proxy / @@species
 
     // SKIPPED: test/built-ins/Array/prototype/splice/property-traps-order-with-species.js
     // Reason: Proxy / @@species

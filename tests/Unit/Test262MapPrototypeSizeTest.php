@@ -17,14 +17,20 @@ use PHPUnit\Framework\TestCase;
 final class Test262MapPrototypeSizeTest extends TestCase
 {
     // SKIPPED: test/built-ins/Map/prototype/size/constructor.js
+    // Reason: size is a magic property, not an accessor descriptor
     // SKIPPED: test/built-ins/Map/prototype/size/length.js
+    // Reason: size is a magic property, not an accessor descriptor
     // SKIPPED: test/built-ins/Map/prototype/size/name.js
+    // Reason: size is a magic property, not an accessor descriptor
     // SKIPPED: test/built-ins/Map/prototype/size/prop-desc.js
+    // Reason: size is a magic property, not an accessor descriptor
     // SKIPPED: test/built-ins/Map/prototype/size/size.js
     // Reason: size is a magic property, not an accessor descriptor
 
     // SKIPPED: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot-set.js
+    // Reason: methods are invoked on Map instances, not generic this values
     // SKIPPED: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot-weakmap.js
+    // Reason: methods are invoked on Map instances, not generic this values
     // SKIPPED: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot.js
     // Reason: methods are invoked on Map instances, not generic this values
 

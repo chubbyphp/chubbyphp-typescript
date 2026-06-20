@@ -23,49 +23,70 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     // Reason: applied to the Math object via call(); array-likes are JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-11.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-12.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-13.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-14.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-15.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-2.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-3.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-4.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-5.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-6.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-7.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-8.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-9.js
+    // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-1.js
     // Reason: 'length' on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-10.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-11.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-12.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-13.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-14.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-17.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-18.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-19.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     /**
      * test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-2.js.
@@ -81,6 +102,7 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-3.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     /**
      * test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-4.js.
@@ -94,65 +116,94 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-5.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-6.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-7.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-8.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-9.js
+    // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-1.js
     // Reason: 'length' value coercion on array-like objects; Arr->length is always int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-10.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-11.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-12.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-13.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-14.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-15.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-16.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-17.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-18.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-19.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-2.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-20.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-21.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-22.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-23.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-24.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-25.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-28.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-3.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-4.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-5.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-6.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-7.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-9.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     /**
      * test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-1.js.
@@ -165,25 +216,34 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-10.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-11.js
+    // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-2.js
     // Reason: call() on array-like with coerced 'length'; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-3.js
+    // Reason: fromIndex coercion from string; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-4.js
+    // Reason: fromIndex coercion from string; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-5.js
+    // Reason: fromIndex coercion from string; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-6.js
+    // Reason: fromIndex coercion from string; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-7.js
+    // Reason: fromIndex coercion from string; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-8.js
+    // Reason: fromIndex coercion from string; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-4-9.js
+    // Reason: fromIndex coercion from string; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-1.js
     // Reason: fromIndex coercion from string; Arr::lastIndexOf() fromIndex is typed ?int
@@ -192,55 +252,76 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     // Reason: fromIndex coercion from float; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-11.js
+    // Reason: fromIndex Infinity is not representable as int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-12.js
     // Reason: fromIndex Infinity is not representable as int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-13.js
+    // Reason: fromIndex NaN is not representable as int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-14.js
     // Reason: fromIndex NaN is not representable as int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-15.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-16.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-17.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-18.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-19.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-2.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-20.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-21.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-22.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-23.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-24.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-25.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-26.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-27.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-28.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-29.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-3.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-30.js
+    // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-31.js
     // Reason: float fromIndex truncation; Arr::lastIndexOf() fromIndex is typed ?int
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-32.js
+    // Reason: Object.defineProperty getter side effects; JS-only
 
     /**
      * test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-5-33.js.
@@ -560,40 +641,58 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     // Reason: Object.defineProperty getter side effects on array-likes; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-10.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-11.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-12.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-13.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-14.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-15.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-16.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-17.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-18.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-19.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-2.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-3.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-4.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-5.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-6.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-7.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-8.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-a-9.js
+    // Reason: element lookup on array-like objects via call(); JS-only
 
     /**
      * test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-1.js.
@@ -611,24 +710,34 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     // Reason: element lookup on array-like objects via call(); JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-10.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-11.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-12.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-13.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-14.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-15.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-16.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-17.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-18.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-19.js
+    // Reason: applied to the Arguments object; JS-only
 
     /**
      * test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-2.js.
@@ -641,40 +750,55 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-20.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-21.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-22.js
+    // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-25.js
     // Reason: applied to the Arguments object; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-26.js
+    // Reason: prototype-chain element lookup; Arr has no prototype chain
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-27.js
+    // Reason: prototype-chain element lookup; Arr has no prototype chain
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-28.js
+    // Reason: prototype-chain element lookup; Arr has no prototype chain
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-29.js
+    // Reason: prototype-chain element lookup; Arr has no prototype chain
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-3.js
     // Reason: prototype-chain element lookup; Arr has no prototype chain
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-30.js
+    // Reason: Object.defineProperty getters track element access; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-31.js
+    // Reason: Object.defineProperty getters track element access; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-4.js
+    // Reason: Object.defineProperty getters track element access; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-5.js
+    // Reason: Object.defineProperty getters track element access; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-6.js
+    // Reason: Object.defineProperty getters track element access; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-7.js
+    // Reason: Object.defineProperty getters track element access; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-8.js
+    // Reason: Object.defineProperty getters track element access; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-i-9.js
+    // Reason: Object.defineProperty getters track element access; JS-only
 
     /**
      * test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-8-b-ii-1.js.
@@ -832,6 +956,7 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     // Reason: TypedArrays backed by resizable ArrayBuffers; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/coerced-position-shrink.js
+    // Reason: array-like with length near 2^53-1; Arr caps length at 2^32-1
 
     /**
      * test/built-ins/Array/prototype/lastIndexOf/fromindex-zero-conversion.js.
@@ -859,12 +984,16 @@ final class Test262ArrayPrototypeLastIndexOfTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/length.js
+    // Reason: TypedArrays backed by resizable ArrayBuffers; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/name.js
+    // Reason: TypedArrays backed by resizable ArrayBuffers; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/not-a-constructor.js
+    // Reason: TypedArrays backed by resizable ArrayBuffers; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/prop-desc.js
+    // Reason: TypedArrays backed by resizable ArrayBuffers; JS-only
 
     // SKIPPED: test/built-ins/Array/prototype/lastIndexOf/resizable-buffer.js
     // Reason: TypedArrays backed by resizable ArrayBuffers; JS-only

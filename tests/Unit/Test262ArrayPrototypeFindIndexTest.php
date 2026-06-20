@@ -58,14 +58,19 @@ final class Test262ArrayPrototypeFindIndexTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/call-with-boolean.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/callbackfn-resize-arraybuffer.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/length.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/name.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/not-a-constructor.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     /**
      * test/built-ins/Array/prototype/findIndex/predicate-call-parameters.js.
@@ -188,12 +193,16 @@ final class Test262ArrayPrototypeFindIndexTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/prop-desc.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/resizable-buffer-grow-mid-iteration.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/resizable-buffer-shrink-mid-iteration.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/resizable-buffer.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     /**
      * test/built-ins/Array/prototype/findIndex/return-abrupt-from-predicate-call.js.
@@ -216,12 +225,16 @@ final class Test262ArrayPrototypeFindIndexTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/return-abrupt-from-property.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/return-abrupt-from-this-length-as-symbol.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/return-abrupt-from-this-length.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     // SKIPPED: test/built-ins/Array/prototype/findIndex/return-abrupt-from-this.js
+    // Reason: strict-mode `this === undefined` semantics do not map to PHP closures
 
     /**
      * test/built-ins/Array/prototype/findIndex/return-index-predicate-result-is-true.js.

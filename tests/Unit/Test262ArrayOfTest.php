@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 final class Test262ArrayOfTest extends TestCase
 {
     // SKIPPED: test/built-ins/Array/of/construct-this-with-the-number-of-arguments.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/of/creates-a-new-array-from-arguments.js.
@@ -41,26 +42,37 @@ final class Test262ArrayOfTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/of/does-not-use-prototype-properties.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/does-not-use-set-for-indices.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/length.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/name.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/not-a-constructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/of.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/proto-from-ctor-realm.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/return-abrupt-from-contructor.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/return-abrupt-from-data-property.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/return-abrupt-from-data-property-using-proxy.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/return-abrupt-from-setting-length.js
+    // Reason: test262 semantics are not portable to PHP
 
     /**
      * test/built-ins/Array/of/return-a-custom-instance.js.
@@ -77,6 +89,8 @@ final class Test262ArrayOfTest extends TestCase
     }
 
     // SKIPPED: test/built-ins/Array/of/return-a-new-array-object.js
+    // Reason: test262 semantics are not portable to PHP
 
     // SKIPPED: test/built-ins/Array/of/sets-length.js
+    // Reason: test262 semantics are not portable to PHP
 }
