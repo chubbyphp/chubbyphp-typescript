@@ -30,6 +30,22 @@ final class DocumentationExamplesTest extends TestCase
         self::assertSame([2, 4, 6, 8, 10], self::values($arr));
     }
 
+    public function testReadmeMapUsageExample(): void
+    {
+        $map = new Map([
+            ['a', 1],
+            ['b', 2],
+        ]);
+        $map->set('c', 3);
+        $map->delete('b');
+
+        self::assertSame([['a', 1], ['c', 3]], $map->toArray());
+
+        ob_start();
+        $map->forEach(static fn (int $v, string $k): int => print ($k.':'.$v));
+        self::assertSame('a:1c:3', ob_get_clean());
+    }
+
     public function testDocStaticFromExample(): void
     {
         self::assertSame([null, null], Arr::from(new Arr(2))->toArray());

@@ -756,14 +756,6 @@ final class ArrTest extends TestCase
         Arr::from(new \stdClass());
     }
 
-    // Array.of
-
-    public function testArrayOfCreatesArrayFromArguments(): void
-    {
-        self::assertSame([3], iterator_to_array(Arr::of(3)->values()));
-        self::assertSame([1, 2, 3], iterator_to_array(Arr::of(1, 2, 3)->values()));
-    }
-
     // Array.isArray
 
     public function testArrayIsArrayReturnsTrueForArrInstances(): void
@@ -782,6 +774,14 @@ final class ArrTest extends TestCase
         self::assertFalse(Arr::isArray(true));
         self::assertFalse(Arr::isArray(new \stdClass()));
         self::assertFalse(Arr::isArray(new \ArrayObject()));
+    }
+
+    // Array.of
+
+    public function testArrayOfCreatesArrayFromArguments(): void
+    {
+        self::assertSame([3], iterator_to_array(Arr::of(3)->values()));
+        self::assertSame([1, 2, 3], iterator_to_array(Arr::of(1, 2, 3)->values()));
     }
 
     // Array.prototype.at

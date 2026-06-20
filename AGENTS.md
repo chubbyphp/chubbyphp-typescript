@@ -21,6 +21,7 @@ node -e 'console.log([1, , 3].findIndex(x => x === undefined))'  # prints 1
 | `tests/Unit/Test262*Test.php` | Ports of the official test262 suite, one file per `Array`/`Map` method |
 | `tests/Integration/DocumentationExamplesTest.php` | Mirrors every PHP example block in `README.md` / `doc/Arr.md` / `doc/Map.md` |
 | `tests/Integration/MapProcessingTest.php` | Complex end-to-end `Map` integration example |
+| `tests/Integration/UserProcessingTest.php` | Complex end-to-end `Arr` integration example |
 | `tests/Stub/*.php` | Shared test fixtures |
 | `doc/Arr.md` | `Arr` API documentation with runnable examples |
 | `doc/Map.md` | `Map` API documentation with runnable examples |
@@ -95,8 +96,9 @@ Quality gates to preserve:
 - **Deletion uses a `null` sentinel** rather than removing the record, so live iterators and
   `forEach` behave like JS `MapData` even when entries are deleted during iteration.
 - **`size` is live**: it counts non-deleted entries. Access it via the magic `$map->size` property.
-- Iteration methods capture the initial entry count **before** the loop; callbacks may mutate the
-  map without affecting the iteration boundary.
+- Iteration methods walk the live entry list; entries added during iteration may be visited,
+  while entries deleted during iteration are skipped via the `null` sentinel without shortening
+  the boundary.
 - Callback signatures follow JS order: `forEach(value, key, map)`, `groupBy(value, index)`,
   `getOrInsertComputed(key)`.
 - `thisArg` support: bind only non-static `Closure` callables via `Closure::bindTo`;
