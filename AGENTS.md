@@ -15,6 +15,7 @@ node -e 'console.log([1, , 3].findIndex(x => x === undefined))'  # prints 1
 |---|---|
 | `src/Arr.php` | The whole `Arr` implementation (one class) |
 | `src/Map.php` | The whole `Map` implementation (one class) |
+| `src/FloatToString.php` | ECMAScript `Number::toString` helper used by `Arr` |
 | `src/RangeError.php`, `src/NumberFormatError.php` | Project exception classes |
 | `tests/Unit/ArrTest.php` | Main `Arr` spec, organized in JS API order (see ordering rule) |
 | `tests/Unit/MapTest.php` | Main `Map` spec, organized in JS API order |
@@ -75,7 +76,7 @@ Quality gates to preserve:
 - `$this->internalArray` keys are in **insertion order, not index order**
   (`$a[2] = ...; $a[0] = ...;`). When order matters, never `foreach` over it directly;
   loop `for ($i = 0; $i < $len; ++$i)` and check `\array_key_exists($i, ...)`.
-- Floats stringify via `numberToString()` which implements ECMAScript `Number::toString`
+- Floats stringify via `FloatToString::floatToString()` which implements ECMAScript `Number::toString`
   (shortest round-trip): `0.1` → `"0.1"`, `1.0` → `"1"`, `-0.0` → `"0"`, `INF` → `"Infinity"`,
   `NAN` → `"NaN"`, `1e21` → `"1e+21"`, `1e-7` → `"1e-7"`. Do not use `sprintf('%g')` or `(string)` casts.
 - `sort()` moves explicit `null`s (JS `undefined`) to the end without calling the comparator;
