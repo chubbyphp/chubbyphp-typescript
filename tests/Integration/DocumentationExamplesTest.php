@@ -471,6 +471,16 @@ final class DocumentationExamplesTest extends TestCase
         self::assertSame(2, $map->size);
     }
 
+    public function testDocMapGroupByExample(): void
+    {
+        $numbers = new Arr(1, 2, 3, 4, 5);
+
+        $grouped = Map::groupBy($numbers, static fn (int $n): string => 0 === $n % 2 ? 'even' : 'odd');
+
+        self::assertSame([2, 4], $grouped->get('even')->toArray());
+        self::assertSame([1, 3, 5], $grouped->get('odd')->toArray());
+    }
+
     public function testDocMapClearExample(): void
     {
         $map = new Map([['a', 1], ['b', 2]]);
@@ -518,6 +528,24 @@ final class DocumentationExamplesTest extends TestCase
 
         self::assertSame(1, $map->get('a'));
         self::assertNull($map->get('c'));
+    }
+
+    public function testDocMapGetOrInsertExample(): void
+    {
+        $map = new Map([['a', 1]]);
+
+        self::assertSame(1, $map->getOrInsert('a', 99));
+        self::assertSame(99, $map->getOrInsert('b', 99));
+        self::assertSame(99, $map->get('b'));
+    }
+
+    public function testDocMapGetOrInsertComputedExample(): void
+    {
+        $map = new Map([['a', 1]]);
+
+        self::assertSame(1, $map->getOrInsertComputed('a', static fn (): int => 99));
+        self::assertSame('b: default', $map->getOrInsertComputed('b', static fn (string $key): string => $key.': default'));
+        self::assertSame('b: default', $map->get('b'));
     }
 
     public function testDocMapHasExample(): void

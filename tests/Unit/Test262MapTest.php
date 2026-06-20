@@ -43,22 +43,6 @@ final class Test262MapTest extends TestCase
     // SKIPPED: test/built-ins/Map/get-set-method-failure.js
     // Reason: constructor does not call a set method
 
-    // SKIPPED: test/built-ins/Map/groupBy/callback-arg.js
-    // SKIPPED: test/built-ins/Map/groupBy/callback-throws.js
-    // SKIPPED: test/built-ins/Map/groupBy/emptyList.js
-    // SKIPPED: test/built-ins/Map/groupBy/evenOdd.js
-    // SKIPPED: test/built-ins/Map/groupBy/groupLength.js
-    // SKIPPED: test/built-ins/Map/groupBy/invalid-callback.js
-    // SKIPPED: test/built-ins/Map/groupBy/invalid-iterable.js
-    // SKIPPED: test/built-ins/Map/groupBy/iterator-next-throws.js
-    // SKIPPED: test/built-ins/Map/groupBy/length.js
-    // SKIPPED: test/built-ins/Map/groupBy/map-instance.js
-    // SKIPPED: test/built-ins/Map/groupBy/name.js
-    // SKIPPED: test/built-ins/Map/groupBy/negativeZero.js
-    // SKIPPED: test/built-ins/Map/groupBy/string.js
-    // SKIPPED: test/built-ins/Map/groupBy/toPropertyKey.js
-    // Reason: Map.groupBy static method is not implemented
-
     // SKIPPED: test/built-ins/Map/is-a-constructor.js
     // Reason: PHP class constructor is always a constructor
 

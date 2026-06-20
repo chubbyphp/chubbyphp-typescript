@@ -189,6 +189,104 @@ final class MapTest extends TestCase
         self::assertCount(2, $map);
     }
 
+    // groupBy
+
+    public function testMapGroupByWithEvenOddCallback(): void
+    {
+        $numbers = new Arr(1, 2, 3, 4, 5);
+
+        $grouped = Map::groupBy($numbers, static fn (int $n): string => 0 === $n % 2 ? 'even' : 'odd');
+
+        self::assertSame(2, $grouped->size);
+        self::assertInstanceOf(Arr::class, $grouped->get('even'));
+        self::assertSame([2, 4], $grouped->get('even')->toArray());
+        self::assertSame([1, 3, 5], $grouped->get('odd')->toArray());
+    }
+
+    public function testMapGroupByWithGenerator(): void
+    {
+        $items = (static function (): \Generator {
+            yield 1;
+
+            yield 2;
+
+            yield 3;
+        })();
+
+        $grouped = Map::groupBy($items, static fn (int $n): string => 0 === $n % 2 ? 'even' : 'odd');
+
+        self::assertSame(2, $grouped->size);
+        self::assertSame([2], $grouped->get('even')->toArray());
+        self::assertSame([1, 3], $grouped->get('odd')->toArray());
+    }
+
+    public function testMapGroupByWithEmptyIterable(): void
+    {
+        $grouped = Map::groupBy(new Arr(), static fn (int $n): string => 0 === $n % 2 ? 'even' : 'odd');
+
+        self::assertSame(0, $grouped->size);
+        self::assertSame([], $grouped->toArray());
+    }
+
+    public function testMapGroupByCallbackReceivesValueAndIndex(): void
+    {
+        $seen = [];
+
+        $grouped = Map::groupBy(new Arr('a', 'b', 'c'), static function (string $value, int $index) use (&$seen): string {
+            $seen[] = [$value, $index];
+
+            return $value;
+        });
+
+        self::assertSame([['a', 0], ['b', 1], ['c', 2]], $seen);
+        self::assertSame(3, $grouped->size);
+    }
+
+    public function testMapGroupByWithObjectKeys(): void
+    {
+        $a = new \stdClass();
+        $b = new \stdClass();
+
+        $grouped = Map::groupBy(new Arr($a, $b, $a), static fn (\stdClass $value): \stdClass => $value);
+
+        self::assertSame(2, $grouped->size);
+        self::assertSame([$a, $a], $grouped->get($a)->toArray());
+        self::assertSame([$b], $grouped->get($b)->toArray());
+    }
+
+    public function testMapGroupByWithSparseArrTreatsHolesAsNull(): void
+    {
+        /** @var Arr<null|string> $items */
+        $items = new Arr();
+        $items[0] = 'a';
+        $items[2] = 'c';
+
+        $grouped = Map::groupBy($items, static fn (?string $value, int $index): int => $index);
+
+        self::assertSame(3, $grouped->size);
+        self::assertSame(['a'], $grouped->get(0)->toArray());
+        self::assertNull($grouped->get(1)[0]);
+        self::assertSame(['c'], $grouped->get(2)->toArray());
+    }
+
+    public function testMapGroupByCallbackThrowIsPropagated(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('boom');
+
+        Map::groupBy(new Arr(1, 2), static function (): string {
+            throw new \RuntimeException('boom');
+        });
+    }
+
+    public function testMapGroupByGroupsPositiveZeroAndNegativeZeroTogether(): void
+    {
+        $grouped = Map::groupBy(new Arr(1, 2), static fn (int $value, int $index): float => 0 === $index ? -0.0 : 0.0);
+
+        self::assertSame(1, $grouped->size);
+        self::assertSame([1, 2], $grouped->get(0.0)->toArray());
+    }
+
     // clear
 
     public function testMapClearRemovesAllEntries(): void
@@ -294,6 +392,92 @@ final class MapTest extends TestCase
 
         self::assertNull($map->get('a'));
         self::assertNull($map->get('b'));
+    }
+
+    // getOrInsert
+
+    public function testMapGetOrInsertReturnsExistingValue(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        self::assertSame(1, $map->getOrInsert('a', 99));
+        self::assertSame(2, $map->getOrInsert('b', 99));
+        self::assertSame(2, $map->size);
+    }
+
+    public function testMapGetOrInsertInsertsDefaultValueWhenKeyMissing(): void
+    {
+        $map = new Map([['a', 1]]);
+
+        self::assertSame(99, $map->getOrInsert('b', 99));
+        self::assertSame(1, $map->get('a'));
+        self::assertSame(99, $map->get('b'));
+        self::assertSame(2, $map->size);
+    }
+
+    public function testMapGetOrInsertWithNullValueDoesNotReplaceExisting(): void
+    {
+        $map = new Map([['a', null]]);
+
+        self::assertNull($map->getOrInsert('a', 'default'));
+        self::assertSame(1, $map->size);
+    }
+
+    // getOrInsertComputed
+
+    public function testMapGetOrInsertComputedReturnsExistingValue(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        $called = false;
+        $value = $map->getOrInsertComputed('a', static function () use (&$called): int {
+            $called = true;
+
+            return 99;
+        });
+
+        self::assertSame(1, $value);
+        self::assertFalse($called);
+    }
+
+    public function testMapGetOrInsertComputedInsertsCallbackResultWhenKeyMissing(): void
+    {
+        $map = new Map([['a', 1]]);
+
+        $value = $map->getOrInsertComputed('b', static fn (string $key): string => 'default for '.$key);
+
+        self::assertSame('default for b', $value);
+        self::assertSame('default for b', $map->get('b'));
+        self::assertSame(2, $map->size);
+    }
+
+    public function testMapGetOrInsertComputedCallbackReceivesKey(): void
+    {
+        $map = new Map();
+
+        $received = null;
+        $map->getOrInsertComputed('target', static function (string $key) use (&$received): string {
+            $received = $key;
+
+            return 'value';
+        });
+
+        self::assertSame('target', $received);
+    }
+
+    public function testMapGetOrInsertComputedDoesNotCallCallbackWhenKeyExists(): void
+    {
+        $map = new Map([['a', 'existing']]);
+
+        $calls = 0;
+        $value = $map->getOrInsertComputed('a', static function () use (&$calls): string {
+            ++$calls;
+
+            return 'new';
+        });
+
+        self::assertSame('existing', $value);
+        self::assertSame(0, $calls);
     }
 
     // has

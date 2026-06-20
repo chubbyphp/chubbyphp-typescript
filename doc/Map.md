@@ -41,6 +41,26 @@ $map->size;  // 2
 
 ---
 
+## Static methods
+
+### `groupBy(iterable $items, callable $callback): Map`
+
+Groups the elements of an iterable into a `Map`, using the return value of `$callback` as the key for each element. The callback receives the element and its zero-based index. Each group is stored as an `Arr`.
+
+```php
+use Chubbyphp\Typescript\Arr;
+use Chubbyphp\Typescript\Map;
+
+$numbers = new Arr(1, 2, 3, 4, 5);
+
+$grouped = Map::groupBy($numbers, static fn (int $n): string => 0 === $n % 2 ? 'even' : 'odd');
+
+$grouped->get('even')->toArray();  // [2, 4]
+$grouped->get('odd')->toArray();   // [1, 3, 5]
+```
+
+---
+
 ## Instance methods
 
 ### `clear(): void`
@@ -112,6 +132,36 @@ Returns the value associated with the key, or `null` if the key is not present.
 $map = new Map([['a', 1], ['b', 2]]);
 $map->get('a');  // 1
 $map->get('c');  // null
+```
+
+---
+
+### `getOrInsert(mixed $key, mixed $defaultValue): mixed`
+
+Returns the value for the given key. If the key is not present, inserts the key with `defaultValue` and returns it.
+
+```php
+$map = new Map([['a', 1]]);
+
+$map->getOrInsert('a', 99);  // 1
+$map->getOrInsert('b', 99);  // 99
+
+$map->get('b');  // 99
+```
+
+---
+
+### `getOrInsertComputed(mixed $key, callable $callback): mixed`
+
+Returns the value for the given key. If the key is not present, calls `callback(key)` to compute a default value, inserts it, and returns it.
+
+```php
+$map = new Map([['a', 1]]);
+
+$map->getOrInsertComputed('a', static fn (): int => 99);              // 1
+$map->getOrInsertComputed('b', static fn (string $key): string => $key.': default');  // 'b: default'
+
+$map->get('b');  // 'b: default'
 ```
 
 ---

@@ -66,6 +66,65 @@ final class Map implements \Countable, \IteratorAggregate
         return null;
     }
 
+    /**
+     * @return non-negative-int
+     */
+    public function count(): int
+    {
+        $count = 0;
+
+        foreach ($this->entries as $entry) {
+            if (null !== $entry) {
+                ++$count;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * @return \Generator<int, array{0: K, 1: V}, mixed, void>
+     */
+    public function getIterator(): \Generator
+    {
+        return $this->entries();
+    }
+
+    /**
+     * @template GK
+     * @template GV
+     *
+     * @param Arr<GV>|iterable<int, GV> $items
+     * @param callable(GV, int): GK     $callback
+     *
+     * @return self<GK, Arr<GV>>
+     */
+    public static function groupBy(iterable $items, callable $callback): self
+    {
+        /** @var self<GK, Arr<GV>> $map */
+        $map = new self();
+
+        if ($items instanceof Arr) {
+            $length = $items->length;
+
+            for ($i = 0; $i < $length; ++$i) {
+                $value = $items[$i];
+                $key = $callback($value, $i);
+                self::appendToGroup($map, $key, $value);
+            }
+        } else {
+            $i = 0;
+
+            foreach ($items as $value) {
+                $key = $callback($value, $i);
+                self::appendToGroup($map, $key, $value);
+                ++$i;
+            }
+        }
+
+        return $map;
+    }
+
     public function clear(): void
     {
         $this->entries = [];
@@ -83,6 +142,20 @@ final class Map implements \Countable, \IteratorAggregate
         $this->entries[$index] = null;
 
         return true;
+    }
+
+    /**
+     * @return \Generator<int, array{0: K, 1: V}, mixed, void>
+     */
+    public function entries(): \Generator
+    {
+        for ($i = 0; $i < \count($this->entries); ++$i) {
+            $entry = $this->entries[$i];
+
+            if (null !== $entry) {
+                yield $entry;
+            }
+        }
     }
 
     /**
@@ -120,9 +193,64 @@ final class Map implements \Countable, \IteratorAggregate
         return $entry[1];
     }
 
+    /**
+     * @return V
+     */
+    public function getOrInsert(mixed $key, mixed $defaultValue): mixed
+    {
+        $index = $this->findEntryIndex($key);
+
+        if (null !== $index) {
+            $entry = $this->entries[$index];
+            \assert(null !== $entry);
+
+            return $entry[1];
+        }
+
+        $this->set($key, $defaultValue);
+
+        return $defaultValue;
+    }
+
+    /**
+     * @param callable(K): V $callback
+     *
+     * @return V
+     */
+    public function getOrInsertComputed(mixed $key, callable $callback): mixed
+    {
+        $index = $this->findEntryIndex($key);
+
+        if (null !== $index) {
+            $entry = $this->entries[$index];
+            \assert(null !== $entry);
+
+            return $entry[1];
+        }
+
+        $value = $callback($key);
+        $this->set($key, $value);
+
+        return $value;
+    }
+
     public function has(mixed $key): bool
     {
         return null !== $this->findEntryIndex($key);
+    }
+
+    /**
+     * @return \Generator<int, K, mixed, void>
+     */
+    public function keys(): \Generator
+    {
+        for ($i = 0; $i < \count($this->entries); ++$i) {
+            $entry = $this->entries[$i];
+
+            if (null !== $entry) {
+                yield $entry[0];
+            }
+        }
     }
 
     /**
@@ -147,34 +275,6 @@ final class Map implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @return \Generator<int, array{0: K, 1: V}, mixed, void>
-     */
-    public function entries(): \Generator
-    {
-        for ($i = 0; $i < \count($this->entries); ++$i) {
-            $entry = $this->entries[$i];
-
-            if (null !== $entry) {
-                yield $entry;
-            }
-        }
-    }
-
-    /**
-     * @return \Generator<int, K, mixed, void>
-     */
-    public function keys(): \Generator
-    {
-        for ($i = 0; $i < \count($this->entries); ++$i) {
-            $entry = $this->entries[$i];
-
-            if (null !== $entry) {
-                yield $entry[0];
-            }
-        }
-    }
-
-    /**
      * @return \Generator<int, V, mixed, void>
      */
     public function values(): \Generator
@@ -186,33 +286,6 @@ final class Map implements \Countable, \IteratorAggregate
                 yield $entry[1];
             }
         }
-    }
-
-    /**
-     * @return \Generator<int, array{0: K, 1: V}, mixed, void>
-     */
-    public function getIterator(): \Generator
-    {
-        return $this->entries();
-    }
-
-    /**
-     * @return non-negative-int
-     */
-    /**
-     * @return non-negative-int
-     */
-    public function count(): int
-    {
-        $count = 0;
-
-        foreach ($this->entries as $entry) {
-            if (null !== $entry) {
-                ++$count;
-            }
-        }
-
-        return $count;
     }
 
     /**
@@ -278,6 +351,25 @@ final class Map implements \Countable, \IteratorAggregate
         }
 
         return $callback;
+    }
+
+    /**
+     * @template GK
+     * @template GV
+     *
+     * @param self<GK, Arr<GV>> $map
+     * @param GK                $key
+     * @param GV                $value
+     */
+    private static function appendToGroup(self $map, mixed $key, mixed $value): void
+    {
+        if ($map->has($key)) {
+            /** @var Arr<GV> $group */
+            $group = $map->get($key);
+            $group->push($value);
+        } else {
+            $map->set($key, Arr::of($value));
+        }
     }
 
     /**
