@@ -189,6 +189,20 @@ final class MapTest extends TestCase
         self::assertCount(2, $map);
     }
 
+    // IteratorAggregate / default iterator
+
+    public function testMapDefaultIteratorYieldsEntries(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        $entries = [];
+        foreach ($map as $entry) {
+            $entries[] = $entry;
+        }
+
+        self::assertSame([['a', 1], ['b', 2]], $entries);
+    }
+
     // groupBy
 
     public function testMapGroupByWithEvenOddCallback(): void
@@ -341,32 +355,93 @@ final class MapTest extends TestCase
         self::assertSame([['b', 2], ['a', 3]], $map->toArray());
     }
 
-    // set
+    // entries
 
-    public function testMapSetAddsNewEntry(): void
-    {
-        $map = new Map();
-
-        self::assertSame($map, $map->set('a', 1));
-        self::assertSame([['a', 1]], $map->toArray());
-    }
-
-    public function testMapSetChains(): void
-    {
-        $map = new Map();
-
-        $map->set('a', 1)->set('b', 2)->set('c', 3);
-
-        self::assertSame([['a', 1], ['b', 2], ['c', 3]], $map->toArray());
-    }
-
-    public function testMapSetUpdatesExistingKeyWithoutChangingOrder(): void
+    public function testMapEntriesIterateInInsertionOrder(): void
     {
         $map = new Map([['a', 1], ['b', 2]]);
 
-        $map->set('a', 3);
+        $entries = [];
+        foreach ($map->entries() as $entry) {
+            $entries[] = $entry;
+        }
 
-        self::assertSame([['a', 3], ['b', 2]], $map->toArray());
+        self::assertSame([['a', 1], ['b', 2]], $entries);
+    }
+
+    // forEach
+
+    public function testMapForEachReceivesValueKeyAndMap(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        $seen = [];
+        $map->forEach(static function (int $value, string $key, Map $m) use (&$seen, $map): void {
+            self::assertSame($map, $m);
+            $seen[] = [$key, $value];
+        });
+
+        self::assertSame([['a', 1], ['b', 2]], $seen);
+    }
+
+    public function testMapForEachBindsThisArgForNonStaticClosure(): void
+    {
+        $map = new Map([['a', 1]]);
+        $context = new \stdClass();
+        $context->touched = false;
+
+        $map->forEach(function (): void {
+            // @phpstan-ignore-next-line
+            $this->touched = true;
+        }, $context);
+
+        self::assertTrue($context->touched);
+    }
+
+    public function testMapForEachDoesNotBindThisArgForStaticClosure(): void
+    {
+        $map = new Map([['a', 1]]);
+        $context = new \stdClass();
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Using $this when not in object context');
+
+        $map->forEach(static function (): void {
+            // @phpstan-ignore-next-line
+            $this->touched = true;
+        }, $context);
+    }
+
+    public function testMapForEachDoesNotBindThisArgForArrayCallable(): void
+    {
+        $map = new Map([['a', 1]]);
+        $context = new \stdClass();
+        $context->touched = false;
+
+        $handler = new class {
+            public bool $called = false;
+
+            public function handle(): void
+            {
+                $this->called = true;
+            }
+        };
+
+        $map->forEach([$handler, 'handle'], $context);
+
+        self::assertTrue($handler->called);
+    }
+
+    public function testMapForEachWithNullValues(): void
+    {
+        $map = new Map([['a', null], ['b', null]]);
+
+        $seen = [];
+        $map->forEach(static function (?string $value, string $key) use (&$seen): void {
+            $seen[] = [$key, $value];
+        });
+
+        self::assertSame([['a', null], ['b', null]], $seen);
     }
 
     // get
@@ -585,19 +660,7 @@ final class MapTest extends TestCase
         self::assertSame('number', $map->get(1.0));
     }
 
-    // entries / keys / values
-
-    public function testMapEntriesIterateInInsertionOrder(): void
-    {
-        $map = new Map([['a', 1], ['b', 2]]);
-
-        $entries = [];
-        foreach ($map->entries() as $entry) {
-            $entries[] = $entry;
-        }
-
-        self::assertSame([['a', 1], ['b', 2]], $entries);
-    }
+    // keys
 
     public function testMapKeysIterateInInsertionOrder(): void
     {
@@ -606,98 +669,41 @@ final class MapTest extends TestCase
         self::assertSame(['a', 'b'], iterator_to_array($map->keys()));
     }
 
+    // set
+
+    public function testMapSetAddsNewEntry(): void
+    {
+        $map = new Map();
+
+        self::assertSame($map, $map->set('a', 1));
+        self::assertSame([['a', 1]], $map->toArray());
+    }
+
+    public function testMapSetChains(): void
+    {
+        $map = new Map();
+
+        $map->set('a', 1)->set('b', 2)->set('c', 3);
+
+        self::assertSame([['a', 1], ['b', 2], ['c', 3]], $map->toArray());
+    }
+
+    public function testMapSetUpdatesExistingKeyWithoutChangingOrder(): void
+    {
+        $map = new Map([['a', 1], ['b', 2]]);
+
+        $map->set('a', 3);
+
+        self::assertSame([['a', 3], ['b', 2]], $map->toArray());
+    }
+
+    // values
+
     public function testMapValuesIterateInInsertionOrder(): void
     {
         $map = new Map([['a', 1], ['b', 2]]);
 
         self::assertSame([1, 2], iterator_to_array($map->values()));
-    }
-
-    public function testMapDefaultIteratorYieldsEntries(): void
-    {
-        $map = new Map([['a', 1], ['b', 2]]);
-
-        $entries = [];
-        foreach ($map as $entry) {
-            $entries[] = $entry;
-        }
-
-        self::assertSame([['a', 1], ['b', 2]], $entries);
-    }
-
-    // forEach
-
-    public function testMapForEachReceivesValueKeyAndMap(): void
-    {
-        $map = new Map([['a', 1], ['b', 2]]);
-
-        $seen = [];
-        $map->forEach(static function (int $value, string $key, Map $m) use (&$seen, $map): void {
-            self::assertSame($map, $m);
-            $seen[] = [$key, $value];
-        });
-
-        self::assertSame([['a', 1], ['b', 2]], $seen);
-    }
-
-    public function testMapForEachBindsThisArgForNonStaticClosure(): void
-    {
-        $map = new Map([['a', 1]]);
-        $context = new \stdClass();
-        $context->touched = false;
-
-        $map->forEach(function (): void {
-            // @phpstan-ignore-next-line
-            $this->touched = true;
-        }, $context);
-
-        self::assertTrue($context->touched);
-    }
-
-    public function testMapForEachDoesNotBindThisArgForStaticClosure(): void
-    {
-        $map = new Map([['a', 1]]);
-        $context = new \stdClass();
-
-        $this->expectException(\Error::class);
-        $this->expectExceptionMessage('Using $this when not in object context');
-
-        $map->forEach(static function (): void {
-            // @phpstan-ignore-next-line
-            $this->touched = true;
-        }, $context);
-    }
-
-    public function testMapForEachDoesNotBindThisArgForArrayCallable(): void
-    {
-        $map = new Map([['a', 1]]);
-        $context = new \stdClass();
-        $context->touched = false;
-
-        $handler = new class {
-            public bool $called = false;
-
-            public function handle(): void
-            {
-                $this->called = true;
-            }
-        };
-
-        $map->forEach([$handler, 'handle'], $context);
-
-        self::assertTrue($handler->called);
-    }
-
-    public function testMapForEachWithNullValues(): void
-    {
-        $map = new Map([['a', null], ['b', null]]);
-
-        $seen = [];
-        $map->forEach(static function (?string $value, string $key) use (&$seen): void {
-            $seen[] = [$key, $value];
-        });
-
-        self::assertSame([['a', null], ['b', null]], $seen);
     }
 
     // toArray
