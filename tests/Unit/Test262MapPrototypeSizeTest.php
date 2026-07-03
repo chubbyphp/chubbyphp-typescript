@@ -16,23 +16,20 @@ use PHPUnit\Framework\TestCase;
  */
 final class Test262MapPrototypeSizeTest extends TestCase
 {
-    // SKIPPED: test/built-ins/Map/prototype/size/constructor.js
-    // Reason: size is a magic property, not an accessor descriptor
-    // SKIPPED: test/built-ins/Map/prototype/size/length.js
-    // Reason: size is a magic property, not an accessor descriptor
-    // SKIPPED: test/built-ins/Map/prototype/size/name.js
-    // Reason: size is a magic property, not an accessor descriptor
-    // SKIPPED: test/built-ins/Map/prototype/size/prop-desc.js
-    // Reason: size is a magic property, not an accessor descriptor
-    // SKIPPED: test/built-ins/Map/prototype/size/size.js
-    // Reason: size is a magic property, not an accessor descriptor
-
     // SKIPPED: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot-set.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: calls the extracted size getter on a Set via .call(); PHP's magic $map->size cannot be detached from a Map instance
+
     // SKIPPED: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot-weakmap.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: calls the extracted size getter on a WeakMap via .call(); PHP's magic $map->size cannot be detached from a Map instance
+
     // SKIPPED: test/built-ins/Map/prototype/size/does-not-have-mapdata-internal-slot.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: calls the extracted size getter on an array via .call(); PHP's magic $map->size cannot be detached from a Map instance
+
+    // SKIPPED: test/built-ins/Map/prototype/size/length.js
+    // Reason: tests the "length" property descriptor of the size getter function object; PHP has no getter function object
+
+    // SKIPPED: test/built-ins/Map/prototype/size/name.js
+    // Reason: tests the "name" property descriptor ("get size") of the size getter function object; PHP has no getter function object
 
     /**
      * test/built-ins/Map/prototype/size/returns-count-of-present-values-before-after-set-clear.js.
@@ -41,16 +38,14 @@ final class Test262MapPrototypeSizeTest extends TestCase
     {
         $map = new Map();
 
-        self::assertSame(0, $map->size);
+        self::assertSame(0, $map->size, 'The value of $map->size is 0');
 
         $map->set(1, 1);
         $map->set(2, 2);
-
-        self::assertSame(2, $map->size);
+        self::assertSame(2, $map->size, 'The value of $map->size is 2');
 
         $map->clear();
-
-        self::assertSame(0, $map->size);
+        self::assertSame(0, $map->size, 'The value of $map->size is 0, after executing $map->clear()');
     }
 
     /**
@@ -60,45 +55,76 @@ final class Test262MapPrototypeSizeTest extends TestCase
     {
         $map = new Map();
 
-        self::assertSame(0, $map->size);
+        self::assertSame(0, $map->size, 'The value of $map->size is 0');
 
         $map->set(1, 1);
-
-        self::assertSame(1, $map->size);
+        self::assertSame(1, $map->size, 'The value of $map->size is 1, after executing $map->set(1, 1)');
 
         $map->delete(1);
-
-        self::assertSame(0, $map->size);
+        self::assertSame(0, $map->size, 'The value of $map->size is 0, after executing $map->delete(1)');
     }
 
-    // SKIPPED: test/built-ins/Map/prototype/size/returns-count-of-present-values-by-insertion.js
-    // Reason: requires Symbol keys
+    /**
+     * test/built-ins/Map/prototype/size/returns-count-of-present-values-by-insertion.js.
+     */
+    public function testReturnsCountOfPresentValuesByInsertion(): void
+    {
+        // Adapted: the JS Symbol() key is replaced by an object key; JS `undefined` and `null`
+        // both map to PHP null and collapse into a single key, so the expected size is 6, not 7.
+        $map = new Map();
 
-    // SKIPPED: test/built-ins/Map/prototype/size/returns-count-of-present-values-by-iterable.js
-    // Reason: requires Symbol keys
+        $map->set(0, null);
+        $map->set(null, null); // covers both the JS `undefined` and JS `null` keys
+        $map->set(false, null);
+        $map->set(NAN, null);
+        $map->set('', null);
+        $map->set(new \stdClass(), null);
+
+        self::assertSame(6, $map->size, 'The value of $map->size is 6');
+    }
+
+    /**
+     * test/built-ins/Map/prototype/size/returns-count-of-present-values-by-iterable.js.
+     */
+    public function testReturnsCountOfPresentValuesByIterable(): void
+    {
+        // Adapted: the JS Symbol() key is replaced by an object key; JS `undefined` and `null`
+        // both map to PHP null and collapse into a single key, so the expected size is 6, not 7.
+        $map = new Map([
+            [0, null],
+            [null, null], // covers both the JS `undefined` and JS `null` keys
+            [false, null],
+            [NAN, null],
+            ['', null],
+            [new \stdClass(), null],
+        ]);
+
+        self::assertSame(6, $map->size, 'The value of $map->size is 6');
+    }
 
     /**
      * test/built-ins/Map/prototype/size/size.js.
      */
     public function testSize(): void
     {
-        $map = new Map();
+        // Adapted: the JS accessor descriptor (get is a function, set is undefined) maps to
+        // PHP's magic property: reading $map->size works, writing throws a TypeError.
+        // The enumerable/configurable descriptor parts are not portable to PHP.
+        $map = new Map([['a', 1]]);
 
-        self::assertSame(0, $map->size);
+        self::assertSame(1, $map->size, 'reading $map->size works: the getter is present');
 
-        $map->set('a', 1);
-        self::assertSame(1, $map->size);
+        try {
+            $map->size = 2;
 
-        $map->set('b', 2);
-        self::assertSame(2, $map->size);
+            self::fail('writing $map->size must throw a TypeError: there is no setter');
+        } catch (\TypeError $e) {
+            self::assertSame('Cannot set property Map::$size which has only a getter', $e->getMessage());
+        }
 
-        $map->delete('a');
-        self::assertSame(1, $map->size);
-
-        $map->clear();
-        self::assertSame(0, $map->size);
+        self::assertSame(1, $map->size, '$map->size is unchanged after the rejected write');
     }
 
     // SKIPPED: test/built-ins/Map/prototype/size/this-not-object-throw.js
-    // Reason: PHP methods are invoked on Map instances
+    // Reason: calls the extracted size getter with primitive this values via .call(); PHP's magic $map->size is always accessed on a Map instance
 }

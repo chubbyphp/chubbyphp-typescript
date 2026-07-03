@@ -4,7 +4,7 @@
 
 - **Generic type**: `@template K, V` — every `Map` instance carries type parameters for its keys and values.
 - **Internal storage**: `list<null|array{0: K, 1: V}>` — an ordered list of key-value pairs with `null` sentinels for deleted entries, matching JS `MapData` semantics.
-- **Errors**: Throws `\TypeError` when the constructor receives an invalid entry object.
+- **Errors**: Throws `\TypeError` when the constructor receives a non-iterable argument or an entry that is not iterable.
 
 ---
 
@@ -15,10 +15,11 @@ use Chubbyphp\Typescript\Map;
 
 new Map();                            // size 0
 new Map([['a', 1], ['b', 2]]);        // size 2
+new Map([['a']]);                     // size 1, 'a' => null
 new Map(null);                        // size 0
 ```
 
-The constructor accepts an iterable of entries. Each entry must itself be iterable and yield at least a key and a value. Extra values in an entry are ignored.
+The constructor accepts an iterable of entries. Each entry must itself be iterable; its first two values are used as key and value, and missing values default to `null` (JS `undefined`). Extra values in an entry are ignored.
 
 ---
 
@@ -26,7 +27,7 @@ The constructor accepts an iterable of entries. Each entry must itself be iterab
 
 ### `size`
 
-Returns the number of key-value pairs in the map. Accessed via magic `__get`.
+Returns the number of key-value pairs in the map. Accessed via magic `__get`. The property is read-only — assigning to it throws a `\TypeError`, matching the getter-only `size` accessor in JS.
 
 ```php
 $map = new Map([['a', 1], ['b', 2]]);
@@ -65,7 +66,7 @@ $grouped->get('odd')->toArray();   // [1, 3, 5]
 
 ### `clear(): void`
 
-Removes all key-value pairs from the map.
+Removes all key-value pairs from the map. Like JS, the entry records are emptied in place, so a live iterator keeps its position and still sees entries added after the clear.
 
 ```php
 $map = new Map([['a', 1], ['b', 2]]);
@@ -153,7 +154,7 @@ $map->get('b');  // 99
 
 ### `getOrInsertComputed(mixed $key, callable $callback): mixed`
 
-Returns the value for the given key. If the key is not present, calls `callback(key)` to compute a default value, inserts it, and returns it.
+Returns the value for the given key. If the key is not present, calls `callback(key)` to compute a default value, inserts it, and returns it. The key is canonicalized (`-0` → `+0`) before it is passed to the callback.
 
 ```php
 $map = new Map([['a', 1]]);

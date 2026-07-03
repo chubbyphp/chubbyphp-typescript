@@ -88,6 +88,14 @@ Quality gates to preserve:
 
 - PHP `null` plays the role of JS `undefined` everywhere, including as a valid stored value.
   `Map` distinguishes a missing key (returns `null`) from a key explicitly mapped to `null`.
+- **Constructor entries pad with `null`**: an entry with fewer than two values fills the missing
+  key/value with `null` (`new Map([['a']])` → `'a' => null`), matching JS `Get(entry, "0"/"1")`.
+  `new Map('')` is an empty map; any other string throws (characters are not entry objects);
+  other non-iterable arguments throw `TypeError('<type> is not iterable')`.
+- **`clear()` empties records in place** (all entries become `null` sentinels, the list keeps its
+  length), so live iterators keep their position and see entries added after the clear — like JS.
+- **`size` is read-only**: writing `$map->size` throws `\TypeError` (JS getter-only accessor);
+  `getOrInsertComputed` passes the canonicalized key (`-0` → `+0`) to the callback.
 - **Key equality is `SameValueZero`**: `NaN` matches `NaN`, `-0` matches `+0`, object keys are
   compared by identity, and string/numeric lookalikes are not equal.
 - **`-0` is canonicalized to `+0`** on insertion (`set`, constructor, `getOrInsert`,

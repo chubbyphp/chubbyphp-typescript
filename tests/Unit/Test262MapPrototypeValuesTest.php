@@ -17,29 +17,25 @@ use PHPUnit\Framework\TestCase;
 final class Test262MapPrototypeValuesTest extends TestCase
 {
     // SKIPPED: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot-set.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: PHP methods are always bound to a Map instance; no generic this without [[MapData]]
     // SKIPPED: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot-weakmap.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: PHP methods are always bound to a Map instance; no generic this without [[MapData]]
     // SKIPPED: test/built-ins/Map/prototype/values/does-not-have-mapdata-internal-slot.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: PHP methods are always bound to a Map instance; no generic this without [[MapData]]
 
     // SKIPPED: test/built-ins/Map/prototype/values/length.js
-    // Reason: property descriptor / function identity tests are not portable to PHP
+    // Reason: function length property descriptor; PHP methods have no such descriptor
     // SKIPPED: test/built-ins/Map/prototype/values/name.js
-    // Reason: property descriptor / function identity tests are not portable to PHP
+    // Reason: function name property descriptor; PHP methods have no such descriptor
     // SKIPPED: test/built-ins/Map/prototype/values/not-a-constructor.js
-    // Reason: property descriptor / function identity tests are not portable to PHP
-    // SKIPPED: test/built-ins/Map/prototype/values/values.js
-    // Reason: property descriptor / function identity tests are not portable to PHP
+    // Reason: [[Construct]] check; PHP methods are not constructible values
 
     /**
      * test/built-ins/Map/prototype/values/returns-iterator-empty.js.
      */
     public function testReturnsIteratorEmpty(): void
     {
-        $map = new Map();
-
-        self::assertFalse($map->values()->valid());
+        self::assertSame([], iterator_to_array((new Map())->values()));
     }
 
     /**
@@ -55,26 +51,31 @@ final class Test262MapPrototypeValuesTest extends TestCase
 
         $iterator = $map->values();
 
-        self::assertTrue($iterator->valid());
-        self::assertSame('foo', $iterator->current());
+        self::assertSame(['foo', $obj, $map], iterator_to_array($iterator));
 
+        // Exhausted iterator (repeated request): JS yields { value: undefined, done: true }.
         $iterator->next();
-        self::assertTrue($iterator->valid());
-        self::assertSame($obj, $iterator->current());
 
-        $iterator->next();
-        self::assertTrue($iterator->valid());
-        self::assertSame($map, $iterator->current());
-
-        $iterator->next();
-        self::assertFalse($iterator->valid());
-        self::assertNull($iterator->current());
-
-        $iterator->next();
         self::assertFalse($iterator->valid());
         self::assertNull($iterator->current());
     }
 
     // SKIPPED: test/built-ins/Map/prototype/values/this-not-object-throw.js
-    // Reason: PHP methods are invoked on Map instances
+    // Reason: PHP methods are always bound to a Map instance; this can never be a non-object
+
+    /**
+     * test/built-ins/Map/prototype/values/values.js.
+     */
+    public function testValues(): void
+    {
+        // Adapted: JS asserts `typeof Map.prototype.values` is "function" plus its property
+        // descriptor; PHP asserts the method returns a \Generator and iterates the values.
+        $map = new Map();
+        $map->set('a', 1);
+
+        $iterator = $map->values();
+
+        self::assertInstanceOf(\Generator::class, $iterator);
+        self::assertSame([1], iterator_to_array($iterator));
+    }
 }

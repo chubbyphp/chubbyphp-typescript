@@ -22,7 +22,7 @@ final class Map implements \Countable, \IteratorAggregate
     private array $entries = [];
 
     /**
-     * @param null|iterable<int, mixed> $entries
+     * @param null|iterable<int, mixed>|string $entries
      */
     public function __construct(mixed $entries = null)
     {
@@ -30,9 +30,18 @@ final class Map implements \Countable, \IteratorAggregate
             return;
         }
 
+        // JS: a string is an iterable of characters, and a character is not an entry object.
+        if (\is_string($entries)) {
+            if ('' === $entries) {
+                return;
+            }
+
+            throw new \TypeError(self::INVALID_ENTRY);
+        }
+
         // @phpstan-ignore-next-line is_iterable (runtime guard for mixed input)
         if (!is_iterable($entries)) {
-            throw new \TypeError(self::INVALID_ENTRY);
+            throw new \TypeError(\sprintf('%s is not iterable', get_debug_type($entries)));
         }
 
         foreach ($entries as $entry) {
@@ -42,11 +51,8 @@ final class Map implements \Countable, \IteratorAggregate
 
             $values = self::entryValues($entry);
 
-            if (\count($values) < 2) {
-                throw new \TypeError(self::INVALID_ENTRY);
-            }
-
-            $this->set($values[0], $values[1]);
+            // JS reads the entry's "0" and "1" properties; missing ones become undefined.
+            $this->set($values[0] ?? null, $values[1] ?? null);
         }
     }
 
@@ -64,6 +70,15 @@ final class Map implements \Countable, \IteratorAggregate
         trigger_error('Undefined property: Map::$'.$name, E_USER_WARNING);
 
         return null;
+    }
+
+    public function __set(string $name, mixed $value): void
+    {
+        if ('size' === $name) {
+            throw new \TypeError('Cannot set property Map::$size which has only a getter');
+        }
+
+        trigger_error('Undefined property: Map::$'.$name, E_USER_WARNING);
     }
 
     /**
@@ -127,7 +142,9 @@ final class Map implements \Countable, \IteratorAggregate
 
     public function clear(): void
     {
-        $this->entries = [];
+        // JS empties the MapData records in place, so live iterators keep their
+        // position and still see entries added after the clear.
+        $this->entries = array_fill(0, \count($this->entries), null);
     }
 
     public function delete(mixed $key): bool
@@ -217,6 +234,9 @@ final class Map implements \Countable, \IteratorAggregate
      */
     public function getOrInsertComputed(mixed $key, callable $callback): mixed
     {
+        // CanonicalizeKeyedCollectionKey happens before the callback is invoked.
+        $key = self::canonicalizeKey($key);
+
         $index = $this->findEntryIndex($key);
 
         if (null !== $index) {
@@ -255,10 +275,7 @@ final class Map implements \Countable, \IteratorAggregate
      */
     public function set(mixed $key, mixed $value): self
     {
-        // ECMAScript canonicalizes -0 to +0 for Map keys.
-        if (\is_float($key) && !is_nan($key) && '-0' === (string) $key) {
-            $key = 0.0;
-        }
+        $key = self::canonicalizeKey($key);
 
         $index = $this->findEntryIndex($key);
 
@@ -329,6 +346,18 @@ final class Map implements \Countable, \IteratorAggregate
         }
 
         return $entry;
+    }
+
+    /**
+     * ECMAScript canonicalizes -0 to +0 for Map keys.
+     */
+    private static function canonicalizeKey(mixed $key): mixed
+    {
+        if (\is_float($key) && !is_nan($key) && '-0' === (string) $key) {
+            return 0.0;
+        }
+
+        return $key;
     }
 
     private static function sameValueZero(mixed $value, mixed $searchElement): bool

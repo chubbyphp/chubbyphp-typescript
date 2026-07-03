@@ -8,7 +8,7 @@ use Chubbyphp\Typescript\Map;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Ported from Test262 Map.prototype[@@iterator] tests.
+ * Ported from Test262 Map.prototype[Symbol.iterator] tests.
  *
  * @covers \Chubbyphp\Typescript\Map
  *
@@ -16,26 +16,22 @@ use PHPUnit\Framework\TestCase;
  */
 final class Test262MapPrototypeIteratorTest extends TestCase
 {
-    // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator/descriptor.js
-    // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
-    // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator/length.js
-    // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
-    // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator/name.js
-    // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
-    // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator/not-a-constructor.js
-    // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
-    // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator.js
-    // Reason: PHP has no Symbol.iterator; function identity / descriptor tests are not portable
-
     /**
      * test/built-ins/Map/prototype/Symbol.iterator.js.
      */
     public function testSymbolIterator(): void
     {
-        $map = new Map([
-            ['a', 1],
-            ['b', 2],
-        ]);
+        // Adapted: JS asserts Map.prototype[Symbol.iterator] === Map.prototype.entries plus its
+        // property descriptor; PHP equivalent: getIterator() / foreach ($map as $entry) yield
+        // the same entry sequence as entries().
+        $map = new Map();
+        $map->set('a', 1);
+        $map->set('b', 2);
+
+        self::assertSame(
+            iterator_to_array($map->entries()),
+            iterator_to_array($map->getIterator()),
+        );
 
         $entries = [];
         foreach ($map as $entry) {
@@ -45,19 +41,6 @@ final class Test262MapPrototypeIteratorTest extends TestCase
         self::assertSame([['a', 1], ['b', 2]], $entries);
     }
 
-    /**
-     * test/built-ins/Map/prototype/Symbol.iterator.js.
-     */
-    public function testDefaultIteratorYieldsSameAsEntries(): void
-    {
-        $map = new Map([
-            ['a', 1],
-            ['b', 2],
-        ]);
-
-        self::assertSame(
-            iterator_to_array($map->entries()),
-            iterator_to_array($map),
-        );
-    }
+    // SKIPPED: test/built-ins/Map/prototype/Symbol.iterator/not-a-constructor.js
+    // Reason: [[Construct]] check; PHP methods are not constructible values
 }

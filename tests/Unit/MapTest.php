@@ -70,12 +70,32 @@ final class MapTest extends TestCase
         self::assertSame([['a', 3], ['b', 2]], $map->toArray());
     }
 
-    public function testMapConstructorThrowsTypeErrorForEntryWithLessThanTwoValues(): void
+    public function testMapConstructorPadsEntryWithSingleValueWithNullValue(): void
     {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Iterator value is not an entry object');
+        $map = new Map([['a', 1], ['b']]);
 
-        new Map([['a', 1], ['b']]);
+        self::assertSame(2, $map->size);
+        self::assertTrue($map->has('b'));
+        self::assertNull($map->get('b'));
+        self::assertSame([['a', 1], ['b', null]], $map->toArray());
+    }
+
+    public function testMapConstructorPadsEmptyEntryWithNullKeyAndValue(): void
+    {
+        $map = new Map([[]]);
+
+        self::assertSame(1, $map->size);
+        self::assertTrue($map->has(null));
+        self::assertNull($map->get(null));
+        self::assertSame([[null, null]], $map->toArray());
+    }
+
+    public function testMapConstructorWithEmptyStringCreatesEmptyMap(): void
+    {
+        $map = new Map('');
+
+        self::assertSame(0, $map->size);
+        self::assertSame([], $map->toArray());
     }
 
     public function testMapConstructorThrowsTypeErrorForStringEntries(): void
@@ -84,6 +104,14 @@ final class MapTest extends TestCase
         $this->expectExceptionMessage('Iterator value is not an entry object');
 
         new Map('abc');
+    }
+
+    public function testMapConstructorThrowsTypeErrorForNonIterableArgument(): void
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('int is not iterable');
+
+        new Map(1);
     }
 
     public function testMapConstructorThrowsTypeErrorForNonIterableEntry(): void
@@ -179,6 +207,52 @@ final class MapTest extends TestCase
         self::assertSame('Undefined property: Map::$unknown', $lastError['message']);
     }
 
+    // __set
+
+    public function testMapSetSizePropertyThrowsTypeError(): void
+    {
+        $map = new Map([['a', 1]]);
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Cannot set property Map::$size which has only a getter');
+
+        $map->size = 5;
+    }
+
+    public function testMapSetSizePropertyDoesNotShadowLiveSize(): void
+    {
+        $map = new Map([['a', 1]]);
+
+        try {
+            $map->size = 5;
+        } catch (\TypeError) {
+        }
+
+        $map->set('b', 2);
+
+        self::assertSame(2, $map->size);
+    }
+
+    public function testMapSetUnknownPropertyTriggersWarningAndStoresNothing(): void
+    {
+        $map = new Map();
+
+        error_clear_last();
+
+        @$map->unknown = 'value';
+
+        $lastError = error_get_last();
+
+        self::assertNotNull($lastError);
+        self::assertArrayHasKey('type', $lastError);
+        self::assertSame(E_USER_WARNING, $lastError['type']);
+        self::assertArrayHasKey('message', $lastError);
+        self::assertSame('Undefined property: Map::$unknown', $lastError['message']);
+
+        self::assertFalse(isset($map->unknown));
+        self::assertNull(@$map->unknown);
+    }
+
     // count
 
     public function testMapCountReturnsSize(): void
@@ -227,8 +301,14 @@ final class MapTest extends TestCase
             yield 3;
         })();
 
-        $grouped = Map::groupBy($items, static fn (int $n): string => 0 === $n % 2 ? 'even' : 'odd');
+        $indexes = [];
+        $grouped = Map::groupBy($items, static function (int $n, int $i) use (&$indexes): string {
+            $indexes[] = $i;
 
+            return 0 === $n % 2 ? 'even' : 'odd';
+        });
+
+        self::assertSame([0, 1, 2], $indexes);
         self::assertSame(2, $grouped->size);
         self::assertSame([2], $grouped->get('even')->toArray());
         self::assertSame([1, 3], $grouped->get('odd')->toArray());
@@ -322,6 +402,42 @@ final class MapTest extends TestCase
         $map->clear();
 
         self::assertSame(0, $map->size);
+    }
+
+    public function testMapClearDuringIterationKeepsIteratorPositionAndSeesNewEntries(): void
+    {
+        $map = new Map([[1, 'a'], [2, 'b'], [3, 'c']]);
+
+        $seen = [];
+        foreach ($map as [$key, $value]) {
+            $seen[] = $key;
+
+            if (1 === $key) {
+                $map->clear();
+                $map->set(9, 'z');
+            }
+        }
+
+        self::assertSame([1, 9], $seen);
+        self::assertSame(1, $map->size);
+        self::assertSame([[9, 'z']], $map->toArray());
+    }
+
+    public function testMapClearDuringForEachKeepsPositionAndSeesNewEntries(): void
+    {
+        $map = new Map([[1, 'a'], [2, 'b']]);
+
+        $seen = [];
+        $map->forEach(static function (string $value, int $key) use (&$seen, $map): void {
+            $seen[] = $key;
+
+            if (1 === $key) {
+                $map->clear();
+                $map->set(8, 'y');
+            }
+        });
+
+        self::assertSame([1, 8], $seen);
     }
 
     // delete
@@ -538,6 +654,36 @@ final class MapTest extends TestCase
         });
 
         self::assertSame('target', $received);
+    }
+
+    public function testMapGetOrInsertComputedPassesCanonicalizedKeyToCallback(): void
+    {
+        $map = new Map();
+
+        $received = null;
+        $map->getOrInsertComputed(-0.0, static function (float $key) use (&$received): string {
+            $received = $key;
+
+            return 'value';
+        });
+
+        self::assertSame('0', (string) $received);
+        self::assertSame('value', $map->get(0.0));
+    }
+
+    public function testMapGetOrInsertComputedOverwritesMutationFromCallback(): void
+    {
+        $map = new Map();
+
+        $value = $map->getOrInsertComputed('a', static function () use ($map): int {
+            $map->set('a', 0);
+
+            return 3;
+        });
+
+        self::assertSame(3, $value);
+        self::assertSame(3, $map->get('a'));
+        self::assertSame(1, $map->size);
     }
 
     public function testMapGetOrInsertComputedDoesNotCallCallbackWhenKeyExists(): void

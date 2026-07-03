@@ -17,31 +17,41 @@ use PHPUnit\Framework\TestCase;
 final class Test262MapPrototypeEntriesTest extends TestCase
 {
     // SKIPPED: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot-set.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: PHP methods are always bound to a Map instance; no generic this without [[MapData]]
     // SKIPPED: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot-weakmap.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: PHP methods are always bound to a Map instance; no generic this without [[MapData]]
     // SKIPPED: test/built-ins/Map/prototype/entries/does-not-have-mapdata-internal-slot.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: PHP methods are always bound to a Map instance; no generic this without [[MapData]]
 
-    // SKIPPED: test/built-ins/Map/prototype/entries/entries.js
-    // Reason: prop-desc descriptor tests are not portable
+    /**
+     * test/built-ins/Map/prototype/entries/entries.js.
+     */
+    public function testEntries(): void
+    {
+        // Adapted: JS asserts `typeof Map.prototype.entries` is "function" plus its property
+        // descriptor; PHP asserts the method returns a \Generator and iterates the entries.
+        $map = new Map();
+        $map->set('a', 1);
+
+        $iterator = $map->entries();
+
+        self::assertInstanceOf(\Generator::class, $iterator);
+        self::assertSame([['a', 1]], iterator_to_array($iterator));
+    }
 
     // SKIPPED: test/built-ins/Map/prototype/entries/length.js
-    // Reason: length/name/not-a-constructor descriptor tests are not portable
+    // Reason: function length property descriptor; PHP methods have no such descriptor
     // SKIPPED: test/built-ins/Map/prototype/entries/name.js
-    // Reason: length/name/not-a-constructor descriptor tests are not portable
+    // Reason: function name property descriptor; PHP methods have no such descriptor
     // SKIPPED: test/built-ins/Map/prototype/entries/not-a-constructor.js
-    // Reason: length/name/not-a-constructor descriptor tests are not portable
+    // Reason: [[Construct]] check; PHP methods are not constructible values
 
     /**
      * test/built-ins/Map/prototype/entries/returns-iterator-empty.js.
      */
     public function testReturnsIteratorEmpty(): void
     {
-        $iterator = (new Map())->entries();
-
-        self::assertNull($iterator->current());
-        self::assertFalse($iterator->valid());
+        self::assertSame([], iterator_to_array((new Map())->entries()));
     }
 
     /**
@@ -56,33 +66,15 @@ final class Test262MapPrototypeEntriesTest extends TestCase
 
         $iterator = $map->entries();
 
-        self::assertSame(['a', 1], $iterator->current());
-        self::assertCount(2, $iterator->current());
-        self::assertTrue($iterator->valid());
+        self::assertSame([['a', 1], ['b', 2], ['c', 3]], iterator_to_array($iterator));
 
+        // Exhausted iterator (repeated request): JS yields { value: undefined, done: true }.
         $iterator->next();
 
-        self::assertSame(['b', 2], $iterator->current());
-        self::assertCount(2, $iterator->current());
-        self::assertTrue($iterator->valid());
-
-        $iterator->next();
-
-        self::assertSame(['c', 3], $iterator->current());
-        self::assertCount(2, $iterator->current());
-        self::assertTrue($iterator->valid());
-
-        $iterator->next();
-
-        self::assertNull($iterator->current());
         self::assertFalse($iterator->valid());
-
-        $iterator->next();
-
         self::assertNull($iterator->current());
-        self::assertFalse($iterator->valid());
     }
 
     // SKIPPED: test/built-ins/Map/prototype/entries/this-not-object-throw.js
-    // Reason: methods are invoked on Map instances, not generic this values
+    // Reason: PHP methods are always bound to a Map instance; this can never be a non-object
 }

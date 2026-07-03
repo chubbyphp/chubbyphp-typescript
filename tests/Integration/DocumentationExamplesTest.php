@@ -471,6 +471,12 @@ final class DocumentationExamplesTest extends TestCase
     {
         self::assertSame(0, (new Map())->size);
         self::assertSame(2, (new Map([['a', 1], ['b', 2]]))->size);
+
+        $shortEntry = new Map([['a']]);
+        self::assertSame(1, $shortEntry->size);
+        self::assertTrue($shortEntry->has('a'));
+        self::assertNull($shortEntry->get('a'));
+
         self::assertSame(0, (new Map(null))->size);
     }
 
