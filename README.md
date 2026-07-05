@@ -40,7 +40,7 @@ composer require chubbyphp/chubbyphp-typescript "^1.0"
 
 ### Arr (Array)
 
-A PHP implementation of the JavaScript `Array` class, including sparse-array semantics and chainable methods. See the [full documentation](doc/Arr.md) for API reference and examples.
+A PHP implementation of the JavaScript `Array` class, including sparse-array semantics and chainable methods. The entire `Array` API is ported except `Array.fromAsync`, which is deliberately omitted (it is built on promises and async iteration, which have no PHP equivalent). See the [full documentation](doc/Arr.md) for API reference and examples.
 
 ```php
 use Chubbyphp\Typescript\Arr;

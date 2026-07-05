@@ -7,6 +7,7 @@
 .gitignore               export-ignore
 .php-cs-fixer.php        export-ignore
 .php_cs                  export-ignore
+AGENTS.md                export-ignore
 infection.json           export-ignore
 LICENSE                  export-ignore
 phpstan.neon             export-ignore

@@ -5,6 +5,7 @@
 - **Generic type**: `@template T` — every `Arr` instance carries a type parameter for its elements.
 - **Internal storage**: `array<int, null|T>` — an ordered, integer-keyed array with sparse-array semantics.
 - **Errors**: Throws `Chubbyphp\Typescript\RangeError` for invalid array lengths and `Chubbyphp\Typescript\NumberFormatError` when locale-based number formatting fails.
+- **Coverage**: The entire JavaScript `Array` API is ported, with one deliberate omission: `Array.fromAsync`, which is built on promises and async iteration and has no PHP equivalent.
 
 ---
 

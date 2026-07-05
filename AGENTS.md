@@ -58,6 +58,11 @@ Quality gates to preserve:
 - `thisArg` support: bind only non-static `Closure` callables via `Closure::bindTo`;
   every other callable type silently ignores `$thisArg`.
 
+## API Coverage
+
+- `Arr` ports the entire JS `Array` API except `Array.fromAsync` (async, deliberately omitted).
+- `Map` ports the entire JS `Map` API including the TC39 upsert proposal (`getOrInsert`, `getOrInsertComputed`).
+
 ## JavaScript Semantics Cheat Sheet (read before touching `src/Arr.php`)
 
 - PHP `null` plays the role of JS `undefined` everywhere.
