@@ -342,7 +342,7 @@ final class Map implements \Countable, \IteratorAggregate
         $entry = $this->entries[$index];
 
         if (null === $entry) {
-            throw new \RuntimeException('Map entry unexpectedly deleted');
+            throw new MapCorruptionError('Map entry unexpectedly deleted');
         }
 
         return $entry;

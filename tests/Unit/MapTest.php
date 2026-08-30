@@ -6,6 +6,7 @@ namespace Chubbyphp\Tests\Typescript\Unit;
 
 use Chubbyphp\Typescript\Arr;
 use Chubbyphp\Typescript\Map;
+use Chubbyphp\Typescript\MapCorruptionError;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -879,7 +880,7 @@ final class MapTest extends TestCase
 
         $method = new \ReflectionMethod($map, 'entryAt');
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(MapCorruptionError::class);
         $this->expectExceptionMessage('Map entry unexpectedly deleted');
 
         $method->invoke($map, 0);

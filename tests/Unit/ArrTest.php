@@ -8,6 +8,7 @@ use Chubbyphp\Tests\Typescript\Stub\Color;
 use Chubbyphp\Tests\Typescript\Stub\Direction;
 use Chubbyphp\Tests\Typescript\Stub\Dummy;
 use Chubbyphp\Typescript\Arr;
+use Chubbyphp\Typescript\InvalidOffsetError;
 use Chubbyphp\Typescript\NumberFormatError;
 use Chubbyphp\Typescript\RangeError;
 use PHPUnit\Framework\TestCase;
@@ -593,7 +594,7 @@ final class ArrTest extends TestCase
     {
         $array = new Arr('a');
 
-        $this->expectException(\Exception::class);
+        $this->expectException(InvalidOffsetError::class);
         $this->expectExceptionMessage('Cannot convert offset to string');
 
         $array->offsetGet(new \stdClass());

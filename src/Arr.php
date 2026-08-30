@@ -82,39 +82,19 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
     public function __set(string $name, mixed $value): void
     {
-        if ('length' === $name) {
-            if (true === $value) {
-                $value = 1;
-            }
-
-            if (false === $value || null === $value) {
-                $value = 0;
-            }
-
-            if (\is_string($value) && self::isIntAsString($value)) {
-                $value = (int) $value;
-            }
-
-            if (!\is_int($value)) {
-                throw new RangeError('Length needs to be an integer');
-            }
-
-            $length = self::validateLength($value);
-
-            if ($length < $this->internalLength) {
-                foreach ($this->internalArray as $i => $_) {
-                    if ($i >= $length) {
-                        unset($this->internalArray[$i]);
-                    }
-                }
-            }
-
-            $this->internalLength = $length;
+        if ('length' !== $name) {
+            trigger_error('Undefined property: Arr::$'.$name, E_USER_WARNING);
 
             return;
         }
 
-        trigger_error('Undefined property: Arr::$'.$name, E_USER_WARNING);
+        $length = self::validateLength(self::coerceLengthToInt($value));
+
+        if ($length < $this->internalLength) {
+            $this->truncate($length);
+        }
+
+        $this->internalLength = $length;
     }
 
     public function __toString(): string
@@ -693,27 +673,14 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     public function reduce(callable $callback, mixed $initialValue = null): mixed
     {
         $len = $this->internalLength;
-        $numArgs = \func_num_args();
-        $accumulator = null;
 
-        if (2 <= $numArgs) {
+        if (2 <= \func_num_args()) {
             $accumulator = $initialValue;
             $i = 0;
         } else {
-            $found = false;
-            for ($i = 0; $i < $len; ++$i) {
-                if (\array_key_exists($i, $this->internalArray)) {
-                    $accumulator = $this->internalArray[$i];
-                    $found = true;
-                    ++$i;
-
-                    break;
-                }
-            }
-
-            if (!$found) {
-                throw new \TypeError('Reduce of empty array with no initial value');
-            }
+            $i = $this->firstPresentIndex(0, 1);
+            $accumulator = $this->internalArray[$i];
+            ++$i;
         }
 
         for (; $i < $len; ++$i) {
@@ -735,28 +702,13 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
      */
     public function reduceRight(callable $callback, mixed $initialValue = null): mixed
     {
-        $len = $this->internalLength;
-        $numArgs = \func_num_args();
-        $accumulator = null;
-
-        if (2 <= $numArgs) {
+        if (2 <= \func_num_args()) {
             $accumulator = $initialValue;
-            $i = $len - 1;
+            $i = $this->internalLength - 1;
         } else {
-            $found = false;
-            for ($i = $len - 1; $i >= 0; --$i) {
-                if (\array_key_exists($i, $this->internalArray)) {
-                    $accumulator = $this->internalArray[$i];
-                    $found = true;
-                    --$i;
-
-                    break;
-                }
-            }
-
-            if (!$found) {
-                throw new \TypeError('Reduce of empty array with no initial value');
-            }
+            $i = $this->firstPresentIndex($this->internalLength - 1, -1);
+            $accumulator = $this->internalArray[$i];
+            --$i;
         }
 
         for (; $i >= 0; --$i) {
@@ -1344,35 +1296,74 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         }
 
         if (\is_float($offset)) {
-            if (self::isIntAsFloat($offset)) {
-                $offset = (int) $offset;
-            } elseif (is_nan($offset)) {
-                // (string) NAN would trigger a coercion warning below
-                return 'NAN';
+            $offset = self::normalizeFloatOffset($offset);
+        }
+
+        if (\is_int($offset)) {
+            return self::isValidIntegerOffset($offset) ? $offset : (string) $offset;
+        }
+
+        return \is_string($offset) ? $offset : self::stringifyOffset($offset);
+    }
+
+    private static function normalizeFloatOffset(float $offset): float|int|string
+    {
+        if (self::isIntAsFloat($offset)) {
+            return (int) $offset;
+        }
+
+        // (string) NAN would trigger a coercion warning in stringifyOffset
+        return is_nan($offset) ? 'NAN' : $offset;
+    }
+
+    private static function stringifyOffset(mixed $offset): string
+    {
+        return match (true) {
+            \is_bool($offset) => $offset ? 'true' : 'false',
+            null === $offset => 'null',
+            \is_scalar($offset), $offset instanceof \Stringable => (string) $offset,
+            default => throw new InvalidOffsetError('Cannot convert offset to string'),
+        };
+    }
+
+    private static function coerceLengthToInt(mixed $value): int
+    {
+        if (\is_bool($value) || null === $value) {
+            return (int) $value;
+        }
+
+        if (\is_string($value) && self::isIntAsString($value)) {
+            return (int) $value;
+        }
+
+        if (!\is_int($value)) {
+            throw new RangeError('Length needs to be an integer');
+        }
+
+        return $value;
+    }
+
+    private function truncate(int $length): void
+    {
+        foreach ($this->internalArray as $i => $_) {
+            if ($i >= $length) {
+                unset($this->internalArray[$i]);
+            }
+        }
+    }
+
+    /**
+     * @param -1|1 $step
+     */
+    private function firstPresentIndex(int $start, int $step): int
+    {
+        for ($i = $start; $i >= 0 && $i < $this->internalLength; $i += $step) {
+            if (\array_key_exists($i, $this->internalArray)) {
+                return $i;
             }
         }
 
-        if (\is_int($offset) && !self::isValidIntegerOffset($offset)) {
-            return (string) $offset;
-        }
-
-        if (\is_int($offset) || \is_string($offset)) {
-            return $offset;
-        }
-
-        if (\is_bool($offset)) {
-            return $offset ? 'true' : 'false';
-        }
-
-        if (null === $offset) {
-            return 'null';
-        }
-
-        if (\is_scalar($offset) || $offset instanceof \Stringable) {
-            return (string) $offset;
-        }
-
-        throw new \Exception('Cannot convert offset to string');
+        throw new \TypeError('Reduce of empty array with no initial value');
     }
 
     private static function isFloatAsString(string $string): bool
