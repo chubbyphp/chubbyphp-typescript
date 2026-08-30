@@ -90,10 +90,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
         $length = self::validateLength(self::coerceLengthToInt($value));
 
-        if ($length < $this->internalLength) {
-            $this->truncate($length);
-        }
-
+        $this->truncate($length);
         $this->internalLength = $length;
     }
 
@@ -286,20 +283,13 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $len = $this->internalLength;
 
-        $to = $target < 0 ? max($len + $target, 0) : min($target, $len);
-        $from = $start < 0 ? max($len + $start, 0) : min($start, $len);
-        $relativeEnd = $end ?? $len;
-        $final = $relativeEnd < 0 ? max($len + $relativeEnd, 0) : min($relativeEnd, $len);
+        $to = self::relativeIndex($target, $len);
+        $from = self::relativeIndex($start, $len);
+        $final = self::relativeIndex($end ?? $len, $len);
 
         $count = min($final - $from, $len - $to);
 
-        $copied = [];
-        for ($i = 0; $i < $count; ++$i) {
-            $fromKey = $from + $i;
-            if (\array_key_exists($fromKey, $this->internalArray)) {
-                $copied[$i] = $this->internalArray[$fromKey];
-            }
-        }
+        $copied = $this->slice($from, $from + $count)->internalArray;
 
         for ($i = 0; $i < $count; ++$i) {
             $toKey = $to + $i;
@@ -330,15 +320,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        $len = $this->internalLength;
-
-        for ($i = 0; $i < $len; ++$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            $value = $this->internalArray[$i];
-
+        foreach ($this->presentEntries() as $i => $value) {
             if (!$callback($value, $i, $this)) {
                 return false;
             }
@@ -354,11 +336,9 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $len = $this->internalLength;
 
-        $i = $start < 0 ? max($len + $start, 0) : min($start, $len);
-        $relativeEnd = $end ?? $len;
-        $final = $relativeEnd < 0 ? max($len + $relativeEnd, 0) : min($relativeEnd, $len);
+        $final = self::relativeIndex($end ?? $len, $len);
 
-        for (; $i < $final; ++$i) {
+        for ($i = self::relativeIndex($start, $len); $i < $final; ++$i) {
             $this->internalArray[$i] = $value;
         }
 
@@ -377,13 +357,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         /** @var self<T> $result */
         $result = new self();
 
-        $len = $this->internalLength;
-        for ($i = 0; $i < $len; ++$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            $value = $this->internalArray[$i];
+        foreach ($this->presentEntries() as $i => $value) {
             if ($callback($value, $i, $this)) {
                 $result->push($value);
             }
@@ -480,13 +454,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         /** @var self<T> $result */
         $result = new self();
 
-        for ($i = 0; $i < $this->internalLength; ++$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            $value = $this->internalArray[$i];
-
+        foreach ($this->presentEntries() as $value) {
             if ($value instanceof self && 0 < $depth) {
                 foreach ($value->flat($depth - 1)->internalArray as $flattenedValue) {
                     $result->push($flattenedValue);
@@ -516,15 +484,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        $len = $this->internalLength;
-
-        for ($i = 0; $i < $len; ++$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            $value = $this->internalArray[$i];
-
+        foreach ($this->presentEntries() as $i => $value) {
             $callback($value, $i, $this);
         }
     }
@@ -533,9 +493,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $len = $this->internalLength;
 
-        $i = $fromIndex < 0 ? max($len + $fromIndex, 0) : $fromIndex;
-
-        for (; $i < $len; ++$i) {
+        for ($i = self::relativeIndex($fromIndex, $len); $i < $len; ++$i) {
             $value = $this->internalArray[$i] ?? null;
 
             if (self::sameValueZero($value, $searchElement)) {
@@ -548,13 +506,8 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
 
     public function indexOf(mixed $searchElement = null, int $fromIndex = 0): int
     {
-        $i = $fromIndex < 0 ? max($this->internalLength + $fromIndex, 0) : $fromIndex;
-
-        for (; $i < $this->internalLength; ++$i) {
-            if (
-                \array_key_exists($i, $this->internalArray)
-                && self::strictlyEqual($this->internalArray[$i], $searchElement)
-            ) {
+        foreach ($this->presentEntries(self::relativeIndex($fromIndex, $this->internalLength)) as $i => $value) {
+            if (self::strictlyEqual($value, $searchElement)) {
                 return $i;
             }
         }
@@ -589,12 +542,13 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $len = $this->internalLength;
 
-        // for an empty array $i ends up at -1, so the loop is skipped
-        $n = $fromIndex ?? $len - 1;
-        $i = $n >= 0 ? min($n, $len - 1) : $len + $n;
+        $start = $fromIndex ?? $len;
+        if ($start < 0) {
+            $start += $len;
+        }
 
-        for (; $i >= 0; --$i) {
-            if (\array_key_exists($i, $this->internalArray) && self::strictlyEqual($this->internalArray[$i], $searchElement)) {
+        foreach ($this->presentEntriesReversed($start) as $i => $value) {
+            if (self::strictlyEqual($value, $searchElement)) {
                 return $i;
             }
         }
@@ -616,15 +570,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         /** @var self<U> $result */
         $result = new self($this->internalLength);
 
-        $len = $this->internalLength;
-
-        for ($i = 0; $i < $len; ++$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            $value = $this->internalArray[$i];
-
+        foreach ($this->presentEntries() as $i => $value) {
             $result->internalArray[$i] = $callback($value, $i, $this);
         }
 
@@ -672,24 +618,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
      */
     public function reduce(callable $callback, mixed $initialValue = null): mixed
     {
-        $len = $this->internalLength;
-
-        if (2 <= \func_num_args()) {
-            $accumulator = $initialValue;
-            $i = 0;
-        } else {
-            $i = $this->firstPresentIndex(0, 1);
-            $accumulator = $this->internalArray[$i];
-            ++$i;
-        }
-
-        for (; $i < $len; ++$i) {
-            if (\array_key_exists($i, $this->internalArray)) {
-                $accumulator = $callback($accumulator, $this->internalArray[$i], $i, $this);
-            }
-        }
-
-        return $accumulator;
+        return $this->reduceEntries($this->presentEntries(), $callback, 2 <= \func_num_args(), $initialValue);
     }
 
     /**
@@ -702,22 +631,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
      */
     public function reduceRight(callable $callback, mixed $initialValue = null): mixed
     {
-        if (2 <= \func_num_args()) {
-            $accumulator = $initialValue;
-            $i = $this->internalLength - 1;
-        } else {
-            $i = $this->firstPresentIndex($this->internalLength - 1, -1);
-            $accumulator = $this->internalArray[$i];
-            --$i;
-        }
-
-        for (; $i >= 0; --$i) {
-            if (\array_key_exists($i, $this->internalArray)) {
-                $accumulator = $callback($accumulator, $this->internalArray[$i], $i, $this);
-            }
-        }
-
-        return $accumulator;
+        return $this->reduceEntries($this->presentEntriesReversed($this->internalLength), $callback, 2 <= \func_num_args(), $initialValue);
     }
 
     /**
@@ -765,18 +679,8 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $len = $this->internalLength;
 
-        if (null === $end) {
-            $end = $len;
-        } elseif ($end < 0) {
-            $end = max(0, $len + $end);
-        }
-
-        if ($start < 0) {
-            $start = max(0, $len + $start);
-        }
-
-        $start = min($start, $len);
-        $end = min($end, $len);
+        $start = self::relativeIndex($start, $len);
+        $end = self::relativeIndex($end ?? $len, $len);
 
         /** @var self<T> $new */
         $new = new self(max(0, $end - $start));
@@ -797,15 +701,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         $callback = self::bindCallback($callback, $thisArg);
 
-        $len = $this->internalLength;
-
-        for ($i = 0; $i < $len; ++$i) {
-            if (!\array_key_exists($i, $this->internalArray)) {
-                continue;
-            }
-
-            $value = $this->internalArray[$i];
-
+        foreach ($this->presentEntries() as $i => $value) {
             if ($callback($value, $i, $this)) {
                 return true;
             }
@@ -823,12 +719,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     {
         // collect values in index order (not internal key order) so the
         // stable sort preserves index order for equal elements, like JS
-        $values = [];
-        for ($i = 0; $i < $this->internalLength; ++$i) {
-            if (\array_key_exists($i, $this->internalArray)) {
-                $values[] = $this->internalArray[$i];
-            }
-        }
+        $values = [...$this->presentEntries()];
 
         $this->internalArray = self::sortValues($values, $callback);
 
@@ -845,11 +736,7 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
         $len = $this->internalLength;
         $numArgs = \func_num_args();
 
-        if ($start < 0) {
-            $start = max(0, $len + $start);
-        }
-
-        $start = min($start, $len);
+        $start = self::relativeIndex($start, $len);
 
         $deleteCount = match (true) {
             2 > $numArgs => $len - $start,
@@ -1353,17 +1240,70 @@ final class Arr implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSe
     }
 
     /**
-     * @param -1|1 $step
+     * Yields the present (non-hole) entries in index order; the length is
+     * captured up front while presence is checked live, like the JS iteration
+     * semantics for callbacks that mutate the array.
+     *
+     * @return \Generator<int, null|T, mixed, void>
      */
-    private function firstPresentIndex(int $start, int $step): int
+    private function presentEntries(int $start = 0): \Generator
     {
-        for ($i = $start; $i >= 0 && $i < $this->internalLength; $i += $step) {
+        $len = $this->internalLength;
+
+        for ($i = $start; $i < $len; ++$i) {
             if (\array_key_exists($i, $this->internalArray)) {
-                return $i;
+                yield $i => $this->internalArray[$i];
+            }
+        }
+    }
+
+    /**
+     * Like presentEntries but from min($start, length - 1) down to 0.
+     *
+     * @return \Generator<int, null|T, mixed, void>
+     */
+    private function presentEntriesReversed(int $start): \Generator
+    {
+        for ($i = min($start, $this->internalLength - 1); $i >= 0; --$i) {
+            if (\array_key_exists($i, $this->internalArray)) {
+                yield $i => $this->internalArray[$i];
+            }
+        }
+    }
+
+    /**
+     * @template U
+     *
+     * @param iterable<int, null|T>                         $entries
+     * @param callable((null|T)|U, null|T, int, self<T>): U $callback
+     * @param U                                             $accumulator
+     *
+     * @return (null|T)|U
+     */
+    private function reduceEntries(iterable $entries, callable $callback, bool $hasInitialValue, mixed $accumulator): mixed
+    {
+        foreach ($entries as $i => $value) {
+            if ($hasInitialValue) {
+                $accumulator = $callback($accumulator, $value, $i, $this);
+            } else {
+                $accumulator = $value;
+                $hasInitialValue = true;
             }
         }
 
-        throw new \TypeError('Reduce of empty array with no initial value');
+        if (!$hasInitialValue) {
+            throw new \TypeError('Reduce of empty array with no initial value');
+        }
+
+        return $accumulator;
+    }
+
+    /**
+     * Resolves a possibly negative relative index to an absolute one clamped to [0, $len].
+     */
+    private static function relativeIndex(int $relative, int $len): int
+    {
+        return $relative < 0 ? max($len + $relative, 0) : min($relative, $len);
     }
 
     private static function isFloatAsString(string $string): bool

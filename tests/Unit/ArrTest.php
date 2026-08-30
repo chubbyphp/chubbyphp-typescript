@@ -590,6 +590,22 @@ final class ArrTest extends TestCase
         self::assertFalse(isset($array['null']));
     }
 
+    public function testArrayAccessAcceptsStringableOffset(): void
+    {
+        $array = new Arr('a');
+        $offset = new class implements \Stringable {
+            public function __toString(): string
+            {
+                return 'foo';
+            }
+        };
+
+        $array[$offset] = 'bar';
+
+        self::assertSame('bar', $array['foo']);
+        self::assertSame('bar', $array[$offset]);
+    }
+
     public function testArrayAccessThrowsForNonStringableOffset(): void
     {
         $array = new Arr('a');

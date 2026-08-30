@@ -20,9 +20,10 @@ final class FloatToString
             return INF === $value ? 'Infinity' : '-Infinity';
         }
 
-        $sign = $value < 0 ? '-' : '';
+        // abs() also normalizes -0.0 to 0.0, so zero never gets a sign
+        $absolute = abs($value);
 
-        return 0.0 === $value ? '0' : $sign.self::formatAbsolute(abs($value));
+        return ($absolute === $value ? '' : '-').self::formatAbsolute($absolute);
     }
 
     private static function formatAbsolute(float $value): string
@@ -40,33 +41,40 @@ final class FloatToString
             return $raw;
         }
 
+        // var_export always emits a signed exponent, e.g. "1.5E+25" or "1.0E-7"
         [$mantissa, $exponent] = explode('E', $raw);
 
-        $digits = str_replace('.', '', rtrim(rtrim($mantissa, '0'), '.'));
+        // $value === {$digits[0]}.{$digits[1:]} * 10 ** $exponent
+        $digits = str_replace('.', '', rtrim($mantissa, '0'));
 
-        // $value === 0.{$digits} * 10 ** $pointPosition
-        $pointPosition = (int) $exponent + 1;
-
-        // fixed notation between 1e-6 and 1e21, exponential notation beyond
-        return -6 < $pointPosition && $pointPosition <= 21
-            ? self::fixedNotation($digits, $pointPosition)
-            : self::exponentialNotation($digits, $pointPosition - 1);
+        return str_starts_with($exponent, '-')
+            ? self::formatSmall($digits, (int) $exponent)
+            : self::formatLarge($digits, (int) $exponent);
     }
 
-    private static function fixedNotation(string $digits, int $pointPosition): string
+    /**
+     * Fixed notation down to 1e-6, exponential notation below.
+     */
+    private static function formatSmall(string $digits, int $exponent): string
     {
-        $digitCount = \strlen($digits);
+        return -7 < $exponent
+            ? '0.'.str_repeat('0', -$exponent - 1).$digits
+            : self::exponentialNotation($digits, $exponent);
+    }
 
-        if ($digitCount <= $pointPosition) {
-            return $digits.str_repeat('0', $pointPosition - $digitCount);
-        }
-
-        return '0.'.str_repeat('0', -$pointPosition).$digits;
+    /**
+     * Fixed notation up to 1e21 (exclusive), exponential notation beyond.
+     */
+    private static function formatLarge(string $digits, int $exponent): string
+    {
+        return $exponent < 21
+            ? $digits.str_repeat('0', $exponent + 1 - \strlen($digits))
+            : self::exponentialNotation($digits, $exponent);
     }
 
     private static function exponentialNotation(string $digits, int $e): string
     {
-        $exponentPart = 'e'.(0 <= $e ? '+' : '-').abs($e);
+        $exponentPart = \sprintf('e%+d', $e);
 
         if (1 === \strlen($digits)) {
             return $digits.$exponentPart;
