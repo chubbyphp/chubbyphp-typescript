@@ -161,7 +161,6 @@ final class Test262MapPrototypeGetOrInsertComputedTest extends TestCase
     {
         $map = new Map();
 
-        $args = null;
         $map->getOrInsertComputed(1, static function (mixed ...$receivedArgs) use (&$args): void {
             $args = $receivedArgs;
         });

@@ -113,8 +113,6 @@ final class Test262ArrayPrototypeFindIndexTest extends TestCase
      */
     public function testPredicateCallThisNonStrict(): void
     {
-        $result = null;
-
         Arr::of(1)->findIndex(function () use (&$result) {
             $result = $this;
 

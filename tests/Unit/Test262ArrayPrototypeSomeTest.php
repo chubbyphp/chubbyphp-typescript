@@ -939,7 +939,6 @@ final class Test262ArrayPrototypeSomeTest extends TestCase
     {
         $arr = new Arr(0, 1, 2, 3, 4, 5);
         $lastIdx = 0;
-        $called = 0;
 
         $callbackfn = static function (int $val, int $idx) use (&$lastIdx, &$called): bool {
             ++$called;

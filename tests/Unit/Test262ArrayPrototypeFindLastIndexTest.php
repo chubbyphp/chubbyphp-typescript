@@ -115,8 +115,6 @@ final class Test262ArrayPrototypeFindLastIndexTest extends TestCase
      */
     public function testPredicateCallThisNonStrict(): void
     {
-        $result = null;
-
         Arr::of(1)->findLastIndex(function () use (&$result) {
             $result = $this;
 

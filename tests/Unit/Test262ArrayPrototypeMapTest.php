@@ -1027,7 +1027,6 @@ final class Test262ArrayPrototypeMapTest extends TestCase
     {
         $arr = new Arr(0, 1, 2, 3, 4, 5);
         $lastIdx = 0;
-        $called = 0;
         $result = true;
 
         $callbackfn = static function (int $val, int $idx) use (&$lastIdx, &$called, &$result): void {

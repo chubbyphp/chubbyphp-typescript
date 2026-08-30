@@ -20,11 +20,9 @@ final class FloatToString
             return INF === $value ? 'Infinity' : '-Infinity';
         }
 
-        if (0.0 === $value) {
-            return '0';
-        }
+        $sign = $value < 0 ? '-' : '';
 
-        return ($value < 0 ? '-' : '').self::formatAbsolute(abs($value));
+        return 0.0 === $value ? '0' : $sign.self::formatAbsolute(abs($value));
     }
 
     private static function formatAbsolute(float $value): string
@@ -50,11 +48,9 @@ final class FloatToString
         $pointPosition = (int) $exponent + 1;
 
         // fixed notation between 1e-6 and 1e21, exponential notation beyond
-        if (-6 < $pointPosition && $pointPosition <= 21) {
-            return self::fixedNotation($digits, $pointPosition);
-        }
-
-        return self::exponentialNotation($digits, $pointPosition - 1);
+        return -6 < $pointPosition && $pointPosition <= 21
+            ? self::fixedNotation($digits, $pointPosition)
+            : self::exponentialNotation($digits, $pointPosition - 1);
     }
 
     private static function fixedNotation(string $digits, int $pointPosition): string

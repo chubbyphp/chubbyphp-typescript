@@ -267,7 +267,6 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     {
         // Adapted: when thisArg is not passed a non-static Closure keeps its original
         // $this (the JS test expects the global object rather than a local binding).
-        $result = null;
 
         $callbackfn = function () use (&$result): void {
             $result = $this;
@@ -1053,7 +1052,6 @@ final class Test262ArrayPrototypeForEachTest extends TestCase
     {
         $arr = new Arr(0, 1, 2, 3, 4, 5);
         $lastIdx = 0;
-        $called = 0;
         $result = true;
 
         $callbackfn = static function (mixed $val, int $idx) use (&$lastIdx, &$called, &$result): void {
