@@ -109,8 +109,8 @@ final class Map implements \Countable, \IteratorAggregate
      * @template GK
      * @template GV
      *
-     * @param Arr<GV>|iterable<int, GV> $items
-     * @param callable(GV, int): GK     $callback
+     * @param iterable<int, GV>     $items
+     * @param callable(GV, int): GK $callback
      *
      * @return self<GK, Arr<GV>>
      */
@@ -119,22 +119,12 @@ final class Map implements \Countable, \IteratorAggregate
         /** @var self<GK, Arr<GV>> $map */
         $map = new self();
 
-        if ($items instanceof Arr) {
-            $length = $items->length;
+        $i = 0;
 
-            for ($i = 0; $i < $length; ++$i) {
-                $value = $items[$i];
-                $key = $callback($value, $i);
-                self::appendToGroup($map, $key, $value);
-            }
-        } else {
-            $i = 0;
-
-            foreach ($items as $value) {
-                $key = $callback($value, $i);
-                self::appendToGroup($map, $key, $value);
-                ++$i;
-            }
+        foreach ($items as $value) {
+            $key = $callback($value, $i);
+            self::appendToGroup($map, $key, $value);
+            ++$i;
         }
 
         return $map;
